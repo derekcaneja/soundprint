@@ -13,6 +13,20 @@ var ApplicationView = Backbone.View.extend({
 		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
 
 		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
+
+		this.count = 0;
+	},
+	play: function() {
+		this.interval = setInterval(function(){
+			toneMatrix1.play(application.count);
+			toneMatrix2.play(application.count);
+			toneMatrix3.play(application.count);
+			toneMatrix4.play(application.count);
+			application.count++;
+		}, 125);
+	},
+	stop: function() {
+		clearInterval(this.interval);
 	}
 });
 
@@ -33,9 +47,13 @@ var ToneMatrixView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'square-container',
 	initialize: function() {
+		_.bindAll(this, 'play')
+
 		this.$el.append('<div class="square"></div><div class="tool-container"></div>');
 		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="tools"></div>');
-		this.$('.tools').append('<div class="knob"></div>');
+		
+		var knob = new KnobView();
+		this.$('.tools').append(knob.el);
 
 		this.$('.square').append('<table class="tablegrid" data-table-name="' + this.model.get('title') + '"></table>');
 
@@ -48,9 +66,38 @@ var ToneMatrixView = Backbone.View.extend({
 
 			this.$('.tablegrid').append(row);
 		}
+	},
+	render: function() {
+
+	},
+	events: {
+
+	},
+	play: function(interval) {
+		this.$('tr').each(function(index){
+			if(index == (interval - 1) % 12) $(this).children().css({ background: 'rgba(255, 255, 255, 0.25)' });
+			else $(this).children().css({ background: 'none' });
+		});
 	}
 });
 
 
+// Knob View
+//-----------------------------------------//
+var KnobView = Backbone.View.extend({
+	tagName: 'div',
+	className: 'knob',
+	initialize: function() {
 
-	
+	}
+});
+
+// Slider View
+//-----------------------------------------//
+var SliderView = Backbone.View.extend({
+	tagName: 'div',
+	className: 'slider',
+	initialize: function() {
+
+	}
+});
