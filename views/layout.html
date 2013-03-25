@@ -1,13 +1,67 @@
 <html>
 	 <head>
 	  	<title>{{title}}</title>
+	  	<link rel="stylesheet" href="css/style.css">
 	</head>
-	<body></body>
-	<script src="js/libs/jquery/jquery.js"></script>
-	<script src="js/libs/backbone/underscore.min.js"></script>
-	<script src="js/libs/backbone/backbone.min.js"></script>
-	<script src="js/libs/timbre/timbre.js"></script>
-	<script src="js/models.js"></script>
+
+	<body>
+		<header class="header">
+			<div class="logo-container">
+				<div class="handprint-logo"></div>
+				<span>|</span>
+				<h1>Soundprint</h1>
+			</div>
+		</header>
+		<div class="content-wrapper">
+			<div class="square-wrapper">
+				<!-- <div class="square-container selected"><div class="square"></div><h3>Bass</h3></div>
+				<div class="square-container"><div class="square"></div><h3>Rhythm</h3></div>
+				<div class="square-container"><div class="square"></div><h3>Harmony</h3></div>
+				<div class="square-container"><div class="square"></div><h3>Farts</h3></div> -->
+			</div>
+			<!-- <div class="tool-container">
+				<div class="knob"></div>
+				<div class="knob"></div>
+				<div class="knob"></div>
+			</div> -->
+			<!-- <div class="share">
+				<div class="share-icon"></div><!-- <span>Share on Twitter!</span>
+			</div> --> 
+		</div>
+	</body>
+	<script src="js/jquery.js"></script>
+	<script src="js/compatibility.js"></script>
+	<script src="js/detection.js"></script>
+	<script src="js/jquery.detection.js"></script>
+	<script src="js/face.detection.js"></script>
+	<script src="js/timbre.js"></script>
+	<script src="js/VideoCapture.js"></script>
+	<script src="js/ImageProcessor.js"></script>
+	<script src="js/ToneMatrix.js"></script>
+	<script src="js/MixBoard.js"></script>
+		<script src="js/models.js"></script>
 	<script src="js/views.js"></script>
 	<script src="js/application.js"></script>
+	<!--<script src="js/backbone.min.js"></script>-->
+	<script>
+		var squareSize = 23/100 * $(window).width() * 92/100;
+		var toneMatrix1    = new ToneMatrix({ width: squareSize, height: squareSize, color: '#3498DB', instrument: 'PluckGen', title: 'Bass' });
+		var toneMatrix2    = new ToneMatrix({ width: squareSize, height: squareSize, color: '#2ECC71', instrument: 'PluckGen', title: 'Rhythm' });
+		var toneMatrix3    = new ToneMatrix({ width: squareSize, height: squareSize, color: '#F39C12', instrument: 'PluckGen', title: 'Harmony' });
+		var toneMatrix4    = new ToneMatrix({ width: squareSize, height: squareSize, color: '#E74C3C', instrument: 'PluckGen', title: 'Farts' });
+		// var imageProcessor = new ImageProcessor();
+		// var videoCapture   = new VideoCapture({ width: 320, height: 240, start: true, fps: 8 });
+
+		// var mixBoard = new MixBoard({ input: T('PluckGen').play() });
+		$('.square').height($('.square-container').width());
+		$('.tablegrid').outerHeight($('.square-container').width());
+		//$('.square').children('tbody').outerHeight($('.square-container').width());
+		// var Tools = Backbone.Model.extend({
+		// 	defaults: {
+		// 		label			: null,
+		// 		attributes		: null
+		// 	}
+		// });
+		//$('#Bass').parent().addClass('selected');
+    </script>
 </html>
