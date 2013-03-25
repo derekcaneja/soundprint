@@ -29,21 +29,25 @@
 			</div> --> 
 		</div>
 	</body>
-	<script src="js/jquery.js"></script>
-	<script src="js/compatibility.js"></script>
+	<script src="js/libs/jquery/jquery.js"></script>
+	<script src="js/libs/jquery/jquery.knob.js"></script>
+<!--	<script src="js/compatibility.js"></script>
 	<script src="js/detection.js"></script>
 	<script src="js/jquery.detection.js"></script>
 	<script src="js/face.detection.js"></script>
 	<script src="js/timbre.js"></script>
 	<script src="js/VideoCapture.js"></script>
 	<script src="js/ImageProcessor.js"></script>
-	<script src="js/ToneMatrix.js"></script>
-	<script src="js/MixBoard.js"></script>
-		<script src="js/models.js"></script>
-	<script src="js/views.js"></script>
+	
+	<script src="js/MixBoard.js"></script>-->
+	<script src="js/libs/backbone/backbone.min.js"></script>
+	<script src="js/libs/backbone/underscore.min.js"></script>
 	<script src="js/application.js"></script>
-	<!--<script src="js/backbone.min.js"></script>-->
+	<script src="js/models.js"></script>
+	<script src="js/views.js"></script>
+	<script src="js/ToneMatrix.js"></script>
 	<script>
+		
 		var squareSize = 23/100 * $(window).width() * 92/100;
 		var toneMatrix1    = new ToneMatrix({ width: squareSize, height: squareSize, color: '#3498DB', instrument: 'PluckGen', title: 'Bass' });
 		var toneMatrix2    = new ToneMatrix({ width: squareSize, height: squareSize, color: '#2ECC71', instrument: 'PluckGen', title: 'Rhythm' });
@@ -55,6 +59,29 @@
 		// var mixBoard = new MixBoard({ input: T('PluckGen').play() });
 		$('.square').height($('.square-container').width());
 		$('.tablegrid').outerHeight($('.square-container').width());
+		$('.square-container').mouseenter(function(){
+			$(this).addClass('square-container-hover');
+		});
+		$('.square-container').mouseleave(function(){
+			$(this).removeClass('square-container-hover');
+		});
+		var flag_dragging = false;//counter Chrome dragging/text selection issue
+		$(".knob-container").mouseover(function(){
+		    document.onselectstart = function(){ return false; };
+		}).mouseout(function(){
+		    if(!flag_dragging){
+		        document.onselectstart = null;
+		    }
+		});
+
+		// //make them draggable
+		// $(".knob-container").draggable({
+		//     start: function(event, ui){
+		//         flag_dragging = true;
+		//     }, stop: function(event, ui){
+		//         flag_dragging = false;
+		//     }
+		// });
 		//$('.square').children('tbody').outerHeight($('.square-container').width());
 		// var Tools = Backbone.Model.extend({
 		// 	defaults: {
