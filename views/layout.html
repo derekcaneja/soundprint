@@ -31,6 +31,7 @@
 	</body>
 	<script src="js/libs/jquery/jquery.js"></script>
 	<script src="js/libs/jquery/jquery.knob.js"></script>
+	<script src="js/libs/jquery/jquery.transit.min.js"></script>
 <!--	<script src="js/compatibility.js"></script>
 	<script src="js/detection.js"></script>
 	<script src="js/jquery.detection.js"></script>
@@ -61,9 +62,12 @@
 		$('.tablegrid').outerHeight($('.square-container').width());
 		$('.square-container').mouseenter(function(){
 			$(this).addClass('square-container-hover');
+			//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
 		});
 		$('.square-container').mouseleave(function(){
+			//$('.square-container').transition({opacity: 1});
 			$(this).removeClass('square-container-hover');
+			
 		});
 		var flag_dragging = false;//counter Chrome dragging/text selection issue
 		$(".knob-container").mouseover(function(){
@@ -82,13 +86,5 @@
 		//         flag_dragging = false;
 		//     }
 		// });
-		//$('.square').children('tbody').outerHeight($('.square-container').width());
-		// var Tools = Backbone.Model.extend({
-		// 	defaults: {
-		// 		label			: null,
-		// 		attributes		: null
-		// 	}
-		// });
-		//$('#Bass').parent().addClass('selected');
     </script>
 </html>
