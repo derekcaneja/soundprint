@@ -3,6 +3,8 @@ var ToneMatrix = function(options) {
 	// Check for options and give blank JSON if none
 	options = (options) ? options : {};
 
+	//console.log(options.width);
+
 	// Defaults
 	this.matrix 	= (options.matrix) 	   ? options.matrix     : [[00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11],[11, 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10],[10, 11, 00, 03, 02, 03, 04, 05, 06, 07, 08, 09],[09, 10, 11, 00, 01, 02, 03, 04, 05, 06, 07, 08],[08, 09, 10, 11, 00, 01, 02, 03, 04, 05, 06, 07],[07, 08, 09, 10, 11, 00, 01, 02, 03, 04, 05, 06],[06, 07, 08, 09, 10, 11, 00, 01, 02, 03, 04, 05],[05, 06, 07, 08, 09, 10, 11, 00, 01, 02, 03, 04],[04, 05, 06, 07, 08, 09, 10, 11, 00, 01, 02, 03],[03, 04, 05, 06, 07, 08, 09, 10, 11, 00, 01, 02],[02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 00, 01],[01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 00]];
 	this.BPM   		= (options.BPM)    	   ? options.BPM 	    : 0;
@@ -10,6 +12,10 @@ var ToneMatrix = function(options) {
 	this.instrument = (options.instrument) ? options.instrument : null;
 	this.width 		= (options.width)  	   ? options.width  	: 640;
 	this.height 	= (options.height) 	   ? options.height 	: 480;
+	this.title      = (options.title)	   ? options.title		: 'New Tone Matrix';
+	this.line       = (options.line)	   ? options.line 		: 'rgba(255, 255, 255, 0.25)';
+
+	this.textColor = this.color.substring(1);
 
 	this.column = 0;
 	// this.output = null;
@@ -90,5 +96,14 @@ ToneMatrix.prototype.draw = function() {
 		context.closePath();
 	}
 
-	$('body').append(canvas);
+	$('.square-wrapper').append('<div class="square-container"><div class="square" id="' + this.title + '"></div><div class="tool-container"><h3 style="color: #' + this.textColor + ';">' + this.title + '</h3><div class="tools"><div class="knob"></div</div>></div>');
+	//console.log(this.textColor);
+	$('#' + this.title).append('<table class="tablegrid" data-table-name="' + this.title + '"></table>');
+
+	for(var i = 0; i < 12; i++) {
+		var row = $('<tr data-sqtype="' + this.title + '"></tr>');
+		for(var x = 0; x < 12; x++) row.append('<td></td>');
+		row.appendTo('#' + this.title + ' table');
+	}
+
 }
