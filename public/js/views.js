@@ -23,7 +23,7 @@ var ApplicationView = Backbone.View.extend({
 			toneMatrix3.play(application.count);
 			toneMatrix4.play(application.count);
 			application.count++;
-		}, 125);
+		}, 150);
 	},
 	stop: function() {
 		clearInterval(this.interval);
@@ -50,7 +50,7 @@ var ToneMatrixView = Backbone.View.extend({
 		_.bindAll(this, 'play')
 		this.$el.attr('rel', this.model.get('title'));
 		this.$el.append('<div class="square"></div><div class="tool-container"></div>');
-		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="tools"><div class="tool-row" tool-row="1"></div></div>');
+		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><select name="pretty" tabindex="1" class="dk_theme_default dk_container dk"></select><div class="tools"><div class="tool-row" tool-row="1"></div></div>');
 		//var knob = ;
 		var knob2 = new Knob();
 		var knob3 = new Knob();
@@ -58,11 +58,12 @@ var ToneMatrixView = Backbone.View.extend({
 		var delay = new KnobView({ model:new Knob({title: 'Delay'}) });
 		var gain = new KnobView({ model:new Knob({title: 'Gain'}) });
 
-		var balance = new SliderView({ model:new Slider({type: 'balance'})});
+		var balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
+		var volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
 
 		this.$('.tool-row').append(reverb.el, delay.el, gain.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
-		this.$('.tool-row:nth-of-type(2)').append(balance.el);
+		this.$('.tool-row:nth-of-type(2)').append(balance.el, volume.el);
 		// this.$('.tool-row').append(delay.el);
 		// this.$('.tool-row').append(gain.el);
 
@@ -135,7 +136,9 @@ var SliderView = Backbone.View.extend({
 	className: 'slider-container',
 	initialize: function() {
 		this.$el.attr('rel', this.model.get('type'))
-		this.$el.append('<div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 50%;"></a></div>');
+		this.$el.append('<span class="balance-lr">L</span><div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 50%;"></a></div><span class="balance-lr">R</span><h5>' + this.model.get('title') + '</h5>');
+		this.handleColor = this.model.get('handlecolor');
+		//this.handleColor = jQuery.Color(this.handleColor).lightness('.45').saturation('.3');
 		if(this.$el.attr('rel') == 'balance'){
 			this.$('.slider').slider({
 		        min: 1,
@@ -143,6 +146,17 @@ var SliderView = Backbone.View.extend({
 		        value: 3,
 		        orientation: "horizontal",
 	   	 	});
+		}
+		if(this.$el.attr('rel') == 'volume'){
+			this.$('.slider').slider({
+		        min: 0,
+		        max: 10,
+		        value: 5,
+		        orientation: "horizontal",
+		        range: 'min',
+	   	 	});
+	   	 	this.$('.ui-slider-range').css({'background-color': this.model.get('color')});
+	   	 	this.$('.ui-slider-handle').css({'background-color': this.handleColor});
 		}
 	},
 	render: function() {

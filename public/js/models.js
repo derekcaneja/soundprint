@@ -5,7 +5,8 @@
 var ToneMatrix =  Backbone.Model.extend({
 	defaults: {
 		title 		: 'New Tone Matrix',
-		color 		: '#FFFFFF'
+		color 		: '#FFFFFF',
+		gridcolor   : '#cccccc',
 	}
 });
 var Knob = Backbone.Model.extend({
@@ -18,6 +19,7 @@ var Slider = Backbone.Model.extend({
 	defaults: {
 		title		: 'Slider',
 		value		: '0',
-		type		: null
+		type		: null,
+		color		: '#1abc9c',
 	}
 });
