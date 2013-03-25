@@ -2,24 +2,19 @@
 	 <head>
 	  	<title>{{title}}</title>
 	  	<link rel="stylesheet" href="css/style.css">
-	  	<style>
-	  		.knob {
-	  			rotation-point: 50% 50%;
-	  		}
-	  		.knob-dot {
-	  			width: 20px;
-	  			height: 20px;
-	  			border-radius: 50%;
-	  			background: blue;
-	  			position: relative;
-	  		}
-	  	</style>
 	</head>
 	<body></body>
 	<script src="js/libs/jquery/jquery.js"></script>
 	<script src="js/libs/backbone/underscore.min.js"></script>
 	<script src="js/libs/backbone/backbone.min.js"></script>
+	<script src="js/libs/socket.io/socket.io.js"></script>
 	<script src="js/models.js"></script>
 	<script src="js/views.js"></script>
 	<script src="js/application.js"></script>
+	<script>
+		var socket = io.connect('http://localhost:3000');
+		socket.on('data', function (data) {
+			console.log(data);
+		});
+	</script>
 </html>

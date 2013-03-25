@@ -1,9 +1,16 @@
+//-----------------------------------------//
+//-------------Node Application------------//
+//-----------------------------------------//
 
 var express = require('express')
-  , routes = require('./routes')
-  , http = require('http')
-  , path = require('path');
+  , routes  = require('./routes')
+  , http    = require('http')
+  , path    = require('path')
+  , io      = require('socket.io');
 
+
+// Express
+//-----------------------------------------//
 var app = express();
 
 app.configure(function(){
@@ -25,6 +32,15 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
+});
+
+
+// Socket.io
+//-----------------------------------------//
+var socket = io.listen(server);
+
+socket.on('connection', function (socket) {
+  socket.emit('data', { data: 'data' });
 });
