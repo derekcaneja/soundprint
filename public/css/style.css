@@ -6448,7 +6448,6 @@ header.header .navbar-inner {
   width: 23.490628%;
   margin: 0 10px;
   height: 250px;
-  cursor: pointer;
 }
 .content-wrapper .square-wrapper .square-container h3 {
   margin: 2px 0 0 0;
@@ -6472,10 +6471,11 @@ header.header .navbar-inner {
   -webkit-box-shadow: 0px 0px 0px 4px transparent;
   -moz-box-shadow: 0px 0px 0px 4px transparent;
   box-shadow: 0px 0px 0px 4px transparent;
-  -webkit-transition: box-shadow 0.2s ease;
-  -moz-transition: box-shadow 0.2s ease;
-  -o-transition: box-shadow 0.2s ease;
-  transition: box-shadow 0.2s ease;
+  -webkit-transition: box-shadow 0.2s ease-out;
+  -moz-transition: box-shadow 0.2s ease-out;
+  -o-transition: box-shadow 0.2s ease-out;
+  transition: box-shadow 0.2s ease-out;
+  cursor: pointer;
 }
 .content-wrapper .square-wrapper .tablegrid {
   width: 100%;
@@ -6538,23 +6538,77 @@ header.header .navbar-inner {
 .content-wrapper .square-wrapper .square-container:nth-of-type(2) .square {
   background: #2ECC71;
 }
-.content-wrapper .square-wrapper .square-container:nth-of-type(2):hover .square {
+.content-wrapper .square-wrapper .square-container-hover[rel="Bass"] .square {
+  -webkit-box-shadow: 0px 0px 0px 4px #2980b9;
+  -moz-box-shadow: 0px 0px 0px 4px #2980b9;
+  box-shadow: 0px 0px 0px 4px #2980b9;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
+}
+.content-wrapper .square-wrapper .square-container-hover[rel="Bass"] .tool-container {
+  -webkit-box-shadow: 0px 2px 0px 4px #2980b9;
+  -moz-box-shadow: 0px 2px 0px 4px #2980b9;
+  box-shadow: 0px 2px 0px 4px #2980b9;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
+}
+.content-wrapper .square-wrapper .square-container-hover[rel="Rhythm"] .square {
   -webkit-box-shadow: 0px 0px 0px 4px #27ae60;
   -moz-box-shadow: 0px 0px 0px 4px #27ae60;
   box-shadow: 0px 0px 0px 4px #27ae60;
-  -webkit-transition: box-shadow 0.2s ease;
-  -moz-transition: box-shadow 0.2s ease;
-  -o-transition: box-shadow 0.2s ease;
-  transition: box-shadow 0.2s ease;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
 }
-.content-wrapper .square-wrapper .square-container:nth-of-type(2):hover .tool-container {
+.content-wrapper .square-wrapper .square-container-hover[rel="Rhythm"] .tool-container {
   -webkit-box-shadow: 0px 2px 0px 4px #27ae60;
   -moz-box-shadow: 0px 2px 0px 4px #27ae60;
   box-shadow: 0px 2px 0px 4px #27ae60;
-  -webkit-transition: box-shadow 0.2s ease;
-  -moz-transition: box-shadow 0.2s ease;
-  -o-transition: box-shadow 0.2s ease;
-  transition: box-shadow 0.2s ease;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
+}
+.content-wrapper .square-wrapper .square-container-hover[rel="Harmony"] .square {
+  -webkit-box-shadow: 0px 0px 0px 4px #f39c12;
+  -moz-box-shadow: 0px 0px 0px 4px #f39c12;
+  box-shadow: 0px 0px 0px 4px #f39c12;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
+}
+.content-wrapper .square-wrapper .square-container-hover[rel="Harmony"] .tool-container {
+  -webkit-box-shadow: 0px 2px 0px 4px #f39c12;
+  -moz-box-shadow: 0px 2px 0px 4px #f39c12;
+  box-shadow: 0px 2px 0px 4px #f39c12;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
+}
+.content-wrapper .square-wrapper .square-container-hover[rel="Farts"] .square {
+  -webkit-box-shadow: 0px 0px 0px 4px #c0392b;
+  -moz-box-shadow: 0px 0px 0px 4px #c0392b;
+  box-shadow: 0px 0px 0px 4px #c0392b;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
+}
+.content-wrapper .square-wrapper .square-container-hover[rel="Farts"] .tool-container {
+  -webkit-box-shadow: 0px 2px 0px 4px #c0392b;
+  -moz-box-shadow: 0px 2px 0px 4px #c0392b;
+  box-shadow: 0px 2px 0px 4px #c0392b;
+  -webkit-transition: box-shadow 0.12s ease-in;
+  -moz-transition: box-shadow 0.12s ease-in;
+  -o-transition: box-shadow 0.12s ease-in;
+  transition: box-shadow 0.12s ease-in;
 }
 .content-wrapper .square-wrapper .square-container.selected:nth-of-type(2) .square {
   border: 6px solid #27AE60;
@@ -6584,10 +6638,18 @@ header.header .navbar-inner {
   -webkit-box-shadow: 0px 2px 0px 4px transparent;
   -moz-box-shadow: 0px 2px 0px 4px transparent;
   box-shadow: 0px 2px 0px 4px transparent;
-  -webkit-transition: box-shadow 0.2s ease;
-  -moz-transition: box-shadow 0.2s ease;
-  -o-transition: box-shadow 0.2s ease;
-  transition: box-shadow 0.2s ease;
+  -webkit-transition: box-shadow 0.2s ease-out;
+  -moz-transition: box-shadow 0.2s ease-out;
+  -o-transition: box-shadow 0.2s ease-out;
+  transition: box-shadow 0.2s ease-out;
+}
+.content-wrapper .square-wrapper .tool-container * {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
 }
 .share {
   width: 90px;
@@ -6641,9 +6703,36 @@ header.header .navbar-inner {
   height: 200px;
   padding: 15px 0px 0 0px;
 }
-.knob {
-  height: 80px;
-  width: 80px;
+/*.tick{
+	background: #7F8C8D;
+	width: 3px;
+	height: 8px;
+
+}*/
+.knob-container {
+  width: 70px;
+  height: 70px;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+.knob-container * {
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.knob-container .knob {
+  height: 70px;
+  width: 70px;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
@@ -6651,19 +6740,47 @@ header.header .navbar-inner {
   -webkit-box-shadow: inset -4px 4px 0px #e6ebed, -4px 4px 0px #283949;
   -moz-box-shadow: inset -4px 4px 0px #e6ebed, -4px 4px 0px #283949;
   box-shadow: inset -4px 4px 0px #e6ebed, -4px 4px 0px #283949;
-  border: 7px solid #1ABC9C;
+  border: 7px solid #1abc9c;
   display: inline-block;
   margin-right: 60px;
   padding: 5px;
-  cursor: pointer;
   outline: 3px solid transparent;
   -webkit-transition: border 0.2s ease;
   -moz-transition: border 0.2s ease;
   -o-transition: border 0.2s ease;
   transition: border 0.2s ease;
+  position: relative;
+  z-index: 99;
 }
-.knob:hover {
-  border: 7px solid #15977e;
+.knob-container .tick {
+  /*width: 10px;
+		height: 10px;
+		.border-radius(50%);*/
+
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid #1abc9c;
+  margin-top: -76px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 100;
+  -webkit-transition: border-bottom 0.2s ease;
+  -moz-transition: border-bottom 0.2s ease;
+  -o-transition: border-bottom 0.2s ease;
+  transition: border-bottom 0.2s ease;
+}
+.knob-container:hover .tick {
+  border-bottom: 7px solid #19b395;
+  -webkit-transition: border-bottom 0.2s ease;
+  -moz-transition: border-bottom 0.2s ease;
+  -o-transition: border-bottom 0.2s ease;
+  transition: border-bottom 0.2s ease;
+}
+.knob-container:hover .knob {
+  border: 7px solid #19b395;
   -webkit-box-shadow: inset -4px 4px 0px #ecf0f1, -4px 4px 0px #283949;
   -moz-box-shadow: inset -4px 4px 0px #ecf0f1, -4px 4px 0px #283949;
   box-shadow: inset -4px 4px 0px #ecf0f1, -4px 4px 0px #283949;
@@ -6672,9 +6789,31 @@ header.header .navbar-inner {
   -o-transition: border 0.2s ease;
   transition: border 0.2s ease;
 }
-.knob:active {
+.knob-container::selection {
+  background: transparent;
+}
+.knob-container::-moz-selection {
+  background: transparent;
+}
+.knob-container:active * {
+  cursor: pointer !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+.knob-container:active .knob {
   border: 8px solid #138a72;
   padding: 0;
+  -webkit-transition: border 0.2s ease;
+  -moz-transition: border 0.2s ease;
+  -o-transition: border 0.2s ease;
+  transition: border 0.2s ease;
+}
+.knob-container:active .tick {
+  border-bottom: 7px solid #138a72;
   -webkit-transition: border 0.2s ease;
   -moz-transition: border 0.2s ease;
   -o-transition: border 0.2s ease;
