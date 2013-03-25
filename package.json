@@ -6,10 +6,10 @@
     "start": "node app"
   },
   "dependencies": {
-    "express" : "*",
-    "hbs"     : "*",
-    "fs"      : "*",
-    "timbre"  : "*",
-    "camelot" : "*"
+    "express"   : "*",
+    "hbs"       : "*",
+    "fs"        : "*",
+    "timbre"    : "*",
+    "socket.io" : "*"
   }
 }
