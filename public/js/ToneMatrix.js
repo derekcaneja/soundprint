@@ -96,7 +96,7 @@ ToneMatrix.prototype.draw = function() {
 		context.closePath();
 	}
 
-	$('.square-wrapper').append('<div class="square-container" rel="' + this.title + '"><div class="square" id="' + this.title + '"></div><div class="tool-container"><h3 style="color: #' + this.textColor + ';">' + this.title + '</h3><div class="tools"><div class="knob-container"><div class="knob"></div><div class="tick"></div></div></div></div>');
+	$('.square-wrapper').append('<div class="square-container" rel="' + this.title + '"><div class="square" id="' + this.title + '"></div><div class="tool-container"><h3 style="color: #' + this.textColor + ';">' + this.title + '</h3><div class="tools"><div class="knob-container"></div></div></div>');
 	//console.log(this.textColor);
 	$('#' + this.title).append('<table class="tablegrid" data-table-name="' + this.title + '"></table>');
 
@@ -105,7 +105,7 @@ ToneMatrix.prototype.draw = function() {
 		for(var x = 0; x < 12; x++) row.append('<td></td>');
 		row.appendTo('#' + this.title + ' table');
 	}
-	$('.knob-container').onselectstart = function () { return false; };
+	$('.knob-container')
 	$('.knob').onselectstart = function () { return false; };
 	$('.tick').onselectstart = function () { return false; };
 
