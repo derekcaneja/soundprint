@@ -1,0 +1,56 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'fs' ]
+2 info using npm@1.1.65
+3 info using node@v0.8.14
+4 verbose node symlink C:\Program Files\nodejs\\node.exe
+5 verbose read json C:\Users\Jack\Desktop\Git\soundprint\package.json
+6 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\assert\package.json
+7 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\camelot\package.json
+8 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\express\package.json
+9 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\fs\package.json
+10 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\hbs\package.json
+11 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\imagesnap\package.json
+12 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\opencv\package.json
+13 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\socket.io\package.json
+14 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\timbre\package.json
+15 warn package.json assert@0.4.9 No README.md file found!
+16 verbose from cache C:\Users\Jack\Desktop\Git\soundprint\package.json
+17 verbose readDependencies using package.json deps
+18 verbose cache add [ 'fs@*', null ]
+19 silly cache add name=undefined spec="fs@*" args=["fs@*",null]
+20 verbose parsed url { pathname: 'fs@*', path: 'fs@*', href: 'fs@*' }
+21 silly cache add name="fs" spec="*" args=["fs","*"]
+22 verbose parsed url { pathname: '*', path: '*', href: '*' }
+23 verbose addNamed [ 'fs', '*' ]
+24 verbose addNamed [ null, '' ]
+25 silly lockFile d8bf140d-fs fs@*
+26 verbose lock fs@* C:\Users\Jack\AppData\Roaming\npm-cache\d8bf140d-fs.lock
+27 silly addNameRange { name: 'fs', range: '', hasData: false }
+28 verbose url raw fs
+29 verbose url resolving [ 'https://registry.npmjs.org/', './fs' ]
+30 verbose url resolved https://registry.npmjs.org/fs
+31 info trying registry request attempt 1 at 15:15:18
+32 http GET https://registry.npmjs.org/fs
+33 http 404 https://registry.npmjs.org/fs
+34 silly registry.get cb [ 404,
+34 silly registry.get   { server: 'CouchDB/1.2.1 (Erlang OTP/R15B03)',
+34 silly registry.get     date: 'Tue, 26 Mar 2013 20:15:57 GMT',
+34 silly registry.get     'content-type': 'application/json',
+34 silly registry.get     'content-length': '52',
+34 silly registry.get     'cache-control': 'must-revalidate' } ]
+35 silly lockFile d8bf140d-fs fs@*
+36 error 404 'fs' is not in the npm registry.
+36 error 404 You should bug the author to publish it
+36 error 404
+36 error 404 Note that you can also install from a
+36 error 404 tarball, folder, or http url, or git url.
+37 error System Windows_NT 6.1.7600
+38 error command "C:\\Program Files\\nodejs\\\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "fs"
+39 error cwd C:\Users\Jack\Desktop\Git\soundprint
+40 error node -v v0.8.14
+41 error npm -v 1.1.65
+42 error code E404
+43 verbose exit [ 1, true ]
