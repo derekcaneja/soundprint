@@ -1,20 +1,18 @@
-//-----------------------------------------//
-//-------------Node Application------------//
-//-----------------------------------------//
+//----------------------------------//
+//-----------Application------------//
+//----------------------------------//
 
 var express = require('express')
-  , routes  = require('./routes')
-  , http    = require('http')
-  , path    = require('path')
-  , io      = require('socket.io');
+  , hbs = require('hbs')
+  , io = require('socket.io')
+  , routes = require('./routes')
+  , http = require('http')
+  , path = require('path');
 
-
-// Express
-//-----------------------------------------//
 var app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', process.env.PORT || 5555);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'html');
   app.engine('html', require('hbs').__express);
@@ -33,14 +31,37 @@ app.configure('development', function(){
 app.get('/', routes.index);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+	console.log("Express server listening on port " + app.get('port'));
 });
 
 
-// Socket.io
-//-----------------------------------------//
-var socket = io.listen(server);
-
-socket.on('connection', function (socket) {
-  socket.emit('data', { data: 'data' });
+var serverSocket = io.listen(server);
+var clients = [];
+for(var i = 0; i < 6; i+=1)clients[i] = null;
+serverSocket.on('connection', function(socket){
+	//
+	var me = socket;
+	
+	socket.emit('lol');
+	
+	socket.on('ping', function(data){
+		console.log(data);
+	});
+	//
+	socket.on('setCam', function(number){
+		clients[number] = me;
+		console.log("Connected Camera Number "+number);
+	});
+	//
+	socket.on('frame', function(data){
+		var toPrint = "";
+		for(var i = 0; i < data.length; i++){
+			toPrint = "" + toPrint + "\n";
+			for(var n = 0; n < data[i].length; n++){
+				toPrint = ""+toPrint+((data[i][n]<0.5)?("#"):("."));
+			}
+			
+		}
+		console.log(toPrint);
+	});
 });

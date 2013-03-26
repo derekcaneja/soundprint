@@ -1,15 +1,8 @@
 {
-  "name": "big-kc",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "start": "node app"
-  },
-  "dependencies": {
-    "express"   : "*",
-    "hbs"       : "*",
-    "fs"        : "*",
-    "timbre"    : "*",
-    "socket.io" : "*"
-  }
+  "name"          : "Soundprint",
+  "version"       : "0.0.1",
+  "private"       : true,
+  "scripts"       : { "start": "node app" },
+  "dependencies"  : { "express": "*", "hbs": "*", "socket.io": "*", "timbre": "*" },
+  "engines"       : { "node": "0.8.4", "npm": "1.1.40" }
 }
