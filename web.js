@@ -32,39 +32,52 @@ app.get('/'			 	, 	    routes.index);
 app.get('/camera'		, 	   routes.camera);
 app.get('/display'		, 	  routes.display);
 app.get('/application'	, routes.application);
-
+x
 
 var server = http.createServer(app).listen(app.get('port'), function(){
 	console.log("Express server listening on port " + app.get('port'));
 });
 
-var serverSocket = io.listen(server);
-var clients = [];
-for(var i = 0; i < 6; i+=1)clients[i] = null;
-serverSocket.on('connection', function(socket){
+io = io.listen(server);
+
+var cameraSocket = io.of('/camera');
+var displaySocket = io.of('/display');
+var applicationSocket = io.of('/application');
+var cameraClient, displayClient, applicationClient;
+
+for(var i = 0; i < 6; i+=1)cameras[i] = null;
+cameraSocket.on('connection', function(socket){	
 	//
-	var me = socket;
-	
-	socket.emit('lol');
-	
+	socket.emit('handshake');
+	cameraClient = socket;
+	//
 	socket.on('ping', function(data){
 		console.log(data);
 	});
 	//
 	socket.on('setCam', function(number){
-		clients[number] = me;
 		console.log("Connected Camera Number "+number);
 	});
 	//
 	socket.on('frame', function(data){
-		var toPrint = "";
-		for(var i = 0; i < data.length; i++){
-			toPrint = "" + toPrint + "\n";
-			for(var n = 0; n < data[i].length; n++){
-				toPrint = ""+toPrint+((data[i][n]<0.5)?("#"):("."));
-			}
-			
+		//var toPrint = "";
+		//for(var i = 0; i < data.length; i++){
+		//	toPrint = "" + toPrint + "\n";
+		//	for(var n = 0; n < data[i].length; n++){
+		//		toPrint = ""+toPrint+((data[i][n]<0.5)?("#"):("."));
+		//	}
+		//	
+		//}
+		//console.log(toPrint);
+		if(applicationClient){
+			applicationClient.emit('data', data);
 		}
-		console.log(toPrint);
 	});
 });
+
+applicationSocket.on('connection', function(socket){
+	applicationClient = socket;
+})
+displaySocket.on('connection', function(socket){
+	displayClient = socket;
+})

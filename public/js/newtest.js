@@ -20,8 +20,8 @@ var totalPix = size*size;
 var sensitivity = 30;
 var maxSensitivity = 120;
 var minSensitivity = 40;
-var hzChunk = 50;
-var vtChunk = 50;
+var hzChunk = 16;
+var vtChunk = 16;
 var hzSize = size/hzChunk;
 var vtSize = size/vtChunk;
 var x,y,r,c = 0;
@@ -126,9 +126,9 @@ function grabBG(){
 var camNumber = null;
 function connectTo(ip, num){
 	camNumber = num||0;
-	clientSocket = io.connect('http://'+ip+':5555');
+	clientSocket = io.connect('http://'+ip);
 
-	clientSocket.on('lol', function(){
+	clientSocket.on('handshake', function(){
 		clientSocket.emit('setCam', camNumber);
 		console.log("Connected Camera as "+ camNumber);
 	});
