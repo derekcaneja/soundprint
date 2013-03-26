@@ -102,6 +102,7 @@ header.header{
 	height: 100%;
 	background: #34495E;//#C9E5F2;
 	padding-top: @headerHeight + 20px;
+	overflow: hidden;
 	.square-wrapper{
 		width: 92%;
 		height: 380px;
@@ -303,123 +304,53 @@ header.header{
 				h3{
 					margin-left: 12px;
 					margin-top: 12px;
-					width: 65px;
+
+					max-width: 70px;
 				}
 				*{
 					.unselectable();
 				}
+				h3:first-of-type{
+					display: inline-block;
+					vertical-align: middle;
+				}
+				select:first-of-type{
+					display: inline-block;
+					vertical-align: middle;
+				}
+				.instrument{
+					height: 30px;
+					max-width: 150px;
+					//margin-left: 10px;
+					margin: 14px 0 0 15px;
+					//border: 2px solid white;
+					background: none !important;
+					
+					*{
+						outline: none !important;
+					}
+					.caret{
+						border-top: 4px solid #ECF0F1;
+						margin-left: 5px;
+					}
+					.btn{
+						.btn-small;
+						background: none !important;
+						color: #ECF0F1;
+						text-shadow: none;
+						font-family: 'Lato';
+						letter-spacing: 1px;
+						font-weight: 400;
+						font-size: 12px;
+						border: 1px solid;
+						//opacity: .5;
+						.box-shadow(none);
+						outline: 1px solid transparent;
+					}
+				}
 			}
 	}
 }
-
-.dk_open {
-  z-index: 10; }
-  .dk_open .dk_toggle {
-    background-color: #1abc9c; }
-    .dk_open .dk_toggle .select-icon {
-      background-color: #16a085;
-      border-left-color: transparent; }
-
-.dk_options {
-  padding-top: 14px; }
-  .dk_options:before {
-    content: "";
-    border-style: solid;
-    border-width: 0 9px 9px 9px;
-    border-color: transparent transparent #34495e transparent;
-    height: 0px;
-    position: absolute;
-    left: 15px;
-    top: 5px;
-    width: 0px;
-    -webkit-transform: rotate(360deg); }
-  .dk_options:before {
-    left: auto;
-    right: 12px; }
-  .dk_options li {
-    padding-bottom: 3px; }
-  .dk_options a {
-    border-radius: 3px;
-    color: white;
-    display: block;
-    padding: 5px 9px;
-    text-decoration: none; }
-    .dk_options a:hover {
-      background-color: #1abc9c; }
-
-.dk_option_current a {
-  background-color: #1abc9c; }
-
-.dk_options_inner {
-  background-color: #34495e;
-  border-radius: 5px;
-  margin: 0;
-  max-height: 244px;
-  padding: 3px 3px 0; }
-
-.dk_touch .dk_options {
-  max-height: 250px; }
-
-.dk_container {
-  display: none;
-  position: relative;
-  vertical-align: middle; }
-  .dk_container.dk_shown {
-    display: inline-block;
-    zoom: 1;
-    *display: inline; }
-  .dk_container[class*="span"] {
-    float: none;
-    margin-left: 0; }
-
-.dk_toggle {
-  display: block;
-  position: relative; }
-
-.dk_open {
-  position: relative; }
-  .dk_open .dk_options {
-    margin-top: -1px;
-    opacity: 1;
-    z-index: 10;
-    display: block\9; }
-  .dk_open .dk_label {
-    color: inherit; }
-
-.dk_options {
-  margin-top: -21px;
-  position: absolute;
-  left: 0;
-  opacity: 0;
-  width: 220px;
-  z-index: -100;
-  display: none\9;
-  -webkit-transition: 0.3s ease-out;
-  -moz-transition: 0.3s ease-out;
-  -o-transition: 0.3s ease-out;
-  transition: 0.3s ease-out;
-  -webkit-backface-visibility: hidden; }
-  .select-right .dk_options {
-    left: auto;
-    right: 0; }
-  .dk_options a {
-    display: block; }
-
-.dk_options_inner {
-  overflow: auto;
-  outline: none;
-  position: relative; }
-
-.dk_touch .dk_options {
-  overflow: hidden; }
-.dk_touch .dk_options_inner {
-  max-height: none;
-  overflow: visible; }
-
-.dk_fouc select {
-  position: relative;
-  top: -99999em;
-  visibility: hidden; }
 
 .share{
 	width: 90px;

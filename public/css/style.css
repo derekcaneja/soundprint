@@ -6446,6 +6446,7 @@ header.header .navbar-inner {
   height: 100%;
   background: #34495E;
   padding-top: 76px;
+  overflow: hidden;
 }
 .content-wrapper .square-wrapper {
   width: 92%;
@@ -6665,7 +6666,7 @@ header.header .navbar-inner {
 .content-wrapper .square-wrapper .tool-container h3 {
   margin-left: 12px;
   margin-top: 12px;
-  width: 65px;
+  max-width: 70px;
 }
 .content-wrapper .square-wrapper .tool-container * {
   -webkit-touch-callout: none !important;
@@ -6675,128 +6676,45 @@ header.header .navbar-inner {
   -ms-user-select: none !important;
   user-select: none !important;
 }
-.dk_open {
-  z-index: 10;
-}
-.dk_open .dk_toggle {
-  background-color: #1abc9c;
-}
-.dk_open .dk_toggle .select-icon {
-  background-color: #16a085;
-  border-left-color: transparent;
-}
-.dk_options {
-  padding-top: 14px;
-}
-.dk_options:before {
-  content: "";
-  border-style: solid;
-  border-width: 0 9px 9px 9px;
-  border-color: transparent transparent #34495e transparent;
-  height: 0px;
-  position: absolute;
-  left: 15px;
-  top: 5px;
-  width: 0px;
-  -webkit-transform: rotate(360deg);
-}
-.dk_options:before {
-  left: auto;
-  right: 12px;
-}
-.dk_options li {
-  padding-bottom: 3px;
-}
-.dk_options a {
-  border-radius: 3px;
-  color: white;
-  display: block;
-  padding: 5px 9px;
-  text-decoration: none;
-}
-.dk_options a:hover {
-  background-color: #1abc9c;
-}
-.dk_option_current a {
-  background-color: #1abc9c;
-}
-.dk_options_inner {
-  background-color: #34495e;
-  border-radius: 5px;
-  margin: 0;
-  max-height: 244px;
-  padding: 3px 3px 0;
-}
-.dk_touch .dk_options {
-  max-height: 250px;
-}
-.dk_container {
-  display: none;
-  position: relative;
+.content-wrapper .square-wrapper .tool-container h3:first-of-type {
+  display: inline-block;
   vertical-align: middle;
 }
-.dk_container.dk_shown {
+.content-wrapper .square-wrapper .tool-container select:first-of-type {
   display: inline-block;
-  zoom: 1;
-  *display: inline;
+  vertical-align: middle;
 }
-.dk_container[class*="span"] {
-  float: none;
-  margin-left: 0;
+.content-wrapper .square-wrapper .tool-container .instrument {
+  height: 30px;
+  max-width: 150px;
+  margin: 14px 0 0 15px;
+  background: none !important;
 }
-.dk_toggle {
-  display: block;
-  position: relative;
+.content-wrapper .square-wrapper .tool-container .instrument * {
+  outline: none !important;
 }
-.dk_open {
-  position: relative;
+.content-wrapper .square-wrapper .tool-container .instrument .caret {
+  border-top: 4px solid #ECF0F1;
+  margin-left: 5px;
 }
-.dk_open .dk_options {
-  margin-top: -1px;
-  opacity: 1;
-  z-index: 10;
-  display: block\9;
-}
-.dk_open .dk_label {
-  color: inherit;
-}
-.dk_options {
-  margin-top: -21px;
-  position: absolute;
-  left: 0;
-  opacity: 0;
-  width: 220px;
-  z-index: -100;
-  display: none\9;
-  -webkit-transition: 0.3s ease-out;
-  -moz-transition: 0.3s ease-out;
-  -o-transition: 0.3s ease-out;
-  transition: 0.3s ease-out;
-  -webkit-backface-visibility: hidden;
-}
-.select-right .dk_options {
-  left: auto;
-  right: 0;
-}
-.dk_options a {
-  display: block;
-}
-.dk_options_inner {
-  overflow: auto;
-  outline: none;
-  position: relative;
-}
-.dk_touch .dk_options {
-  overflow: hidden;
-}
-.dk_touch .dk_options_inner {
-  max-height: none;
-  overflow: visible;
-}
-.dk_fouc select {
-  position: relative;
-  top: -99999em;
-  visibility: hidden;
+.content-wrapper .square-wrapper .tool-container .instrument .btn {
+  padding: 2px 10px;
+  font-size: 11.9px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background: none !important;
+  color: #ECF0F1;
+  text-shadow: none;
+  font-family: 'Lato';
+  letter-spacing: 1px;
+  font-weight: 400;
+  font-size: 12px;
+  border: 1px solid;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  outline: 1px solid transparent;
 }
 .share {
   width: 90px;
