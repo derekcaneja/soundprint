@@ -364,7 +364,8 @@ var KnobView = Backbone.View.extend({
 		var item = this;
 		var offsetX = this.$('.knob').offset().left + this.$('.knob').width() / 2;
 		var offsetY = this.$('.knob').offset().top + this.$('.knob').height() / 2;
-
+		this.$el.css({'cursor': 'pointer'});
+		this.$el.children().css({'cursor': 'pointer'});
 		this.rotating = $(window).mousemove(function(e){
 			item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
 
@@ -421,7 +422,7 @@ var FooterView = Backbone.View.extend({
 	tagName: 'footer',
 	className: 'footer',
 	initialize: function() {
-		this.$el.append('<div class="footer-container"><div class="leftbox"><a href="#">Learn more about Handprint</a></div><div class="record-container"><button class="recordbutton"><div class="recordcircle"></div>Record</button></div><div class="twitter-container">Twitter</div></div>');
+		this.$el.append('<div class="footer-container"><div class="leftbox"><!--<a href="#">Learn more about Handprint</a>--></div><div class="record-container"><button class="recordbutton"><div class="recordcircle"></div>Record</button></div><div class="twitter-container">Twitter</div></div>');
 		
 	}
 });
