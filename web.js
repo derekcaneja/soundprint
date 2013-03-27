@@ -32,7 +32,7 @@ app.get('/'			 	, 	    routes.index);
 app.get('/camera'		, 	   routes.camera);
 app.get('/display'		, 	  routes.display);
 app.get('/application'	, routes.application);
-x
+
 
 var server = http.createServer(app).listen(app.get('port'), function(){
 	console.log("Express server listening on port " + app.get('port'));
@@ -45,7 +45,7 @@ var displaySocket = io.of('/display');
 var applicationSocket = io.of('/application');
 var cameraClient, displayClient, applicationClient;
 
-for(var i = 0; i < 6; i+=1)cameras[i] = null;
+//for(var i = 0; i < 6; i+=1)cameras[i] = null;
 cameraSocket.on('connection', function(socket){	
 	//
 	socket.emit('handshake');
@@ -70,7 +70,7 @@ cameraSocket.on('connection', function(socket){
 		//}
 		//console.log(toPrint);
 		if(applicationClient){
-			applicationClient.emit('data', data);
+			applicationClient.volatile.emit('frame', data);
 		}
 	});
 });

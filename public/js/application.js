@@ -21,4 +21,15 @@ var application = new ApplicationView({ header: header, content: content });
 $('body').append(application.el);
 
 $('.square').height($('.square-container').width());
-$('.tablegrid').outerHeight($('.square-container').width());
+
+	
+
+//Connections
+function connectTo(ip){
+	clientSocket = io.connect('http://'+ip+"/application");
+
+	clientSocket.on('frame', function(data){
+		console.log(data);
+	});
+}
+//

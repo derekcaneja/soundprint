@@ -126,7 +126,7 @@ function grabBG(){
 var camNumber = null;
 function connectTo(ip, num){
 	camNumber = num||0;
-	clientSocket = io.connect('http://'+ip);
+	clientSocket = io.connect('http://'+ip+"/camera");
 
 	clientSocket.on('handshake', function(){
 		clientSocket.emit('setCam', camNumber);

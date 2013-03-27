@@ -5,6 +5,8 @@
 var ToneMatrix =  Backbone.Model.extend({
 	defaults: {
 		title 		: 'New Tone Matrix',
+		width		: 0,
+		height		: 0,
 		color 		: '#FFFFFF',
 		gridcolor   : '#cccccc',
 	}
