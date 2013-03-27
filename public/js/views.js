@@ -101,6 +101,8 @@ var ToneMatrixView = Backbone.View.extend({
 		this.locked = false;
 		this.flip = null;
 
+		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
+
 
 		// this.$('.tool-row').append(delay.el);
 		// this.$('.tool-row').append(gain.el);
@@ -207,11 +209,11 @@ var ToneMatrixView = Backbone.View.extend({
 		this.altImage = this.context2.getImageData(0,0,this.canvas2.width, this.canvas2.height);
 	},
 	mouseover: function(){
-		this.$el.addClass('square-container-hover');
+		this.$('.square-border').css({'visibility': 'visible','border-color': this.model.get('gridcolor')});
 		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
 	},
 	mouseleave: function(){
-		this.$el.removeClass('square-container-hover');
+		this.$('.square-border').css({'visibility': 'hidden','border-color': this.model.get('gridcolor')});
 		//$('.square-container').transition({opacity: 1});
 	},
 	dropdownhover: function(){

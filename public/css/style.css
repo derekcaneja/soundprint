@@ -6465,7 +6465,7 @@ header.header .navbar-inner {
 }
 .content-wrapper .square-wrapper {
   width: 92%;
-  height: 380px;
+  height: 500px;
   margin: 0 auto;
   font-size: 0;
   /*#Bass{
@@ -6479,6 +6479,61 @@ header.header .navbar-inner {
 
 		}
 		#Melody*/
+
+  /*@squareTransition: box-shadow 0.12s;
+		.square-container-hover[rel="Bass"]{
+			/*.square{
+				.box-shadow(0px 0px 0px 4px #2980B9);
+				.transition(@squareTransition);
+			}
+			.square-border{
+				border-color:#2980B9;
+				/*border-top: 4px solid #2980B9;
+				border-right: 4px solid #2980B9;
+				.transition(border-color  0.12s);
+			}
+		
+			.tool-container{
+				.box-shadow(0px 2px 0px 4px #2980B9);
+				.transition(@squareTransition);
+			}
+		}
+		.square-container-hover[rel="Rhythm"]{
+			.square-border{
+				border-color:#27AE60;
+				/*border-top: 4px solid #2980B9;
+				border-right: 4px solid #2980B9;
+				.transition(border-color  0.12s);
+			}
+			.tool-container{
+				.box-shadow(0px 2px 0px 4px #27AE60);
+				.transition(@squareTransition);
+			}
+		}
+		.square-container-hover[rel="Harmony"]{
+			.square-border{
+				border-color:#F39C12;
+				/*border-top: 4px solid #2980B9;
+				border-right: 4px solid #2980B9;
+				.transition(border-color  0.12s);
+			}
+			.tool-container{
+				.box-shadow(0px 2px 0px 4px #F39C12);
+				.transition(@squareTransition);
+			}
+		}
+		.square-container-hover[rel="Melody"]{
+			.square-border{
+				border-color:#C0392B;
+				/*border-top: 4px solid #2980B9;
+				border-right: 4px solid #2980B9;
+				.transition(border-color  0.12s);
+			}
+			.tool-container{
+				.box-shadow(0px 2px 0px 4px #C0392B);
+				.transition(@squareTransition);
+			}
+		}*/
 
 }
 .content-wrapper .square-wrapper .square-container {
@@ -6500,18 +6555,17 @@ header.header .navbar-inner {
 }
 .content-wrapper .square-wrapper .square-border {
   width: 319px;
-  height: 100%;
+  height: 645px;
   background: none;
   border-left: 4px solid transparent;
   border-top: 8px solid transparent;
   border-right: 4px solid transparent;
+  border-bottom: 4px solid transparent;
   margin-left: -4px;
-  -webkit-border-top-right-radius: 19px;
-  -moz-border-radius-topright: 19px;
-  border-top-right-radius: 19px;
-  -webkit-border-top-left-radius: 19px;
-  -moz-border-radius-topleft: 19px;
-  border-top-left-radius: 19px;
+  -webkit-border-radius: 19px;
+  -moz-border-radius: 19px;
+  border-radius: 19px;
+  visibility: hidden;
   -webkit-transition: border-color 0.2s ease-out;
   -moz-transition: border-color 0.2s ease-out;
   -o-transition: border-color 0.2s ease-out;
@@ -6524,7 +6578,7 @@ header.header .navbar-inner {
   position: absolute;
   padding: 0;
   z-index: 9999;
-  margin-top: -309px;
+  margin-top: -642px;
   -webkit-border-top-right-radius: 16px;
   -moz-border-radius-topright: 16px;
   border-top-right-radius: 16px;
@@ -6599,89 +6653,6 @@ header.header .navbar-inner {
 .content-wrapper .square-wrapper .square-container:nth-of-type(2) .square {
   background: #2ECC71;
 }
-.content-wrapper .square-wrapper .square-container-hover[rel="Bass"] {
-  /*.square{
-				.box-shadow(0px 0px 0px 4px #2980B9);
-				.transition(@squareTransition);
-			}*/
-
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Bass"] .square-border {
-  border-color: #2980B9;
-  /*border-top: 4px solid #2980B9;
-				border-right: 4px solid #2980B9;*/
-
-  -webkit-transition: border-color 0.12s;
-  -moz-transition: border-color 0.12s;
-  -o-transition: border-color 0.12s;
-  transition: border-color 0.12s;
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Bass"] .tool-container {
-  -webkit-box-shadow: 0px 2px 0px 4px #2980b9;
-  -moz-box-shadow: 0px 2px 0px 4px #2980b9;
-  box-shadow: 0px 2px 0px 4px #2980b9;
-  -webkit-transition: box-shadow 0.12s;
-  -moz-transition: box-shadow 0.12s;
-  -o-transition: box-shadow 0.12s;
-  transition: box-shadow 0.12s;
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Rhythm"] .square-border {
-  border-color: #27AE60;
-  /*border-top: 4px solid #2980B9;
-				border-right: 4px solid #2980B9;*/
-
-  -webkit-transition: border-color 0.12s;
-  -moz-transition: border-color 0.12s;
-  -o-transition: border-color 0.12s;
-  transition: border-color 0.12s;
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Rhythm"] .tool-container {
-  -webkit-box-shadow: 0px 2px 0px 4px #27ae60;
-  -moz-box-shadow: 0px 2px 0px 4px #27ae60;
-  box-shadow: 0px 2px 0px 4px #27ae60;
-  -webkit-transition: box-shadow 0.12s;
-  -moz-transition: box-shadow 0.12s;
-  -o-transition: box-shadow 0.12s;
-  transition: box-shadow 0.12s;
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Harmony"] .square-border {
-  border-color: #F39C12;
-  /*border-top: 4px solid #2980B9;
-				border-right: 4px solid #2980B9;*/
-
-  -webkit-transition: border-color 0.12s;
-  -moz-transition: border-color 0.12s;
-  -o-transition: border-color 0.12s;
-  transition: border-color 0.12s;
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Harmony"] .tool-container {
-  -webkit-box-shadow: 0px 2px 0px 4px #f39c12;
-  -moz-box-shadow: 0px 2px 0px 4px #f39c12;
-  box-shadow: 0px 2px 0px 4px #f39c12;
-  -webkit-transition: box-shadow 0.12s;
-  -moz-transition: box-shadow 0.12s;
-  -o-transition: box-shadow 0.12s;
-  transition: box-shadow 0.12s;
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Melody"] .square-border {
-  border-color: #C0392B;
-  /*border-top: 4px solid #2980B9;
-				border-right: 4px solid #2980B9;*/
-
-  -webkit-transition: border-color 0.12s;
-  -moz-transition: border-color 0.12s;
-  -o-transition: border-color 0.12s;
-  transition: border-color 0.12s;
-}
-.content-wrapper .square-wrapper .square-container-hover[rel="Melody"] .tool-container {
-  -webkit-box-shadow: 0px 2px 0px 4px #c0392b;
-  -moz-box-shadow: 0px 2px 0px 4px #c0392b;
-  box-shadow: 0px 2px 0px 4px #c0392b;
-  -webkit-transition: box-shadow 0.12s;
-  -moz-transition: box-shadow 0.12s;
-  -o-transition: box-shadow 0.12s;
-  transition: box-shadow 0.12s;
-}
 .content-wrapper .square-wrapper .square-container.selected:nth-of-type(2) .square {
   border: 6px solid #27AE60;
 }
@@ -6714,6 +6685,7 @@ header.header .navbar-inner {
   -moz-transition: box-shadow 0.2s ease-out;
   -o-transition: box-shadow 0.2s ease-out;
   transition: box-shadow 0.2s ease-out;
+  margin-top: -330px;
   /*select:first-of-type{
 					display: inline-block;
 					vertical-align: middle;

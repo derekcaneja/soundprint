@@ -25,7 +25,7 @@ $('body').append(application.el);
 
 
 $('.square').height($('.square-container').width());
-$('.square-border').height($('.square-container').width());
+//$('.square-border').height($('.square-container').height()+$('.tool-container').height());
 
 
 var toneMatrix = [toneMatrix1, toneMatrix2, toneMatrix3, toneMatrix4];
