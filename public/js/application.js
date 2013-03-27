@@ -25,7 +25,8 @@ $('body').append(application.el);
 
 
 $('.square').height($('.square-container').width());
-//$('.square-border').height($('.square-container').height()+$('.tool-container').height());
+$('.square-border').height($('.square').height()+$('.tool-container').height()+15);
+$('.square-border').width($('.square-border').parent().width() + 8);
 
 
 var toneMatrix = [toneMatrix1, toneMatrix2, toneMatrix3, toneMatrix4];
@@ -43,10 +44,10 @@ function connectTo(ip){
 //timbre
 var BPM = 120;
 
-var bass 	= T('PluckGen').play();
-var rhythm  = T('PluckGen').play();
-var harmony = T('PluckGen').play();
-var melody  = T('PluckGen').play();
+// var bass 	= T('PluckGen').play();
+// var rhythm  = T('PluckGen').play();
+// var harmony = T('PluckGen').play();
+// var melody  = T('PluckGen').play();
 
 var bassMatrix 	  = createToneMatrix(56, 16, 16);
 var rhythmMatrix  = createToneMatrix(56, 16, 16);
