@@ -49,7 +49,7 @@ var ToneMatrixView = Backbone.View.extend({
 	initialize: function() {
 	
 		this.$el.attr('rel', this.model.get('title'));
-		this.$el.append('<div class="square"></div><div class="square-border"></div><div class="tool-container"></div>');
+		this.$el.append('<div class="square-border"></div><div class="square"></div><div class="tool-container"></div>');
 		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></div></div>');
 	
 		
@@ -368,11 +368,8 @@ var KnobView = Backbone.View.extend({
 
 			item.rotation += 90;
 
-<<<<<<< HEAD
+
 			if(item.rotation > 120 && item.rotation < 150) 		item.rotation = 125;
-=======
-			if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
->>>>>>> feet
 			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
 			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
 			else if(item.rotation > 130) 						item.rotation = -125;

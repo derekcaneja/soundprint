@@ -148,23 +148,26 @@ header.header{
 			height: 100%;
 			background: none;
 			border-left: 4px solid transparent;
-			border-top: 4px solid transparent;
+			border-top: 8px solid transparent;
 			border-right: 4px solid transparent;
-			position: absolute;
+			
 			//border-color: rbga(0,0,0,0);
 			margin-left: -4px;
-			margin-top: -311px;
-			.border-top-radius(16px);
+			
+			.border-top-radius(19px);
 			.transition(border-color 0.2s ease-out);
 		}
 		.square{
 			width: 100%;
 			height: 100%;
 			overflow: hidden;
+			position: absolute;
 			padding: 0;
+			z-index: 9999;
+			margin-top: -309px;
 			.border-top-radius(16px);
 			.box-shadow(0px 0px 0px 4px transparent);
-			.transition(box-shadow 0.2s ease-out);
+			.transition(box-shadow 0.2s);
 			cursor: pointer;
 			-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC); /* this fixes the overflow:hidden in Chrome/Opera */
 			}
@@ -252,7 +255,7 @@ header.header{
 			background: #2ECC71;
 			
 		}
-		@squareTransition: box-shadow 0.12s ease-in;
+		@squareTransition: box-shadow 0.12s;
 		.square-container-hover[rel="Bass"]{
 			/*.square{
 				.box-shadow(0px 0px 0px 4px #2980B9);
@@ -262,7 +265,7 @@ header.header{
 				border-color:#2980B9;
 				/*border-top: 4px solid #2980B9;
 				border-right: 4px solid #2980B9;*/
-				.transition(border-color  0.12s ease-in);
+				.transition(border-color  0.12s);
 			}
 		
 			.tool-container{
@@ -275,7 +278,7 @@ header.header{
 				border-color:#27AE60;
 				/*border-top: 4px solid #2980B9;
 				border-right: 4px solid #2980B9;*/
-				.transition(border-color  0.12s ease-in);
+				.transition(border-color  0.12s);
 			}
 			.tool-container{
 				.box-shadow(0px 2px 0px 4px #27AE60);
@@ -287,7 +290,7 @@ header.header{
 				border-color:#F39C12;
 				/*border-top: 4px solid #2980B9;
 				border-right: 4px solid #2980B9;*/
-				.transition(border-color  0.12s ease-in);
+				.transition(border-color  0.12s);
 			}
 			.tool-container{
 				.box-shadow(0px 2px 0px 4px #F39C12);
@@ -299,7 +302,7 @@ header.header{
 				border-color:#C0392B;
 				/*border-top: 4px solid #2980B9;
 				border-right: 4px solid #2980B9;*/
-				.transition(border-color  0.12s ease-in);
+				.transition(border-color  0.12s);
 			}
 			.tool-container{
 				.box-shadow(0px 2px 0px 4px #C0392B);
