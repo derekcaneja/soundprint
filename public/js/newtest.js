@@ -94,22 +94,18 @@ k.beforeRender = function(){
 		for(var i = 0; i < vtChunk; i+=1){
 			for(var n = 0; n < hzChunk; n+=1){
 				densityArray[i][n] /= (vtSize*hzSize);
-				this.context.fillStyle = "rgba(255,0,0,"+((1-densityArray[i][n])/2)+")";
+				densityArray[i][n] = (1 - densityArray[i][n]);
+				this.context.fillStyle = "rgba(255,0,0,"+(densityArray[i][n]/2)+")";
 				this.context.fillRect(n*hzSize, i*vtSize , hzSize, vtSize);
 			}
 		}
 		if(clientSocket){
-			clientSocket.emit('frame', densityArray);
+			clientSocket.emit('frame', {cam:camNumber, data: densityArray});
 		}
 	}
 	
 }
 
-function newMat(rs,cs){
-	this.keyDown = [];////
-	this.preventedKeys = new myArray(8);
-	for(ii = 0; ii < 250; ii+=1)this.keyDown[ii] = false; //Populate this.keyDown Array
-}
 function dif(x1,x2){
 	return Math.abs(x1-x2)<sensitivity;
 }
@@ -134,3 +130,5 @@ function connectTo(ip, num){
 	});
 	
 }
+
+

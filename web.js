@@ -66,7 +66,6 @@ cameraSocket.on('connection', function(socket){
 		//	for(var n = 0; n < data[i].length; n++){
 		//		toPrint = ""+toPrint+((data[i][n]<0.5)?("#"):("."));
 		//	}
-		//	
 		//}
 		//console.log(toPrint);
 		if(applicationClient){

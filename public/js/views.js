@@ -94,15 +94,48 @@ var ToneMatrixView = Backbone.View.extend({
 		//
 		this.$('.square').append(this.canvas);
 		//
+		this.minThreshold = 0.3
+		//
+		
 		this.resize();
 		this.render();
 		console.log(this.ww, this.hh, this.hzLength, this.vtLength);
 		//
+		this.densityArray = [];
+		//
+		for(var i= 0; i < this.vtSpaces; i+=1){
+			var temp = [];
+			for(var n = 0; n < this.hzSpaces; n+=1){
+				temp.push(0);
+			}
+			this.densityArray.push(temp);
+		}
+
 		//
 		//setInterval( function(){this2.render();}, (1000/30));
 	},
-	render: function() {
-		this.context.drawImage(this.canvas2,0,0);
+	render: function() {		
+		if(this.altImage){
+			this.context.globalAlpha = 1;
+			this.context.putImageData(this.altImage,0,0);
+		}
+	},
+	sendFrame: function(data){	
+		if(this.altImage){
+			this.context.putImageData(this.altImage,0,0);
+		}
+		for(var n = 0; n < data.length; i += 1){
+			for(var n = 0; n < data[i].length; n += 1){
+				if	(data[i][n]<0.3)	this.densityArray[i][n] = 0; 
+				else if(data[i][n]<0.6)	this.densityArray[i][n] = 1; 
+				else 					this.densityArray[i][n] = 2; 
+				
+				this.context.fillStyle = "#FFFFFF";
+				this.context.globalAlpha = this.densityArray[i][n]/4;
+				this.context.fillRect(i*this.hzLength,n*this.vtLength, this.hzLength, this.vtLength);
+			}
+		}
+		
 	},
 	events: {
 		'mouseover'		: 'mouseover',
@@ -125,13 +158,15 @@ var ToneMatrixView = Backbone.View.extend({
 			this.context2.closePath();
 			this.context2.stroke();
 		}
-		for(var n = 0; n < this.hh - 2; n += this.vtLength){
+		for(var n = 1; n < this.hh - 2; n += this.vtLength){
 			this.context2.beginPath();
 			this.context2.moveTo(0,n);
 			this.context2.lineTo(this.ww,n);
 			this.context2.closePath();
 			this.context2.stroke();
 		}
+		
+		this.altImage = this.context2.getImageData(0,0,this.canvas2.width, this.canvas2.height);
 	},
 	mouseover: function(){
 		this.$el.addClass('square-container-hover');
