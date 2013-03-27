@@ -11,7 +11,7 @@ var ApplicationView = Backbone.View.extend({
 	initialize: function(options) {
 		this.$el.append(options.header.el);
 		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
-
+		this.$el.append(options.footer.el)
 		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
 
 		this.count = 0;
@@ -50,24 +50,31 @@ var ToneMatrixView = Backbone.View.extend({
 		_.bindAll(this, 'play')
 		this.$el.attr('rel', this.model.get('title'));
 		this.$el.append('<div class="square"></div><div class="tool-container"></div>');
-		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><!-- dropdown menu links --></ul></div><div class="tools"><div class="tool-row" tool-row="1"></div></div>');
+		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="icon-unlock"></i><i class="icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"></div></div>');
 		
- 		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '.5';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
- 		//console.log(this.rgbaColor);
-		//console.log(this.$('select'))
+		this.dropdownOpen = "false";
+
+
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '.5';
  		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
 		this.$('.instrument').children('.btn').css({'border-color': this.rgbaColor})
 		
+		//this.$('.dropdown-menu').css({'background-color': this.model.get('color')})
 		this.$('.dropdown-toggle').dropdown();
-		// if(this.model.get('title') == "Bass"){
-		// 	this.$('.tool-container').children('select').append('<option value="0">Default Bass</option>')
-		// }
+		if(this.model.get('title') == "Bass"){
+		 	this.$('.dropdown-menu').append('<li><a class="instrument-item">Bass 1</a></li><li><a class="instrument-item">Bass 2</a></li><li><a class="instrument-item">Bass 3</a></li>')
+		}
+		if(this.model.get('title') == "Rhythm"){
+		 	this.$('.dropdown-menu').append('<li><a class="instrument-item">Rhythm 1</a></li><li><a class="instrument-item">Rhythm 2</a></li><li><a class="instrument-item">Rhythm 3</a></li>')
+		}
+		if(this.model.get('title') == "Harmony"){
+		 	this.$('.dropdown-menu').append('<li><a class="instrument-item">Harmony 1</a></li><li><a class="instrument-item">Harmony 2</a></li><li><a class="instrument-item">Harmony 3</a></li>')
+		}
+		if(this.model.get('title') == "Melody"){
+		 	this.$('.dropdown-menu').append('<li><a class="instrument-item">Melody 1</a></li><li><a class="instrument-item">Melody 2</a></li><li><a class="instrument-item">Melody 3</a></li>')
+		}
 		var knob2 = new Knob();
 		var knob3 = new Knob();
 		var reverb = new KnobView({ model:new Knob({title: 'Reverb'}) });
@@ -77,7 +84,7 @@ var ToneMatrixView = Backbone.View.extend({
 		var balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
 		var volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
 
-		this.$('.tool-row').append(reverb.el, delay.el, gain.el);
+		this.$('.tool-row').append(delay.el, reverb.el, gain.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
 		this.$('.tool-row:nth-of-type(2)').append(balance.el, volume.el);
 		// this.$('.tool-row').append(delay.el);
@@ -94,6 +101,8 @@ var ToneMatrixView = Backbone.View.extend({
 
 			this.$('.tablegrid').append(row);
 		}
+
+
 	},
 	render: function() {
 
@@ -102,7 +111,10 @@ var ToneMatrixView = Backbone.View.extend({
 		'mouseover'		: 'mouseover',
 		'mouseleave'	: 'mouseleave',
 		'mouseover .dropdown-toggle': 'btnhover',
-		'mouseout .dropdown-toggle': 'btnleave'
+		'mouseout .dropdown-toggle': 'btnleave',
+		'click .dropdown-toggle': 'btnclick',
+		'mouseover .instrument-item': 'lihover',
+		'mouseout .instrument-item': 'lileave',
 	},
 	play: function(interval) {
 		this.$('tr').each(function(index){
@@ -119,14 +131,22 @@ var ToneMatrixView = Backbone.View.extend({
 		//$('.square-container').transition({opacity: 1});
 	},
 	btnhover: function(){
+		this.$('.btn').addClass('btnhover');
+
+		this.$('.caret').addClass('carethover');
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '1';
  		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
-			this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
-			this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
-			//console.log(this.rgbaColor);
+		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
+		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
+		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
+			
+		this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
+		this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
+		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
+		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
+		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
 	},
 	btnleave: function(){
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
@@ -135,12 +155,29 @@ var ToneMatrixView = Backbone.View.extend({
  		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
 		if(!this.$('.instrument').hasClass('open')){
 			//this.rgbaColor = '.5';
-			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
-			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'});
+			this.$('.btn').removeClass('btnhover');
+			this.$('.caret').removeClass('carethover');
+			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor}, 300);
+			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'}, 300);
 			this.$('.dropdown-toggle').css({'box-shadow': 'none'});
+
 			//console.log(this.rgbaColor);
-			}
+		}
+	},
+	btnclick: function(){
+		this.dropdownOpen = "true";
+	},
+	lihover: function(ev){
+		this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '1';
+ 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		$(ev.target).css({'background-color': this.rgbaColor});
+	},
+	lileave: function(ev){
+		$(ev.target).css({'background-color': 'transparent'});
 	}
+
 });
 
 
@@ -202,5 +239,13 @@ var SliderView = Backbone.View.extend({
 	},
 	render: function() {
 
+	}
+});
+var FooterView = Backbone.View.extend({
+	tagName: 'footer',
+	className: 'footer',
+	initialize: function() {
+		this.$el.append('<div class="footer-container"><div class="leftbox"><a href="#">Learn more about Handprint</a></div><div class="record-container">Record</div><div class="twitter-container">Twitter</div></div>');
+		
 	}
 });

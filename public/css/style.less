@@ -58,12 +58,13 @@ header.header{
 	background: #2C3E50;//rgba(255,255,255,1);
 	//border-bottom: lighten(#a9c1cc,10%) 2px solid;
 	//text-align: center;
+	
 }
 // Handprint Logo Image Dimensions: width:559 × height:142
 @handprintLogoWidth: 140px;
 @handprintLogoHeight: ((@handprintLogoWidth * 142) / 559);
 .logo-container{
-	height: 100%;
+	height: 80px;
 	width: 300px;
 	margin: 0 auto;
 	padding-top: (@headerHeight - @handprintLogoHeight) * 0.45;
@@ -78,6 +79,7 @@ header.header{
 		margin: 3px 0 0 0;
 		color: #d4d4d4;
 	}
+
 	h1{
 		font-family: 'proxima_novasemibold_italic';
 		font-size: 20px;
@@ -302,7 +304,7 @@ header.header{
 			//.box-shadow(0px 2px 0px 4px transparent);
 			.transition(box-shadow 0.2s ease-out);
 				h3{
-					margin-left: 12px;
+					margin-left: 14px;
 					margin-top: 12px;
 
 					max-width: 70px;
@@ -318,11 +320,30 @@ header.header{
 					display: inline-block;
 					vertical-align: middle;
 				}
+				.lockflip{
+					display: inline-block;
+					vertical-align: middle;
+					height: 24px;
+					margin: 12px 14px 0 0 ;
+					float: right;
+					i{
+						color: rgba(236, 240, 241, .4);
+						font-size: 24px;
+						margin: 0px 8px;
+						line-height: 1.3;
+						.transition(color 0.2s);
+						cursor: pointer;
+					}
+					i:hover{
+						color: lighten(rgba(236, 240, 241, 1), 10%);
+						.transition(color 0.4s);
+					}
+				}
 				.instrument{
 					height: 30px;
-					max-width: 150px;
+					max-width: 125px;
 					//margin-left: 10px;
-					margin: 14px 0 0 15px;
+					margin: 16px 0 0 15px;
 					//border: 2px solid white;
 					background: none !important;
 					
@@ -330,13 +351,14 @@ header.header{
 						outline: none !important;
 					}
 					.caret{
-						border-top: 4px solid #ECF0F1;
+						border-top: 4px solid darken(#ECF0F1, 30%);
 						margin-left: 5px;
+						.transition(border-top 0.2s);
 					}
 					.btn{
 						.btn-small;
 						background: none !important;
-						color: #ECF0F1;
+						color: darken(#ECF0F1, 30%);
 						text-shadow: none;
 						font-family: 'Lato';
 						letter-spacing: 1px;
@@ -346,6 +368,57 @@ header.header{
 						//opacity: .5;
 						.box-shadow(none);
 						outline: 1px solid transparent;
+						.transition(color 0.2s);
+					}
+					.btnhover{
+						color: #ECF0F1;
+						.transition(color 0.2s);
+						
+					}
+					.carethover{
+						border-top: 4px solid #ECF0F1;
+						.transition(border-top 0.2s);
+						}
+					.dropdownarrow{
+					  display: inline-block;
+					  width: 0px;
+					  height: 0px;
+					  vertical-align: top;
+					  border-bottom:   8px solid ;
+					  border-right: 8px solid transparent;
+					  border-left:  8px solid transparent;
+					  margin-top: -15px;
+					  //margin-left: 12px;
+					  
+					}
+					.dropdown-menu{
+						margin-top: 8px;
+						//.border-top-left-radius(0);
+						.box-shadow(none);
+						//border: 1px solid transparent;
+						padding: 5px 0;
+						background: #ECF0F1;
+
+						li{
+							cursor: pointer;
+							width: 100%;
+						}
+						/*.instrument-item:first-of-type{
+							padding-top: 5px;
+						}
+						.instrument-item:last-of-type{
+							padding-bottom: 5px;
+						}*/
+						.instrument-item{
+							background: none;
+							.unselectable();
+							width: 100%;
+							color: darken(#27AE60, 20%);
+							padding: 6px 20px;
+							font-family: 'proxima_novasemibold';
+							letter-spacing: 0px;
+							/*font-weight: 400;*/
+						}
 					}
 				}
 			}
@@ -538,7 +611,7 @@ header.header{
 			width: 60px;
 			//margin-bottom: 5px;
 			display: inline-block;
-			background: rgba(214,219,224,.2) !important;
+			background: rgba(214,219,224,.1) !important;
 		}
 		.ui-slider-segment {
 		  display: none;
@@ -669,6 +742,44 @@ header.header{
 	.knob:after{
 		line-height: 1.5365555;//1.436;
 
+	}
+}
+.footer{
+	.navbar-fixed-bottom;
+	height: 80px;
+	background: #2C3E50;
+	text-align: center;
+	.footer-container{
+		width: 100%;
+		height: 100%;
+		.leftbox{
+			margin-left: 5%;
+			width: 15%;
+			display: inline-block;
+			vertical-align: middle;
+			padding-top: 30px;
+			a{
+				color: rgba(236, 240, 241, .85);
+				font-family: 'proxima_nova_rgregular';
+				font-size: 16px;
+				.transition(color 0.2s);
+			}
+			a:hover{
+				color: rgba(252, 250, 255, 1);
+				.transition(color 0.2s);
+				text-decoration: none;
+			}
+		}
+		.record-container{
+			width: 60%;
+			display: inline-block;
+			vertical-align: middle;
+		}
+		.twitter-container{
+			width: 20%;
+			display: inline-block;
+			vertical-align: middle;
+		}
 	}
 }
 

@@ -5277,8 +5277,8 @@ a.badge:focus {
  */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('../font/fontawesome-webfont.eot?v=3.0.1');
-  src: url('../font/fontawesome-webfont.eot?#iefix&v=3.0.1') format('embedded-opentype'), url('../font/fontawesome-webfont.woff?v=3.0.1') format('woff'), url('../font/fontawesome-webfont.ttf?v=3.0.1') format('truetype');
+  src: url('../fonts//fontawesome-webfont.eot?v=3.0.1');
+  src: url('../fonts//fontawesome-webfont.eot?#iefix&v=3.0.1') format('embedded-opentype'), url('../fonts//fontawesome-webfont.woff?v=3.0.1') format('woff'), url('../fonts//fontawesome-webfont.ttf?v=3.0.1') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -6407,7 +6407,7 @@ header.header .navbar-inner {
   box-shadow: 0 1px 10px rgba(0,0,0,.1);
 }
 .logo-container {
-  height: 100%;
+  height: 80px;
   width: 300px;
   margin: 0 auto;
   padding-top: 9.196422182468696px;
@@ -6664,7 +6664,7 @@ header.header .navbar-inner {
   transition: box-shadow 0.2s ease-out;
 }
 .content-wrapper .square-wrapper .tool-container h3 {
-  margin-left: 12px;
+  margin-left: 14px;
   margin-top: 12px;
   max-width: 70px;
 }
@@ -6684,18 +6684,47 @@ header.header .navbar-inner {
   display: inline-block;
   vertical-align: middle;
 }
+.content-wrapper .square-wrapper .tool-container .lockflip {
+  display: inline-block;
+  vertical-align: middle;
+  height: 24px;
+  margin: 12px 14px 0 0 ;
+  float: right;
+}
+.content-wrapper .square-wrapper .tool-container .lockflip i {
+  color: rgba(236, 240, 241, 0.4);
+  font-size: 24px;
+  margin: 0px 8px;
+  line-height: 1.3;
+  -webkit-transition: color 0.2s;
+  -moz-transition: color 0.2s;
+  -o-transition: color 0.2s;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+.content-wrapper .square-wrapper .tool-container .lockflip i:hover {
+  color: #ffffff;
+  -webkit-transition: color 0.4s;
+  -moz-transition: color 0.4s;
+  -o-transition: color 0.4s;
+  transition: color 0.4s;
+}
 .content-wrapper .square-wrapper .tool-container .instrument {
   height: 30px;
-  max-width: 150px;
-  margin: 14px 0 0 15px;
+  max-width: 125px;
+  margin: 16px 0 0 15px;
   background: none !important;
 }
 .content-wrapper .square-wrapper .tool-container .instrument * {
   outline: none !important;
 }
 .content-wrapper .square-wrapper .tool-container .instrument .caret {
-  border-top: 4px solid #ECF0F1;
+  border-top: 4px solid #94aab0;
   margin-left: 5px;
+  -webkit-transition: border-top 0.2s;
+  -moz-transition: border-top 0.2s;
+  -o-transition: border-top 0.2s;
+  transition: border-top 0.2s;
 }
 .content-wrapper .square-wrapper .tool-container .instrument .btn {
   padding: 2px 10px;
@@ -6704,7 +6733,7 @@ header.header .navbar-inner {
   -moz-border-radius: 3px;
   border-radius: 3px;
   background: none !important;
-  color: #ECF0F1;
+  color: #94aab0;
   text-shadow: none;
   font-family: 'Lato';
   letter-spacing: 1px;
@@ -6715,6 +6744,69 @@ header.header .navbar-inner {
   -moz-box-shadow: none;
   box-shadow: none;
   outline: 1px solid transparent;
+  -webkit-transition: color 0.2s;
+  -moz-transition: color 0.2s;
+  -o-transition: color 0.2s;
+  transition: color 0.2s;
+}
+.content-wrapper .square-wrapper .tool-container .instrument .btnhover {
+  color: #ECF0F1;
+  -webkit-transition: color 0.2s;
+  -moz-transition: color 0.2s;
+  -o-transition: color 0.2s;
+  transition: color 0.2s;
+}
+.content-wrapper .square-wrapper .tool-container .instrument .carethover {
+  border-top: 4px solid #ECF0F1;
+  -webkit-transition: border-top 0.2s;
+  -moz-transition: border-top 0.2s;
+  -o-transition: border-top 0.2s;
+  transition: border-top 0.2s;
+}
+.content-wrapper .square-wrapper .tool-container .instrument .dropdownarrow {
+  display: inline-block;
+  width: 0px;
+  height: 0px;
+  vertical-align: top;
+  border-bottom: 8px solid ;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+  margin-top: -15px;
+}
+.content-wrapper .square-wrapper .tool-container .instrument .dropdown-menu {
+  margin-top: 8px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  padding: 5px 0;
+  background: #ECF0F1;
+  /*.instrument-item:first-of-type{
+							padding-top: 5px;
+						}
+						.instrument-item:last-of-type{
+							padding-bottom: 5px;
+						}*/
+
+}
+.content-wrapper .square-wrapper .tool-container .instrument .dropdown-menu li {
+  cursor: pointer;
+  width: 100%;
+}
+.content-wrapper .square-wrapper .tool-container .instrument .dropdown-menu .instrument-item {
+  background: none;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  width: 100%;
+  color: #145b32;
+  padding: 6px 20px;
+  font-family: 'proxima_novasemibold';
+  letter-spacing: 0px;
+  /*font-weight: 400;*/
+
 }
 .share {
   width: 90px;
@@ -6919,7 +7011,7 @@ header.header .navbar-inner {
   height: 12px;
   width: 60px;
   display: inline-block;
-  background: rgba(214, 219, 224, 0.2) !important;
+  background: rgba(214, 219, 224, 0.1) !important;
 }
 .slider-container[rel="balance"] .ui-slider-segment {
   display: none;
@@ -7083,4 +7175,58 @@ header.header .navbar-inner {
 }
 .knob-container:active .knob:after {
   line-height: 1.5365555;
+}
+.footer {
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+  margin-bottom: 0;
+  bottom: 0;
+  height: 80px;
+  background: #2C3E50;
+  text-align: center;
+}
+.footer .navbar-inner {
+  -webkit-box-shadow: 0 -1px 10px rgba(0,0,0,.1);
+  -moz-box-shadow: 0 -1px 10px rgba(0,0,0,.1);
+  box-shadow: 0 -1px 10px rgba(0,0,0,.1);
+}
+.footer .footer-container {
+  width: 100%;
+  height: 100%;
+}
+.footer .footer-container .leftbox {
+  margin-left: 5%;
+  width: 15%;
+  display: inline-block;
+  vertical-align: middle;
+  padding-top: 30px;
+}
+.footer .footer-container .leftbox a {
+  color: rgba(236, 240, 241, 0.85);
+  font-family: 'proxima_nova_rgregular';
+  font-size: 16px;
+  -webkit-transition: color 0.2s;
+  -moz-transition: color 0.2s;
+  -o-transition: color 0.2s;
+  transition: color 0.2s;
+}
+.footer .footer-container .leftbox a:hover {
+  color: #fcfaff;
+  -webkit-transition: color 0.2s;
+  -moz-transition: color 0.2s;
+  -o-transition: color 0.2s;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+.footer .footer-container .record-container {
+  width: 60%;
+  display: inline-block;
+  vertical-align: middle;
+}
+.footer .footer-container .twitter-container {
+  width: 20%;
+  display: inline-block;
+  vertical-align: middle;
 }

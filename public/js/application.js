@@ -15,8 +15,9 @@ toneMatrix4 = new ToneMatrixView({ model: toneMatrix4 });
 
 var header = new HeaderView();
 var content = [toneMatrix1, toneMatrix2, toneMatrix3, toneMatrix4];
+var footer = new FooterView();
 
-var application = new ApplicationView({ header: header, content: content });
+var application = new ApplicationView({ header: header, content: content, footer: footer });
 
 $('body').append(application.el);
 
