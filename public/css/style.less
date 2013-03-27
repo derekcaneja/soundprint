@@ -100,6 +100,30 @@ header.header{
 		height:((@handprintLogoWidth * 142) / 559);
 	}
 }
+@displayradius: 0 !important;
+.display{
+	.square-wrapper{
+		width: 100% !important;
+	}
+	.square-container{
+		width: 25% !important;
+		margin: 0 !important;
+		border-radius:@displayradius;
+		border: 0;
+		box-shadow: none;
+		.border-top-radius(@displayradius);
+		.square{ 
+			margin:0 !important;
+			-webkit-border-top-right-radius: 0px !important;
+			-moz-border-radius-topright: 0px !important;
+			border-top-right-radius: 0px !important;
+			-webkit-border-top-left-radius: 0px !important;
+			-moz-border-radius-topleft: 0px !important;
+			border-top-left-radius:  0px !important;
+			-webkit-mask-image: none !important;
+		}
+	}
+}
 .content-wrapper{
 	width: 100%;
 	height: 100%;

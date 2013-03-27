@@ -29,6 +29,30 @@ var ApplicationView = Backbone.View.extend({
 		clearInterval(this.interval);
 	}
 });
+var DisplayView = Backbone.View.extend({
+	tagName: 'div',
+	className: 'display',
+	initialize: function(options) {
+		this.$el.append(options.header.el);
+		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
+		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
+		// for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
+
+		// this.count = 0;
+	},
+	play: function() {
+		this.interval = setInterval(function(){
+			toneMatrix1.play(application.count);
+			toneMatrix2.play(application.count);
+			toneMatrix3.play(application.count);
+			toneMatrix4.play(application.count);
+			application.count++;
+		}, 150);
+	},
+	stop: function() {
+		clearInterval(this.interval);
+	}
+});
 
 // Header View
 //-----------------------------------------//
@@ -298,7 +322,210 @@ var ToneMatrixView = Backbone.View.extend({
 	}
 
 });
+var DisplayToneMatrixView = Backbone.View.extend({
+	tagName: 'div',
+	className: 'square-container',
+	initialize: function() {
+	
+		this.$el.attr('rel', this.model.get('title'));
+		this.$el.append('<div class="square"></div>');
+		
+		this.$('#'+this.model.get('title')+'Waveform').height('80px');
+		this.$('#'+this.model.get('title')+'Waveform').width('100%');
+		
 
+		
+		this.canvas = document.createElement('canvas');
+		this.context = this.canvas.getContext('2d');
+		this.canvas2 = document.createElement('canvas');
+		this.context2 = this.canvas.getContext('2d');
+		
+		
+		this.ww = this.model.get('width') + 7;
+		this.hh = this.model.get('height') + 7;
+		
+		this.hzSpaces = 16;
+		this.vtSpaces = 16;
+		
+		this.hzLength = this.ww / this.hzSpaces;
+		this.vtLength = this.hh / this.vtSpaces;
+		//
+		this.$('.square').append(this.canvas);
+		
+		//
+		this.minThreshold = 0.3
+		//
+		
+		this.resize();
+		this.render();
+		//console.log(this.ww, this.hh, this.hzLength, this.vtLength);
+		//
+		this.densityArray = [];
+		//
+		for(var i= 0; i < this.vtSpaces; i+=1){
+			var temp = [];
+			for(var n = 0; n < this.hzSpaces; n+=1){
+				temp.push(0);
+			}
+			this.densityArray.push(temp);
+		}
+
+		//
+		//setInterval( function(){this2.render();}, (1000/30));
+	},
+	render: function() {		
+		if(this.altImage){
+			this.context.globalAlpha = 1;
+			this.context.putImageData(this.altImage,0,0);
+		}
+		
+
+
+
+	},
+	sendFrame: function(data){	
+		if(this.altImage){
+			this.context.putImageData(this.altImage,0,0);
+		}
+		for(var n = 0; n < data.length; i += 1){
+			for(var n = 0; n < data[i].length; n += 1){
+				if	(data[i][n]<0.3)	this.densityArray[i][n] = 0; 
+				else if(data[i][n]<0.6)	this.densityArray[i][n] = 1; 
+				else 					this.densityArray[i][n] = 2; 
+				
+				this.context.fillStyle = "#FFFFFF";
+				this.context.globalAlpha = this.densityArray[i][n]/4;
+				this.context.fillRect(i*this.hzLength,n*this.vtLength, this.hzLength, this.vtLength);
+			}
+		}
+		
+	},
+	events: {
+		'mouseover'						: 'mouseover',
+		'mouseleave'					: 'mouseleave',
+		'mouseover .dropdown-toggle'	: 'dropdownhover',
+		'mouseout .dropdown-toggle'		: 'dropdownleave',
+		'click .dropdown-toggle'		: 'btnclick',
+		'mouseover .instrument-item'	: 'listhover',
+		'mouseout .instrument-item'		: 'listleave',
+		'click .lock'					: 'lockMatrix',
+		'click .flip'					: 'flipMatrix'
+	},
+	
+	resize: function(){
+		this.canvas.width = this.canvas2.width = this.ww;
+		this.canvas.height = this.canvas2.height = this.hh;
+		this.context2.lineWidth = 1;
+		this.context2.fillStyle = this.model.get('color');
+		this.context2.fillRect(0,0,this.ww,this.hh);
+		this.context2.strokeStyle = this.model.get('gridcolor');
+		for(var i = 1; i < this.ww - 2; i += this.hzLength){
+			this.context2.beginPath();
+			this.context2.moveTo(i,0);
+			this.context2.lineTo(i,this.hh);
+			this.context2.closePath();
+			this.context2.stroke();
+		}
+		for(var n = 1; n < this.hh - 2; n += this.vtLength){
+			this.context2.beginPath();
+			this.context2.moveTo(0,n);
+			this.context2.lineTo(this.ww,n);
+			this.context2.closePath();
+			this.context2.stroke();
+		}
+		
+		this.altImage = this.context2.getImageData(0,0,this.canvas2.width, this.canvas2.height);
+	},
+	mouseover: function(){
+		this.$('.square-border').css({'visibility': 'visible','border-color': this.model.get('gridcolor')});
+		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
+	},
+	mouseleave: function(){
+		this.$('.square-border').css({'visibility': 'hidden','border-color': this.model.get('gridcolor')});
+		//$('.square-container').transition({opacity: 1});
+	},
+	dropdownhover: function(){
+		this.$('.btn').addClass('btnhover');
+
+		this.$('.caret').addClass('carethover');
+		this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '1';
+ 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
+
+		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
+		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
+			
+		this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
+		this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
+		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
+		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
+		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
+
+		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
+		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
+		//console.log(this.rgbaColor);
+
+	},
+	dropdownleave: function(){
+		this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '.5';
+ 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		if(!this.$('.instrument').hasClass('open')){
+			//this.rgbaColor = '.5';
+			this.$('.btn').removeClass('btnhover');
+			this.$('.caret').removeClass('carethover');
+			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor}, 300);
+			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'}, 300);
+			this.$('.dropdown-toggle').css({'box-shadow': 'none'});
+
+			//console.log(this.rgbaColor);
+		}
+
+	},
+	btnclick: function(){
+		this.dropdownOpen = "true";
+	},
+	listhover: function(ev){
+		this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '1';
+ 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		$(ev.target).css({'background-color': this.rgbaColor});
+	},
+	listleave: function(ev){
+		$(ev.target).css({'background-color': 'transparent'});
+
+	},
+	lockMatrix: function(){
+		if(!this.locked){
+			this.$('.lock').removeClass('icon-unlock');
+			this.$('.lock').addClass('icon-lock');
+			this.$('.lock').addClass('iconselected');
+			this.locked = true;
+		} else{
+			this.$('.lock').removeClass('iconselected');
+			this.$('.lock').removeClass('icon-lock');
+			this.$('.lock').addClass('icon-unlock');
+			this.locked = false;
+		}
+	},
+	flipMatrix: function(ev){
+		//console.log($(ev.target));
+		// $(ev.target).parent().addClass('fliprotate', function(){
+		// setTimeout(function() {
+		// 	$(ev.target).parent().removeClass('fliprotate');
+		// }, 200);
+		// });
+		
+		
+
+
+	}
+
+});
 
 // Knob View
 //-----------------------------------------//
