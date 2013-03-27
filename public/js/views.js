@@ -113,8 +113,8 @@ var ToneMatrixView = Backbone.View.extend({
 		this.context2 = this.canvas.getContext('2d');
 		
 		
-		this.ww = this.model.get('width');
-		this.hh = this.model.get('height');
+		this.ww = this.model.get('width') + 7;
+		this.hh = this.model.get('height') + 7;
 		
 		this.hzSpaces = 16;
 		this.vtSpaces = 16;
