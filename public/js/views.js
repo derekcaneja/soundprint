@@ -300,19 +300,15 @@ var KnobView = Backbone.View.extend({
 		var offsetX = this.$('.knob').offset().left + this.$('.knob').width() / 2;
 		var offsetY = this.$('.knob').offset().top + this.$('.knob').height() / 2;
 
-		console.log(this.$('.knob').offset());
-
 		this.rotating = $(window).mousemove(function(e){
 			item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
 
 			item.rotation += 90;
 
-			console.log(item.rotation);
-
-			if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
+			if(item.rotation > 120 && item.rotation < 150) 		item.rotation = 125;
 			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
 			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
-			else if(item.rotation > 130) item.rotation = -125;
+			else if(item.rotation > 130) 						item.rotation = -125;
 
 
 			item.rotation = Math.round(item.rotation / 25) * 25;
