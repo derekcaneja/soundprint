@@ -20,8 +20,8 @@ var totalPix = size*size;
 var sensitivity = 30;
 var maxSensitivity = 120;
 var minSensitivity = 40;
-var hzChunk = 50;
-var vtChunk = 50;
+var hzChunk = 16;
+var vtChunk = 16;
 var hzSize = size/hzChunk;
 var vtSize = size/vtChunk;
 var x,y,r,c = 0;
@@ -94,22 +94,18 @@ k.beforeRender = function(){
 		for(var i = 0; i < vtChunk; i+=1){
 			for(var n = 0; n < hzChunk; n+=1){
 				densityArray[i][n] /= (vtSize*hzSize);
-				this.context.fillStyle = "rgba(255,0,0,"+((1-densityArray[i][n])/2)+")";
+				densityArray[i][n] = (1 - densityArray[i][n]);
+				this.context.fillStyle = "rgba(255,0,0,"+(densityArray[i][n]/2)+")";
 				this.context.fillRect(n*hzSize, i*vtSize , hzSize, vtSize);
 			}
 		}
 		if(clientSocket){
-			clientSocket.emit('frame', densityArray);
+			clientSocket.emit('frame', {cam:camNumber, data: densityArray});
 		}
 	}
 	
 }
 
-function newMat(rs,cs){
-	this.keyDown = [];////
-	this.preventedKeys = new myArray(8);
-	for(ii = 0; ii < 250; ii+=1)this.keyDown[ii] = false; //Populate this.keyDown Array
-}
 function dif(x1,x2){
 	return Math.abs(x1-x2)<sensitivity;
 }
@@ -126,11 +122,13 @@ function grabBG(){
 var camNumber = null;
 function connectTo(ip, num){
 	camNumber = num||0;
-	clientSocket = io.connect('http://'+ip+':5555');
+	clientSocket = io.connect('http://'+ip+"/camera");
 
-	clientSocket.on('lol', function(){
+	clientSocket.on('handshake', function(){
 		clientSocket.emit('setCam', camNumber);
 		console.log("Connected Camera as "+ camNumber);
 	});
 	
 }
+
+

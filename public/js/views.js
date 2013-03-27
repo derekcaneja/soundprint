@@ -47,14 +47,11 @@ var ToneMatrixView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'square-container',
 	initialize: function() {
-		_.bindAll(this, 'play')
+	
 		this.$el.attr('rel', this.model.get('title'));
 		this.$el.append('<div class="square"></div><div class="tool-container"></div>');
 		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="icon-unlock"></i><i class="icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"></div></div>');
-		
-		this.dropdownOpen = "false";
-
-
+	
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '.5';
@@ -89,23 +86,68 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$('.tool-row:nth-of-type(2)').append(balance.el, volume.el);
 		// this.$('.tool-row').append(delay.el);
 		// this.$('.tool-row').append(gain.el);
-
-		this.$('.square').append('<table class="tablegrid" data-table-name="' + this.model.get('title') + '"></table>');
-
-		for(var i = 0; i < 12; i++) {
-			var row = $('<tr data-sqtype="' + this.model.get('title') + '"></tr>');
-
-			for(var x = 0; x < 12; x++) {
-				row.append('<td></td>');
+		
+		this.canvas = document.createElement('canvas');
+		this.context = this.canvas.getContext('2d');
+		this.canvas2 = document.createElement('canvas');
+		this.context2 = this.canvas.getContext('2d');
+		
+		
+		this.ww = this.model.get('width');
+		this.hh = this.model.get('height');
+		
+		this.hzSpaces = 16;
+		this.vtSpaces = 16;
+		
+		this.hzLength = this.ww / this.hzSpaces;
+		this.vtLength = this.hh / this.vtSpaces;
+		//
+		this.$('.square').append(this.canvas);
+		//
+		this.minThreshold = 0.3
+		//
+		
+		this.resize();
+		this.render();
+		console.log(this.ww, this.hh, this.hzLength, this.vtLength);
+		//
+		this.densityArray = [];
+		//
+		for(var i= 0; i < this.vtSpaces; i+=1){
+			var temp = [];
+			for(var n = 0; n < this.hzSpaces; n+=1){
+				temp.push(0);
 			}
+			this.densityArray.push(temp);
+		}
 
-			this.$('.tablegrid').append(row);
+		//
+		//setInterval( function(){this2.render();}, (1000/30));
+	},
+	render: function() {		
+		if(this.altImage){
+			this.context.globalAlpha = 1;
+			this.context.putImageData(this.altImage,0,0);
 		}
 
 
 	},
-	render: function() {
-
+	sendFrame: function(data){	
+		if(this.altImage){
+			this.context.putImageData(this.altImage,0,0);
+		}
+		for(var n = 0; n < data.length; i += 1){
+			for(var n = 0; n < data[i].length; n += 1){
+				if	(data[i][n]<0.3)	this.densityArray[i][n] = 0; 
+				else if(data[i][n]<0.6)	this.densityArray[i][n] = 1; 
+				else 					this.densityArray[i][n] = 2; 
+				
+				this.context.fillStyle = "#FFFFFF";
+				this.context.globalAlpha = this.densityArray[i][n]/4;
+				this.context.fillRect(i*this.hzLength,n*this.vtLength, this.hzLength, this.vtLength);
+			}
+		}
+		
 	},
 	events: {
 		'mouseover'		: 'mouseover',
@@ -116,15 +158,34 @@ var ToneMatrixView = Backbone.View.extend({
 		'mouseover .instrument-item': 'lihover',
 		'mouseout .instrument-item': 'lileave',
 	},
-	play: function(interval) {
-		this.$('tr').each(function(index){
-			if(index == (interval - 1) % 12) $(this).children().css({ background: 'rgba(255, 255, 255, 0.25)' });
-			else $(this).children().css({ background: 'none' });
-		});
+	
+	resize: function(){
+		this.canvas.width = this.canvas2.width = this.ww;
+		this.canvas.height = this.canvas2.height = this.hh;
+		this.context2.lineWidth = 1;
+		this.context2.fillStyle = this.model.get('color');
+		this.context2.fillRect(0,0,this.ww,this.hh);
+		this.context2.strokeStyle = this.model.get('gridcolor');
+		for(var i = 1; i < this.ww - 2; i += this.hzLength){
+			this.context2.beginPath();
+			this.context2.moveTo(i,0);
+			this.context2.lineTo(i,this.hh);
+			this.context2.closePath();
+			this.context2.stroke();
+		}
+		for(var n = 1; n < this.hh - 2; n += this.vtLength){
+			this.context2.beginPath();
+			this.context2.moveTo(0,n);
+			this.context2.lineTo(this.ww,n);
+			this.context2.closePath();
+			this.context2.stroke();
+		}
+		
+		this.altImage = this.context2.getImageData(0,0,this.canvas2.width, this.canvas2.height);
 	},
 	mouseover: function(){
-			this.$el.addClass('square-container-hover');
-			//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
+		this.$el.addClass('square-container-hover');
+		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
 	},
 	mouseleave: function(){
 		this.$el.removeClass('square-container-hover');
@@ -139,6 +200,7 @@ var ToneMatrixView = Backbone.View.extend({
  		this.borderAlpha = '1';
  		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
 		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
+
 		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
 		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
 			
@@ -147,6 +209,11 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
 		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
 		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
+
+		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
+		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
+		//console.log(this.rgbaColor);
+
 	},
 	btnleave: function(){
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
@@ -163,6 +230,7 @@ var ToneMatrixView = Backbone.View.extend({
 
 			//console.log(this.rgbaColor);
 		}
+
 	},
 	btnclick: function(){
 		this.dropdownOpen = "true";
@@ -176,6 +244,7 @@ var ToneMatrixView = Backbone.View.extend({
 	},
 	lileave: function(ev){
 		$(ev.target).css({'background-color': 'transparent'});
+
 	}
 
 });

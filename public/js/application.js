@@ -22,4 +22,18 @@ var application = new ApplicationView({ header: header, content: content, footer
 $('body').append(application.el);
 
 $('.square').height($('.square-container').width());
-$('.tablegrid').outerHeight($('.square-container').width());
+
+var toneMatrix = [	toneMatrix1,
+					toneMatrix2,
+					toneMatrix3,
+					toneMatrix4]
+
+//Connections
+function connectTo(ip){
+	clientSocket = io.connect('http://'+ip+"/application");
+
+	clientSocket.on('frame', function(data){
+		toneMatrix[data.cam].sendFrame(data.data);
+	});
+}
+//
