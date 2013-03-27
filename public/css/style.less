@@ -759,8 +759,8 @@ header.header{
 		color: lighten(#BDC3C7, 14%);
 		font-smoothing: antialiased;
 		line-height: 1.2;
-
 	}
+	
 	.tick{
 		/*width: 10px;
 		height: 10px;
@@ -778,6 +778,10 @@ header.header{
 		.transition(border-bottom 0.2s ease);
 	}
 }
+/*.knob.valuechange:after{
+		color: black;//#E67E22;
+		.transition(color 0.05s);
+	}*/
 .knob-container:hover{
 	.tick{
 		border-bottom: 7px solid darken(@knobBorderColor,5%);
@@ -851,6 +855,33 @@ header.header{
 			width: 60%;
 			display: inline-block;
 			vertical-align: middle;
+
+			.recordbutton{
+				width: 100px;
+				height: 40px;
+				.border-radius(6px);
+				background: #ECF0F1;
+				border: 0;
+				padding: 4px;
+				font-family: 'Lato';
+						//font-family: 'proxima_novasemibold';
+						letter-spacing: 0px;
+						font-weight: 400;
+						font-size: 12px;
+				*{
+					display: inline-block;
+					vertical-align: middle;
+					float: left;
+				}
+			}
+			.recordcircle{
+				width: 20px;
+				height: 20px;
+				margin: 0px 5px 0px 5px;
+				.border-radius(50%);
+				background: darken(#C0392B, 2%);
+			}
+
 		}
 		.twitter-container{
 			width: 20%;

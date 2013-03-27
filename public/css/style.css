@@ -7203,6 +7203,10 @@ header.header .navbar-inner {
   -o-transition: border-bottom 0.2s ease;
   transition: border-bottom 0.2s ease;
 }
+/*.knob.valuechange:after{
+		color: black;//#E67E22;
+		.transition(color 0.05s);
+	}*/
 .knob-container:hover .tick {
   border-bottom: 7px solid #17a689;
   -webkit-transition: border-bottom 0.2s ease;
@@ -7312,6 +7316,34 @@ header.header .navbar-inner {
   width: 60%;
   display: inline-block;
   vertical-align: middle;
+}
+.footer .footer-container .record-container .recordbutton {
+  width: 100px;
+  height: 40px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  background: #ECF0F1;
+  border: 0;
+  padding: 4px;
+  font-family: 'Lato';
+  letter-spacing: 0px;
+  font-weight: 400;
+  font-size: 12px;
+}
+.footer .footer-container .record-container .recordbutton * {
+  display: inline-block;
+  vertical-align: middle;
+  float: left;
+}
+.footer .footer-container .record-container .recordcircle {
+  width: 20px;
+  height: 20px;
+  margin: 0px 5px 0px 5px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background: #b83729;
 }
 .footer .footer-container .twitter-container {
   width: 20%;

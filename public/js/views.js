@@ -305,8 +305,14 @@ var KnobView = Backbone.View.extend({
 	className: 'knob-container',
 	initialize: function() {
 		this.knob_dragging = false;
-		this.$el.append('<div class="knob" knob-value="0"></div><div class="tick"></div><h5>' + this.model.get('title') + '</h5>');
 
+		this.knobValue = 0;
+		this.knobValuePrev = 0;
+		
+		
+		this.$el.append('<div class="knob" knob-value="0"></div><div class="tick"></div><h5>' + this.model.get('title') + '</h5>');
+		//this.knobValue = this.$('.knob').attr('knob-value');
+		//console.log(this.knobValue);
 		this.rotation = -125;
 
 		this.$('.tick').css({
@@ -320,6 +326,7 @@ var KnobView = Backbone.View.extend({
 		this.render();
 	},
 	render: function(){
+		this.knobValue = this.$('.knob').attr('knob-value');
 		this.$('.tick').css({
 			'transform'    		: 'rotate(' + this.rotation + 'deg)',
 			'-ms-transform'    	: 'rotate(' + this.rotation + 'deg)',
@@ -329,6 +336,14 @@ var KnobView = Backbone.View.extend({
 		});
 
 		this.$('.knob').attr('knob-value', (this.rotation + 125) / 25 % 15);
+		// if(this.knobValue != this.knobValuePrev){
+		// 	this.$('.knob').addClass('valuechange');
+		// 	setTimeout(function(){
+		// 		this.$('.knob').removeClass('valuechange');
+		// 	}, 300);
+		// }
+
+		// this.knobValuePrev = this.knobValue;
 	},
 	events:{
 		'mouseover' : 'mouseover',
@@ -355,16 +370,12 @@ var KnobView = Backbone.View.extend({
 
 			item.rotation += 90;
 
-			console.log(item.rotation);
-
 			if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
 			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
 			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
 			else if(item.rotation > 130) item.rotation = -125;
 
-
 			item.rotation = Math.round(item.rotation / 25) * 25;
-
 
 			item.render();
 		});
@@ -409,7 +420,7 @@ var FooterView = Backbone.View.extend({
 	tagName: 'footer',
 	className: 'footer',
 	initialize: function() {
-		this.$el.append('<div class="footer-container"><div class="leftbox"><a href="#">Learn more about Handprint</a></div><div class="record-container">Record</div><div class="twitter-container">Twitter</div></div>');
+		this.$el.append('<div class="footer-container"><div class="leftbox"><a href="#">Learn more about Handprint</a></div><div class="record-container"><button class="recordbutton"><div class="recordcircle"></div>Record</button></div><div class="twitter-container">Twitter</div></div>');
 		
 	}
 });
