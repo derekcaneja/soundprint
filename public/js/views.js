@@ -107,19 +107,17 @@ var ToneMatrixView = Backbone.View.extend({
 
 		//console.log(this.$('.tool-row').height());
 
-		var knob2 = new Knob();
-		var knob3 = new Knob();
-		var reverb = new KnobView({ model:new Knob({title: 'Reverb'}) });
-		var delay = new KnobView({ model:new Knob({title: 'Delay'}) });
-		var gain = new KnobView({ model:new Knob({title: 'Gain'}) });
+		this.reverb = new KnobView({ model:new Knob({title: 'Reverb'}) });
+		this.delay = new KnobView({ model:new Knob({title: 'Delay'}) });
+		this.gain = new KnobView({ model:new Knob({title: 'Gain'}) });
 
-		var balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
-		var volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
+		this.balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
+		this.volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
 		this.$('.tools').append('<div class="tool-row"></div>');
-		this.$('.tool-row:nth-of-type(2)').append(delay.el, reverb.el, gain.el);
+		this.$('.tool-row:nth-of-type(2)').append(this.delay.el, this.reverb.el, this.gain.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
 		
-		this.$('.tool-row:nth-of-type(3)').append(balance.el, volume.el);
+		this.$('.tool-row:nth-of-type(3)').append(this.balance.el, this.volume.el);
 
 
 		this.locked = false;
@@ -174,10 +172,6 @@ var ToneMatrixView = Backbone.View.extend({
 			this.context.globalAlpha = 1;
 			this.context.putImageData(this.altImage,0,0);
 		}
-		
-
-
-
 	},
 	sendFrame: function(data){	
 		if(this.altImage){
@@ -593,20 +587,25 @@ var KnobView = Backbone.View.extend({
 		var offsetY = this.$('.knob').offset().top + this.$('.knob').height() / 2;
 		this.$el.css({'cursor': 'pointer'});
 		this.$el.children().css({'cursor': 'pointer'});
-		this.rotating = $(window).mousemove(function(e){
-			item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
 
-			item.rotation += 90;
+		this.rotate = true;
+		
+		$(window).mousemove(function(e){
+			if(item.rotate){
+				item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
+
+				item.rotation += 90;
 
 
-			if(item.rotation > 120 && item.rotation < 150) 		item.rotation = 125;
-			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
-			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
-			else if(item.rotation > 130) 						item.rotation = -125;
+				if(item.rotation > 120 && item.rotation < 150) 		item.rotation = 125;
+				else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
+				else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
+				else if(item.rotation > 130) 						item.rotation = -125;
 
-			item.rotation = Math.round(item.rotation / 25) * 25;
+				item.rotation = Math.round(item.rotation / 25) * 25;
 
-			item.render();
+				item.render();
+			}
 		});
 	}
 });
