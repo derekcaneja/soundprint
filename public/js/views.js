@@ -49,14 +49,17 @@ var ToneMatrixView = Backbone.View.extend({
 	initialize: function() {
 	
 		this.$el.attr('rel', this.model.get('title'));
-		this.$el.append('<div class="square"></div><div class="tool-container"></div>');
-		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="icon-unlock"></i><i class="icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"></div></div>');
+		this.$el.append('<div class="square"></div><div class="square-border"></div><div class="tool-container"></div>');
+		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></div></div>');
 	
+		
+
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '.5';
  		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.instrument').children('.btn').css({'border-color': this.rgbaColor})
+		this.$('.instrument').children('.btn').css({'border-color': this.rgbaColor});
+
 		
 		//this.$('.dropdown-menu').css({'background-color': this.model.get('color')})
 		this.$('.dropdown-toggle').dropdown();
@@ -72,6 +75,14 @@ var ToneMatrixView = Backbone.View.extend({
 		if(this.model.get('title') == "Melody"){
 		 	this.$('.dropdown-menu').append('<li><a class="instrument-item">Melody 1</a></li><li><a class="instrument-item">Melody 2</a></li><li><a class="instrument-item">Melody 3</a></li>')
 		}
+
+		this.$('#'+this.model.get('title')+'Waveform').height('80px');
+		this.$('#'+this.model.get('title')+'Waveform').width('100%');
+		
+
+
+		//console.log(this.$('.tool-row').height());
+
 		var knob2 = new Knob();
 		var knob3 = new Knob();
 		var reverb = new KnobView({ model:new Knob({title: 'Reverb'}) });
@@ -80,10 +91,17 @@ var ToneMatrixView = Backbone.View.extend({
 
 		var balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
 		var volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
-
-		this.$('.tool-row').append(delay.el, reverb.el, gain.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
-		this.$('.tool-row:nth-of-type(2)').append(balance.el, volume.el);
+		this.$('.tool-row:nth-of-type(2)').append(delay.el, reverb.el, gain.el);
+		this.$('.tools').append('<div class="tool-row"></div>');
+		
+		this.$('.tool-row:nth-of-type(3)').append(balance.el, volume.el);
+
+
+		this.locked = false;
+		this.flip = null;
+
+
 		// this.$('.tool-row').append(delay.el);
 		// this.$('.tool-row').append(gain.el);
 		
@@ -103,13 +121,14 @@ var ToneMatrixView = Backbone.View.extend({
 		this.vtLength = this.hh / this.vtSpaces;
 		//
 		this.$('.square').append(this.canvas);
+		
 		//
 		this.minThreshold = 0.3
 		//
 		
 		this.resize();
 		this.render();
-		console.log(this.ww, this.hh, this.hzLength, this.vtLength);
+		//console.log(this.ww, this.hh, this.hzLength, this.vtLength);
 		//
 		this.densityArray = [];
 		//
@@ -129,6 +148,8 @@ var ToneMatrixView = Backbone.View.extend({
 			this.context.globalAlpha = 1;
 			this.context.putImageData(this.altImage,0,0);
 		}
+		
+
 
 
 	},
@@ -150,13 +171,15 @@ var ToneMatrixView = Backbone.View.extend({
 		
 	},
 	events: {
-		'mouseover'		: 'mouseover',
-		'mouseleave'	: 'mouseleave',
-		'mouseover .dropdown-toggle': 'btnhover',
-		'mouseout .dropdown-toggle': 'btnleave',
-		'click .dropdown-toggle': 'btnclick',
-		'mouseover .instrument-item': 'lihover',
-		'mouseout .instrument-item': 'lileave',
+		'mouseover'						: 'mouseover',
+		'mouseleave'					: 'mouseleave',
+		'mouseover .dropdown-toggle'	: 'dropdownhover',
+		'mouseout .dropdown-toggle'		: 'dropdownleave',
+		'click .dropdown-toggle'		: 'btnclick',
+		'mouseover .instrument-item'	: 'listhover',
+		'mouseout .instrument-item'		: 'listleave',
+		'click .lock'					: 'lockMatrix',
+		'click .flip'					: 'flipMatrix'
 	},
 	
 	resize: function(){
@@ -191,7 +214,7 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$el.removeClass('square-container-hover');
 		//$('.square-container').transition({opacity: 1});
 	},
-	btnhover: function(){
+	dropdownhover: function(){
 		this.$('.btn').addClass('btnhover');
 
 		this.$('.caret').addClass('carethover');
@@ -215,7 +238,7 @@ var ToneMatrixView = Backbone.View.extend({
 		//console.log(this.rgbaColor);
 
 	},
-	btnleave: function(){
+	dropdownleave: function(){
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '.5';
@@ -235,15 +258,40 @@ var ToneMatrixView = Backbone.View.extend({
 	btnclick: function(){
 		this.dropdownOpen = "true";
 	},
-	lihover: function(ev){
+	listhover: function(ev){
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '1';
  		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
 		$(ev.target).css({'background-color': this.rgbaColor});
 	},
-	lileave: function(ev){
+	listleave: function(ev){
 		$(ev.target).css({'background-color': 'transparent'});
+
+	},
+	lockMatrix: function(){
+		if(!this.locked){
+			this.$('.lock').removeClass('icon-unlock');
+			this.$('.lock').addClass('icon-lock');
+			this.$('.lock').addClass('iconselected');
+			this.locked = true;
+		} else{
+			this.$('.lock').removeClass('iconselected');
+			this.$('.lock').removeClass('icon-lock');
+			this.$('.lock').addClass('icon-unlock');
+			this.locked = false;
+		}
+	},
+	flipMatrix: function(ev){
+		//console.log($(ev.target));
+		// $(ev.target).parent().addClass('fliprotate', function(){
+		// setTimeout(function() {
+		// 	$(ev.target).parent().removeClass('fliprotate');
+		// }, 200);
+		// });
+		
+		
+
 
 	}
 
