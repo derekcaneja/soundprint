@@ -130,7 +130,7 @@ var metronome = T('interval', { interval: 'BPM' + BPM + ' L16' }, function(count
 	for(var column = 0; column < melodyMatrix[row].length; 	column++)	if(melodyData[row][column] == 1)  melody.noteOn(melodyMatrix[row][column], 80);
 });
 
-//metronome.start();
+metronome.start();
 
 function createToneMatrix(baseNote, width, height) {
 	var matrix = new Array();
