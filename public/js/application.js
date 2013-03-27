@@ -13,6 +13,8 @@ toneMatrix2 = new ToneMatrixView({ model: toneMatrix2 });
 toneMatrix3 = new ToneMatrixView({ model: toneMatrix3 });
 toneMatrix4 = new ToneMatrixView({ model: toneMatrix4 });
 
+
+
 var header = new HeaderView();
 var content = [toneMatrix1, toneMatrix2, toneMatrix3, toneMatrix4];
 var footer = new FooterView();
@@ -21,7 +23,10 @@ var application = new ApplicationView({ header: header, content: content, footer
 
 $('body').append(application.el);
 
+
 $('.square').height($('.square-container').width());
+$('.square-border').height($('.square-container').width());
+
 
 var toneMatrix = [	toneMatrix1,
 					toneMatrix2,
