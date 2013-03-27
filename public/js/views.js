@@ -258,13 +258,34 @@ var KnobView = Backbone.View.extend({
 	initialize: function() {
 		this.knob_dragging = false;
 		this.$el.append('<div class="knob" knob-value="0"></div><div class="tick"></div><h5>' + this.model.get('title') + '</h5>');
+
+		this.rotation = -125;
+
+		this.$('.tick').css({
+			'transform-origin' 			: '50% 515%',
+			'-ms-transform-origin' 		: '50% 515%',
+			'-webkit-transform-origin' 	: '50% 515%',
+			'-moz-transform-origin' 	: '50% 515%',
+			'-o-transform-origin' 		: '50% 515%'
+		});
+
+		this.render();
 	},
 	render: function(){
+		this.$('.tick').css({
+			'transform'    		: 'rotate(' + this.rotation + 'deg)',
+			'-ms-transform'    	: 'rotate(' + this.rotation + 'deg)',
+			'-webkit-transform' : 'rotate(' + this.rotation + 'deg)',
+			'-moz-transform'    : 'rotate(' + this.rotation + 'deg)',
+			'-o-transform'    	: 'rotate(' + this.rotation + 'deg)'
+		});
 
+		this.$('.knob').attr('knob-value', (this.rotation + 125) / 25 % 15);
 	},
 	events:{
 		'mouseover' : 'mouseover',
-		'mouseleave': 'mouseleave'
+		'mouseleave': 'mouseleave',
+		'mousedown'	: 'mousedown'
 	},
 	mouseover: function(){
 		document.onselectstart = function(){ return false; };
@@ -273,6 +294,32 @@ var KnobView = Backbone.View.extend({
 		if(!this.knob_dragging){
 		   document.onselectstart = null;
 		}
+	},
+	mousedown: function() {
+		var item = this;
+		var offsetX = this.$('.knob').offset().left + this.$('.knob').width() / 2;
+		var offsetY = this.$('.knob').offset().top + this.$('.knob').height() / 2;
+
+		console.log(this.$('.knob').offset());
+
+		this.rotating = $(window).mousemove(function(e){
+			item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
+
+			item.rotation += 90;
+
+			console.log(item.rotation);
+
+			if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
+			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
+			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
+			else if(item.rotation > 130) item.rotation = -125;
+
+
+			item.rotation = Math.round(item.rotation / 25) * 25;
+
+
+			item.render();
+		});
 	}
 });
 

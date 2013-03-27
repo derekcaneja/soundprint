@@ -23,10 +23,7 @@ $('body').append(application.el);
 
 $('.square').height($('.square-container').width());
 
-var toneMatrix = [	toneMatrix1,
-					toneMatrix2,
-					toneMatrix3,
-					toneMatrix4]
+var toneMatrix = [toneMatrix1, toneMatrix2, toneMatrix3, toneMatrix4];
 
 //Connections
 function connectTo(ip){
@@ -37,3 +34,4 @@ function connectTo(ip){
 	});
 }
 //
+
