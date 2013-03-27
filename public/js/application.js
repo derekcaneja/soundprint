@@ -1,7 +1,6 @@
 //-----------------------------------------//
 //---------------Application---------------//
 //-----------------------------------------//
-
 var squareSize = 23/100 * $(window).width() * 92/100;
 var toneMatrix1 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#3498DB', instrument: 'PluckGen', title: 'Bass', gridcolor: '#2980B9' });
 var toneMatrix2 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#2ECC71', instrument: 'PluckGen', title: 'Rhythm', gridcolor: '#27AE60' });
@@ -39,3 +38,18 @@ function connectTo(ip){
 		toneMatrix[data.cam].sendFrame(data.data);
 	});
 }
+
+$(window).mouseup(function(){ 
+	toneMatrix1.reverb.rotating = false;
+	toneMatrix1.delay.rotate = false;
+	toneMatrix1.gain.rotate = false;
+	toneMatrix2.reverb.rotate = false;
+	toneMatrix2.delay.rotate = false;
+	toneMatrix2.gain.rotate = false;	
+	toneMatrix3.reverb.rotate = false;
+	toneMatrix3.delay.rotate = false;
+	toneMatrix3.gain.rotate = false;	
+	toneMatrix4.reverb.rotate = false;
+	toneMatrix4.delay.rotate = false;
+	toneMatrix4.gain.rotate = false;
+});
