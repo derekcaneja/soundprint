@@ -154,5 +154,4 @@ function connectTo(ip, num){
 			grabBG();
 		}, 1000);
 	});
-	
 }

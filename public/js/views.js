@@ -273,14 +273,16 @@ var ToneMatrixView = Backbone.View.extend({
 						a:0.5,
 					});
 
-					var note = this.model.get('instrument').noteOn(item.model.get('matrix')[item.playBeat][i] + 53, 10);//.plot({ 
+					var instrument = this.model.get('instrument');
+
+					instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 53, 40);//.plot({ 
 					// 	target		: canvas, 
 					// 	foreground	: item.model.get('color'), 
 					// 	background	: '#233140', 
 					// 	lineWidth	: 3 
 					// });
 					
-					T('reverb', { room:0.9, damp:0.2, mix:0.45 }, this).play();
+					//var reverb = T('reverb', { room: 0, damp: 0, mix: 0 }, note);
 				};
 			}
 		}
@@ -608,6 +610,9 @@ var KnobView = Backbone.View.extend({
 	},
 	render: function(){
 		this.knobValue = this.$('.knob').attr('knob-value');
+
+		this.model.set('value', this.knobValue);
+
 		this.$('.tick').css({
 			'transform'    		: 'rotate(' + this.rotation + 'deg)',
 			'-ms-transform'    	: 'rotate(' + this.rotation + 'deg)',
