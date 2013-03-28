@@ -50,10 +50,9 @@ var rhythmSynth = T('SynthDef').play();
 rhythmSynth.def = function(opts) {
 	var osc1 = T('sin', { freq: 262, mul: 0.10 });
 	var osc2 = T('pulse', { freq: [262, 294, 330, 356], mul: 0.10 });
-	var env = T('linen', { s: 50, r: 100, v: 0.9 }, osc1, osc2);
+	var env = T('linen', { s: 50, r: 100, v: 0.9 }, this.osc1, this.osc2);
 	return env.on('ended', opts.doneAction).bang();
 };
-
 
 var harmonySynth = T('SynthDef').play();
 harmonySynth.def = function(opts) {
@@ -63,22 +62,9 @@ harmonySynth.def = function(opts) {
 	return this.env.on('ended', opts.doneAction).bang();
 };
 
-
 var melodySynth = T('SynthDef').play();
 melodySynth.def = function(opts) {
-	var osc1 = T('pulse', { freq: [262, 294, 330, 356, 384, 412], mul: 0.05 });
-	//var osc2 = T('saw', { mul: 0.15 });
-	var env = T('linen', { s: 100, r: 250, v: 0.9 }, osc1);
+	this.osc1 = T('pulse', { freq: [262, 294, 330, 356, 384, 412], mul: 0.05 });
+	this.env = T('linen', { s: 100, r: 250, v: 0.9 }, this.osc1);
 	return env.on('ended', opts.doneAction).bang();
 };
-
-
-/*var metronome = T('interval', { interval: 'BPM' + BPM + ' L16' }, function(count) {
-	console.log(count);
-	C_SynthMatrix.instrument.noteOn(C_SynthMatrix.matrix[count % 16][0] + 53, 80);
-	G_SynthMatrix.instrument.noteOn(G_SynthMatrix.matrix[count % 16][0] + 53, 80);
-	D_SynthMatrix.instrument.noteOn(D_SynthMatrix.matrix[count % 16][0] + 53, 80);
-	A_SynthMatrix.instrument.noteOn(A_SynthMatrix.matrix[count % 16][0] + 53, 80);
-});
-
-metronome.start();*/

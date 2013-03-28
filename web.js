@@ -7,14 +7,9 @@ var express = require('express')
   , io = require('socket.io')
   , routes = require('./routes')
   , http = require('http')
-  , path = require('path')
-  , cluster = require('cluster');
+  , path = require('path');
  
-
-
-
 var app = express();
-
 
 app.configure(function(){
   app.set('port', process.env.PORT || 5555);
@@ -44,8 +39,8 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 io = io.listen(server);
 
-io.configure('development',function (){
-	io.set("log level", 0);
+io.configure('development', function(){
+	io.set('log level', 0);
 });
 
 var cameraSocket = io.of('/camera');
@@ -54,16 +49,16 @@ var cameraClient;
 var applicationClient = [];
 var cameraData = [];
 
-for(var i = 0; i < 4; i+=1)cameraData[i] = null;
+for(var i = 0; i < 4; i+=1) cameraData[i] = null;
+	
 cameraSocket.on('connection', function(socket){	
-	//
 	socket.emit('handshake');
 	cameraClient = socket;
-	//
+
 	socket.on('setCam', function(number){
-		console.log("Connected Camera Number "+number);
+		console.log('Connected Camera Number ' + number);
 	});
-	//
+
 	socket.on('frame', function(data){
 		if(data && applicationClient){
 			for(var i = 0; i < applicationClient.length; i++) {

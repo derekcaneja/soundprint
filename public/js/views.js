@@ -591,10 +591,8 @@ var KnobView = Backbone.View.extend({
 		this.knobValue = 0;
 		this.knobValuePrev = 0;
 		
-		
 		this.$el.append('<div class="knob" knob-value="0"></div><div class="tick"></div><h5>' + this.model.get('title') + '</h5>');
-		//this.knobValue = this.$('.knob').attr('knob-value');
-		//console.log(this.knobValue);
+		
 		this.rotation = -125;
 
 		this.$('.tick').css({
@@ -678,7 +676,7 @@ var SliderView = Backbone.View.extend({
 		this.$el.attr('rel', this.model.get('type'))
 		this.$el.append('<span class="balance-lr">L</span><div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 50%;"></a></div><span class="balance-lr">R</span><h5>' + this.model.get('title') + '</h5>');
 		this.handleColor = this.model.get('handlecolor');
-		//this.handleColor = jQuery.Color(this.handleColor).lightness('.45').saturation('.3');
+
 		if(this.$el.attr('rel') == 'balance'){
 			this.$('.slider').slider({
 		        min: 1,
