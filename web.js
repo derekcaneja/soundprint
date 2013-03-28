@@ -7,9 +7,8 @@ var express = require('express')
   , io = require('socket.io')
   , routes = require('./routes')
   , http = require('http')
-  , path = require('path')
-  , cv  = require('opencv');
- 
+  , path = require('path');
+   
 var app = express();
 
 app.configure(function(){

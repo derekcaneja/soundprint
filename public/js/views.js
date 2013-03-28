@@ -118,14 +118,14 @@ var ToneMatrixView = Backbone.View.extend({
 
 		//console.log(this.$('.tool-row').height());
 
+		this.pitch = new KnobView({ model:new Knob({title: 'Pitch'}) });
+		this.distortion = new KnobView({ model:new Knob({title: 'Distort'}) });
 		this.reverb = new KnobView({ model:new Knob({title: 'Reverb'}) });
-		this.delay = new KnobView({ model:new Knob({title: 'Delay'}) });
-		this.gain = new KnobView({ model:new Knob({title: 'Gain'}) });
 
 		this.balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
 		this.volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
 		this.$('.tools').append('<div class="tool-row"></div>');
-		this.$('.tool-row:nth-of-type(2)').append(this.delay.el, this.reverb.el, this.gain.el);
+		this.$('.tool-row:nth-of-type(2)').append(this.pitch.el, this.distortion.el, this.reverb.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
 		
 		this.$('.tool-row:nth-of-type(3)').append(this.balance.el, this.volume.el);
@@ -227,9 +227,9 @@ var ToneMatrixView = Backbone.View.extend({
 						else this.densityArray[nn][ii] = 1; 
 					}
 				}
+				if(this.rot>=4)this.rot = 0;
+				for(var i = 0; i < this.rot; i+=1)this.densityArray = rotateMatrix(this.densityArray);
 			}
-			if(this.rot>=4)this.rot = 0;
-			for(var i = 0; i < this.rot; i+=1)this.densityArray = rotateMatrix(this.densityArray);
 		}
 	},
 	render: function(){
@@ -259,7 +259,7 @@ var ToneMatrixView = Backbone.View.extend({
 									this.vtLength);
 				
 			//
-			this.note.a -= 0.01
+			this.note.a -= (this.locked)?0.002:0.01;
 			if(this.note.a <= 0){
 				this.notes.remove(this.note);
 				i -= 1;
@@ -283,10 +283,17 @@ var ToneMatrixView = Backbone.View.extend({
 
 					context.clearRect(0, 0, canvas.width, canvas.height);
 
-
 					var instrument = this.model.get('instrument');
 
-					var note = instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 48, item.volume.model.get('value') * 8).plot({ 
+					console.log(item.delay.model.get('value'))
+
+					instrument.env = T('+', 
+						T('delay', { time: item.delay.model.get('value') * 100, fb: 1 }),
+						T('reverb', { damp: item.delay.model.get('value') / 10 }),
+						T('dist', { pre: 40 * item.delay.model.get('value') / 10, post: -12 * item.delay.model.get('value') / 10, cutoff: 400 + (40 * item.delay.model.get('value') / 10) })
+					);
+
+					instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 60 + item.pitch.model.get('value'), item.volume.model.get('value') * 8).plot({ 
 						target		: canvas, 
 						foreground	: item.model.get('color'), 
 						background	: 'rgba(0,0,0,0)', 
@@ -387,6 +394,10 @@ var ToneMatrixView = Backbone.View.extend({
 	},
 	flipMatrix: function(ev){
 		this.rot += 1;
+
+		for(var i = 0; i < this.notes.ar.length; i+=1){
+			notes[i].a = 0;
+		}
 	}
 
 });
@@ -605,7 +616,8 @@ var KnobView = Backbone.View.extend({
 		
 		this.$el.append('<div class="knob" knob-value="0"></div><div class="tick"></div><h5>' + this.model.get('title') + '</h5>');
 		
-		this.rotation = -125;
+		if(this.model.get('title') == 'Pitch') this.rotation = 0;
+		else this.rotation = -125;
 
 		// this.$('.tick').css({
 		// 	'transform-origin' 			: '50% 515%',
@@ -618,7 +630,14 @@ var KnobView = Backbone.View.extend({
 		this.render();
 	},
 	render: function(){
-		this.knobValue = this.$('.knob').attr('knob-value');
+		if(this.model.get('title') == 'Pitch') {
+			this.knobValue = this.$('.knob').attr('knob-value') - 5;
+			this.$('.knob').attr('knob-value', (this.rotation + 125) / 25 % 15 - 5);
+		} else {
+			this.knobValue = this.$('.knob').attr('knob-value');
+			this.$('.knob').attr('knob-value', (this.rotation + 125) / 25 % 15);
+		}
+
 
 		this.model.set('value', this.knobValue);
 
@@ -629,8 +648,6 @@ var KnobView = Backbone.View.extend({
 			'-moz-transform'    : 'rotate(' + this.rotation + 'deg)',
 			'-o-transform'    	: 'rotate(' + this.rotation + 'deg)'
 		});
-
-		this.$('.knob').attr('knob-value', (this.rotation + 125) / 25 % 15);
 		// if(this.knobValue != this.knobValuePrev){
 		// 	this.$('.knob').addClass('valuechange');
 		// 	setTimeout(function(){

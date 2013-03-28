@@ -86,17 +86,17 @@ function connectTo(ip){
 }
 $(window).mouseup(function(){ 
 	toneMatrix1.reverb.rotate = false;
-	toneMatrix1.delay.rotate = false;
-	toneMatrix1.gain.rotate = false;
+	toneMatrix1.distortion.rotate = false;
+	toneMatrix1.pitch.rotate = false;
 	toneMatrix2.reverb.rotate = false;
-	toneMatrix2.delay.rotate = false;
-	toneMatrix2.gain.rotate = false;	
+	toneMatrix2.distortion.rotate = false;
+	toneMatrix2.pitch.rotate = false;	
 	toneMatrix3.reverb.rotate = false;
-	toneMatrix3.delay.rotate = false;
-	toneMatrix3.gain.rotate = false;	
+	toneMatrix3.distortion.rotate = false;
+	toneMatrix3.pitch.rotate = false;	
 	toneMatrix4.reverb.rotate = false;
-	toneMatrix4.delay.rotate = false;
-	toneMatrix4.gain.rotate = false;
+	toneMatrix4.distortion.rotate = false;
+	toneMatrix4.pitch.rotate = false;
 });
 //
 var playing = false;
