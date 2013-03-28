@@ -34,13 +34,13 @@ var synthMatrix = function(scale, width, height){
 
 var synthMatrixFinal = new synthMatrix(C_Major_PentonicScale, 16, 16);
 
-var bassSynth = T('SynthDef').play();
-bassSynth.def = function(opts) {
-	var osc1 = T('sin', { freq: 64, mul: 0.15 });
-	var osc2 = T('sin', { freq: 130, mul: 0.15 });
-	var env = T('linen', { s: 25, r: 250, v: 0.9 }, osc1, osc2);
-	return env.on('ended', opts.doneAction).bang();
-};
+var bassSynth = T('PluckGen');
+// bassSynth.def = function(opts) {
+// 	var osc1 = T('sin', { freq: 64, mul: 0.15 });
+// 	var osc2 = T('sin', { freq: 130, mul: 0.15 });
+// 	var env = T('linen', { s: 25, r: 250, v: 0.9 }, osc1, osc2);
+// 	return env.on('ended', opts.doneAction).bang();
+// };
 
 var rhythmSynth = T('PluckGen').play();
 // rhythmSynth.def = function(opts) {

@@ -275,14 +275,14 @@ var ToneMatrixView = Backbone.View.extend({
 
 					var instrument = this.model.get('instrument');
 
-					instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 48, 40);//.plot({ 
+					var note = instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 48, item.volume.model.get('value') * 8);
+
+					//.plot({ 
 					// 	target		: canvas, 
 					// 	foreground	: item.model.get('color'), 
 					// 	background	: '#233140', 
 					// 	lineWidth	: 3 
 					// });
-					
-					//var reverb = T('reverb', { room: 0, damp: 0, mix: 0 }, note);
 				};
 			}
 		}
@@ -679,6 +679,7 @@ var SliderView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'slider-container',
 	initialize: function() {
+		var item = this;
 		this.$el.attr('rel', this.model.get('type'))
 		this.$el.append('<span class="balance-lr">L</span><div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 50%;"></a></div><span class="balance-lr">R</span><h5>' + this.model.get('title') + '</h5>');
 		this.handleColor = this.model.get('handlecolor');
@@ -689,6 +690,9 @@ var SliderView = Backbone.View.extend({
 		        max: 5,
 		        value: 3,
 		        orientation: "horizontal",
+		        slide: function(events, ui) {
+		        	item.model.set('value', ui.value);
+		        }
 	   	 	});
 		}
 		if(this.$el.attr('rel') == 'volume'){
@@ -698,6 +702,9 @@ var SliderView = Backbone.View.extend({
 		        value: 5,
 		        orientation: "horizontal",
 		        range: 'min',
+		        slide: function(events, ui) {
+		        	item.model.set('value', ui.value);
+		        }
 	   	 	});
 	   	 	this.$('.ui-slider-range').css({'background-color': this.model.get('color')});
 	   	 	this.$('.ui-slider-handle').css({'background-color': this.handleColor});
