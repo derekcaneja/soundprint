@@ -281,25 +281,17 @@ var ToneMatrixView = Backbone.View.extend({
 						a:0.5,
 					});
 
-					
-					this.model.get('instrument').noteOn(item.model.get('matrix')[item.playBeat][i] + 53, 10).plot({ 
-						target		: canvas, 
-						foreground	: item.model.get('color'), 
-						color2	: item.model.get('color'), 
-						lineWidth	: 3 
-					});
+					context.clearRect(0, 0, canvas.width, canvas.height);
 
 
 					var instrument = this.model.get('instrument');
 
-					var note = instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 48, item.volume.model.get('value') * 8);
-
-					//.plot({ 
-					// 	target		: canvas, 
-					// 	foreground	: item.model.get('color'), 
-					// 	background	: '#233140', 
-					// 	lineWidth	: 3 
-					// });
+					var note = instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 48, item.volume.model.get('value') * 8).plot({ 
+						target		: canvas, 
+						foreground	: item.model.get('color'), 
+						background	: 'rgba(0,0,0,0)', 
+						lineWidth	: 3
+					});
 				};
 			}
 		}

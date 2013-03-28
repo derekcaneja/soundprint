@@ -34,7 +34,7 @@ var synthMatrix = function(scale, width, height){
 
 var synthMatrixFinal = new synthMatrix(C_Major_PentonicScale, 16, 16);
 
-var bassSynth = T('PluckGen');
+var bassSynth = T('PluckGen').play();
 // bassSynth.def = function(opts) {
 // 	var osc1 = T('sin', { freq: 64, mul: 0.15 });
 // 	var osc2 = T('sin', { freq: 130, mul: 0.15 });
