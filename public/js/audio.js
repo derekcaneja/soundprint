@@ -18,38 +18,67 @@ var A_Major_PentonicScale = [A, B, C_SHARP + 7, E + 7, F_SHARP + 7];
 
 var BPM = 120;
 
-var synthMatrix = function(instrument, scale, width, height){
-	this.instrument = T(instrument).play();
-	this.scale 		= scale;
-	this.width 		= width;
-	this.height 	= height;
-	this.matrix 	= new Array();
+var synthMatrix = function(scale, width, height){
+	this.matrix = new Array();
 
-	var count = 0;
-
-	for(var n = 0; n < this.height; n++) {
+	for(var n = 0; n < height; n++) {
+		var count = 0;
 		var temp = new Array();
 
-		if(n != 0 && n % 5 == 0) count += 7;
-
-		for(var i = 0; i < this.width; i++) {
-			temp.push(scale[n % 5] + count);
+		for(var i = 0; i < width; i++) {
+			if(i != 0 && i % 5 == 0) count += 7;
+			temp.push(scale[i % 5] + count);
 		}
 
 		this.matrix.push(temp);
 	}
 };
 
-var C_SynthMatrix = new synthMatrix('OscGen', C_Major_PentonicScale, 16, 16);
-var G_SynthMatrix = new synthMatrix('PluckGen', G_Major_PentonicScale, 16, 16);
-var D_SynthMatrix = new synthMatrix('OscGen', D_Major_PentonicScale, 16, 16);
-var A_SynthMatrix = new synthMatrix('PluckGen', A_Major_PentonicScale, 16, 16);
+var synthMatrixFinal = new synthMatrix(C_Major_PentonicScale, 16, 16);
 
-var metronome = T('interval', { interval: 'BPM' + BPM + ' L16' }, function(count) {
+var bassSynth = T('SynthDef').play();
+bassSynth.def = function(opts) {
+	this.osc1 = T('sin', { freq: 64, mul: 0.05 });
+	this.osc2 = T('sin', { freq: 130, mul: 0.025 });
+	//this.reverb = T('reverb', { room: 1, damp: 0.2, mix: 0.45 });
+	//this.delay = T('delay', { time: toneMatrix1.delay.knobValue / 10 }, this.reverb);
+	this.env = T('linen', { s: 25, r: 250, v: 0.9 }, this.osc1, this.osc2);
+	return this.env.on('ended', opts.doneAction).bang();
+};
+
+var rhythmSynth = T('SynthDef').play();
+rhythmSynth.def = function(opts) {
+	var osc1 = T('sin', { freq: 262, mul: 0.10 });
+	var osc2 = T('pulse', { freq: [262, 294, 330, 356], mul: 0.10 });
+	var env = T('linen', { s: 50, r: 100, v: 0.9 }, osc1, osc2);
+	return env.on('ended', opts.doneAction).bang();
+};
+
+
+var harmonySynth = T('SynthDef').play();
+harmonySynth.def = function(opts) {
+	this.osc1 = T('saw', { freq: [262, 294, 330, 356, 384], mul: 0.10 });
+	this.osc2 = T('sin', { mul: 0.10 });
+	this.env = T('linen', { s: 150, r: 250, v: 0.9 }, this.osc1, this.osc2);
+	return this.env.on('ended', opts.doneAction).bang();
+};
+
+
+var melodySynth = T('SynthDef').play();
+melodySynth.def = function(opts) {
+	var osc1 = T('pulse', { freq: [262, 294, 330, 356, 384, 412], mul: 0.05 });
+	//var osc2 = T('saw', { mul: 0.15 });
+	var env = T('linen', { s: 100, r: 250, v: 0.9 }, osc1);
+	return env.on('ended', opts.doneAction).bang();
+};
+
+
+/*var metronome = T('interval', { interval: 'BPM' + BPM + ' L16' }, function(count) {
+	console.log(count);
 	C_SynthMatrix.instrument.noteOn(C_SynthMatrix.matrix[count % 16][0] + 53, 80);
 	G_SynthMatrix.instrument.noteOn(G_SynthMatrix.matrix[count % 16][0] + 53, 80);
 	D_SynthMatrix.instrument.noteOn(D_SynthMatrix.matrix[count % 16][0] + 53, 80);
 	A_SynthMatrix.instrument.noteOn(A_SynthMatrix.matrix[count % 16][0] + 53, 80);
 });
 
-//metronome.start();
+metronome.start();*/

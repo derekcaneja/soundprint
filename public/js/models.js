@@ -9,6 +9,10 @@ var ToneMatrix =  Backbone.Model.extend({
 		height		: 0,
 		color 		: '#FFFFFF',
 		gridcolor   : '#cccccc',
+		number		: 0,
+		display 	: false,
+		intsrument	: null,
+		matrix		: null
 	}
 });
 var Knob = Backbone.Model.extend({

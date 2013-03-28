@@ -7,9 +7,14 @@ var express = require('express')
   , io = require('socket.io')
   , routes = require('./routes')
   , http = require('http')
-  , path = require('path');
+  , path = require('path')
+  , cluster = require('cluster');
+ 
+
+
 
 var app = express();
+
 
 app.configure(function(){
   app.set('port', process.env.PORT || 5555);
@@ -39,43 +44,40 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 io = io.listen(server);
 
-var cameraSocket = io.of('/camera');
-var displaySocket = io.of('/display');
-var applicationSocket = io.of('/application');
-var cameraClient, displayClient, applicationClient;
+io.configure('development',function (){
+	io.set("log level", 0);
+});
 
-//for(var i = 0; i < 6; i+=1)cameras[i] = null;
+var cameraSocket = io.of('/camera');
+var applicationSocket = io.of('/application');
+var cameraClient;
+var applicationClient = [];
+var cameraData = [];
+
+for(var i = 0; i < 4; i+=1)cameraData[i] = null;
 cameraSocket.on('connection', function(socket){	
 	//
 	socket.emit('handshake');
 	cameraClient = socket;
-	//
-	socket.on('ping', function(data){
-		console.log(data);
-	});
 	//
 	socket.on('setCam', function(number){
 		console.log("Connected Camera Number "+number);
 	});
 	//
 	socket.on('frame', function(data){
-		//var toPrint = "";
-		//for(var i = 0; i < data.length; i++){
-		//	toPrint = "" + toPrint + "\n";
-		//	for(var n = 0; n < data[i].length; n++){
-		//		toPrint = ""+toPrint+((data[i][n]<0.5)?("#"):("."));
-		//	}
-		//}
-		//console.log(toPrint);
-		if(applicationClient){
-			applicationClient.volatile.emit('frame', data);
+		if(data && applicationClient){
+			for(var i = 0; i < applicationClient.length; i++) {
+				applicationClient[i].volatile.emit('sendCamData',{
+					cam: data.cam,
+					density: data.density,
+					pic: data.pic
+				});
+			}
 		}
 	});
 });
 
-applicationSocket.on('connection', function(socket){
-	applicationClient = socket;
-})
-displaySocket.on('connection', function(socket){
-	displayClient = socket;
-})
+applicationSocket.on('connection', function(socket) {
+	applicationClient.push(socket);
+	socket.emit('handshake');
+});

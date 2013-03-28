@@ -11,10 +11,34 @@ var ApplicationView = Backbone.View.extend({
 	initialize: function(options) {
 		this.$el.append(options.header.el);
 		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
-		this.$el.append(options.footer.el)
+		//this.$el.append(options.footer.el)
 		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
 
 		this.count = 0;
+	},
+	play: function() {
+		this.interval = setInterval(function(){
+			toneMatrix1.play(application.count);
+			toneMatrix2.play(application.count);
+			toneMatrix3.play(application.count);
+			toneMatrix4.play(application.count);
+			application.count++;
+		}, 150);
+	},
+	stop: function() {
+		clearInterval(this.interval);
+	}
+});
+var DisplayView = Backbone.View.extend({
+	tagName: 'div',
+	className: 'display',
+	initialize: function(options) {
+		this.$el.append(options.header.el);
+		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
+		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
+		// for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
+
+		// this.count = 0;
 	},
 	play: function() {
 		this.interval = setInterval(function(){
@@ -46,14 +70,17 @@ var HeaderView = Backbone.View.extend({
 var ToneMatrixView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'square-container',
-	initialize: function() {
+	initialize: function() {	
+		this.$el.attr('rel', this.model.get('title'));
 	
 		this.$el.attr('rel', this.model.get('title'));
 		this.$el.append('<div class="square-border"></div><div class="square"></div><div class="tool-container"></div>');
 		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></div></div>');
-	
 		
-
+		//this.$('.square').css({
+		//	'margin-top': '-742px'
+		//});
+		
 		this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '.5';
@@ -100,10 +127,269 @@ var ToneMatrixView = Backbone.View.extend({
 		this.flip = null;
 
 		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
+		
 
 
 		// this.$('.tool-row').append(delay.el);
 		// this.$('.tool-row').append(gain.el);
+		
+		this.canvas = document.createElement('canvas');
+		this.context = this.canvas.getContext('2d');
+		this.canvas2 = document.createElement('canvas');
+		this.context2 = this.canvas2.getContext('2d');
+		this.canvas3 = document.createElement('canvas');
+		this.context3 = this.canvas3.getContext('2d');
+		
+		
+		this.ww = this.model.get('width') + 7;
+		this.hh = this.model.get('height') + 7;
+		
+		this.hzSpaces = 16;
+		this.vtSpaces = 16;
+		
+		this.hzLength = this.ww / this.hzSpaces;
+		this.vtLength = this.hh / this.vtSpaces;
+		//
+		this.$('.square').append(this.canvas);
+		
+		//
+		this.minThreshold = 0.3
+		//
+		this.canvas.width = this.ww;
+		this.canvas.height = this.hh;
+		
+		//
+		this.hasDensity = false;
+		this.densityArray = [];
+		//
+		for(var i= 0; i < this.vtSpaces; i+=1){
+			var temp = [];
+			for(var n = 0; n < this.hzSpaces; n+=1){
+				temp.push(0);
+			}
+			this.densityArray.push(temp);
+		}
+		
+		this.pic = new Image();
+		
+		this.barY = 0;
+		
+		this.canvas.width = this.canvas3.width = this.ww;
+		this.canvas.height = this.canvas3.height = this.hh;
+		
+		this.notes = new myArray();
+		
+		this.rot = 0;
+		
+		this.sendData();
+		this.drawGrid();
+		this.render();
+		
+
+	},
+	drawGrid:function(){
+
+		//
+		this.context3.fillStyle = this.model.get('color');
+		this.context3.fillRect(0,0,this.canvas3.width, this.canvas3.height);
+		this.context3.lineWidth = 1;
+		this.context3.strokeStyle = this.model.get('gridcolor');
+		for(var i = this.hzLength; i < this.ww - 2; i += this.hzLength){
+			this.context3.beginPath();
+			this.context3.moveTo(i,0);
+			this.context3.lineTo(i,this.hh);
+			this.context3.closePath();
+			this.context3.stroke();
+		}
+		for(var n = this.vtLength; n < this.hh - 2; n += this.vtLength){
+			this.context3.beginPath();
+			this.context3.moveTo(0,n);
+			this.context3.lineTo(this.ww,n);
+			this.context3.closePath();
+			this.context3.stroke();
+		}
+	},
+	sendData: function(data){	
+		if(data){
+			if(!this.locked){
+				this.hasDensity = true;
+				for(var nn = 0; nn < data.density.length; nn += 1){
+					for(var ii = 0; ii < data.density[nn].length; ii += 1){
+						if(data.density[nn][ii]<0.3) this.densityArray[nn][ii] = 0; 
+						else this.densityArray[nn][ii] = 1; 
+					}
+				}
+			}
+			if(this.rot>=4)this.rot = 0;
+			for(var i = 0; i < this.rot; i+=1)this.densityArray = rotateMatrix(this.densityArray);
+		}
+	},
+	render: function(){
+		//
+		this.context.drawImage(this.canvas3,0,0);
+		this.context.lineWidth = 2;
+		this.context.strokeStyle = "#FFFFFF";
+		this.barY += this.barS;
+		//
+		if(this.hasDensity){
+			this.context.beginPath();
+			this.context.moveTo(0,this.barY);
+			this.context.lineTo(this.ww,this.barY);
+			this.context.closePath();
+			this.context.stroke();
+			//
+		}
+		//
+		this.context.fillStyle = "#FFFFFF";
+		for(var i = 0; i < this.notes.ar.length; i+=1){
+			this.note = this.notes.ar[i];
+			//
+			this.context.globalAlpha = this.note.a;
+			this.context.fillRect(	this.note.xx * this.hzLength,
+									this.note.yy * this.vtLength,
+									this.hzLength,
+									this.vtLength);
+				
+			//
+			this.note.a -= 0.01
+			if(this.note.a <= 0){
+				this.notes.remove(this.note);
+				i -= 1;
+			}
+		}	
+		this.context.globalAlpha = 1;
+	},
+	setBar: function(yy, frames){
+		var item = this;
+		var canvas = document.getElementById(item.model.get('title') + 'Waveform');		
+		var context = canvas.getContext('2d');
+		this.playBeat = yy;
+		if(this.hasDensity){
+			for(var i = 0; i < this.densityArray[this.playBeat].length; i+=1){
+				if(this.densityArray[this.playBeat][i]==1){
+					this.notes.ar.push({
+						yy:this.playBeat,
+						xx:i,
+						a:0.5,
+					});
+					
+					this.model.get('instrument').noteOn(item.model.get('matrix')[item.playBeat][i] + 53, 10).plot({ 
+						target		: canvas, 
+						foreground	: item.model.get('color'), 
+						background	: '#233140', 
+						lineWidth	: 3 
+					});
+
+				};
+			}
+		}
+		this.barY = (yy/this.vtSpaces)*this.hh;
+		this.barS = this.vtLength/frames
+	},
+	events: {
+		'mouseover'						: 'mouseover',
+		'mouseleave'					: 'mouseleave',
+		'mouseover .dropdown-toggle'	: 'dropdownhover',
+		'mouseout .dropdown-toggle'		: 'dropdownleave',
+		'click .dropdown-toggle'		: 'btnclick',
+		'mouseover .instrument-item'	: 'listhover',
+		'mouseout .instrument-item'		: 'listleave',
+		'click .lock'					: 'lockMatrix',
+		'click .flip'					: 'flipMatrix'
+	},
+	mouseover: function(){
+		this.$('.square-border').css({'visibility': 'visible','border-color': this.model.get('gridcolor')});
+		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
+	},
+	mouseleave: function(){
+		this.$('.square-border').css({'visibility': 'hidden','border-color': this.model.get('gridcolor')});
+		//$('.square-container').transition({opacity: 1});
+	},
+	dropdownhover: function(){
+		this.$('.btn').addClass('btnhover');
+
+		this.$('.caret').addClass('carethover');
+		this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '1';
+ 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
+
+		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
+		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
+			
+		this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
+		this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
+		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
+		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
+		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
+
+		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
+		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
+		//console.log(this.rgbaColor);
+
+	},
+	dropdownleave: function(){
+		this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '.5';
+ 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		if(!this.$('.instrument').hasClass('open')){
+			//this.rgbaColor = '.5';
+			this.$('.btn').removeClass('btnhover');
+			this.$('.caret').removeClass('carethover');
+			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor}, 300);
+			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'}, 300);
+			this.$('.dropdown-toggle').css({'box-shadow': 'none'});
+
+			//console.log(this.rgbaColor);
+		}
+
+	},
+	btnclick: function(){
+		this.dropdownOpen = "true";
+	},
+	listhover: function(ev){
+		this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '1';
+ 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		$(ev.target).css({'background-color': this.rgbaColor});
+	},
+	listleave: function(ev){
+		$(ev.target).css({'background-color': 'transparent'});
+
+	},
+	lockMatrix: function(){
+		if(!this.locked){
+			this.$('.lock').removeClass('icon-unlock');
+			this.$('.lock').addClass('icon-lock');
+			this.$('.lock').addClass('iconselected');
+			this.locked = true;
+		} else{
+			this.$('.lock').removeClass('iconselected');
+			this.$('.lock').removeClass('icon-lock');
+			this.$('.lock').addClass('icon-unlock');
+			this.locked = false;
+		}
+	},
+	flipMatrix: function(ev){
+		this.rot += 1;
+	}
+
+});
+var DisplayToneMatrixView = Backbone.View.extend({
+	tagName: 'div',
+	className: 'square-container',
+	initialize: function() {
+	
+		this.$el.attr('rel', this.model.get('title'));
+		this.$el.append('<div class="square"></div>');
+		
+		this.$('#'+this.model.get('title')+'Waveform').height('80px');
+		this.$('#'+this.model.get('title')+'Waveform').width('100%');
+		
+
 		
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d');
@@ -148,6 +434,10 @@ var ToneMatrixView = Backbone.View.extend({
 			this.context.globalAlpha = 1;
 			this.context.putImageData(this.altImage,0,0);
 		}
+		
+
+
+
 	},
 	sendFrame: function(data){	
 		if(this.altImage){
@@ -155,12 +445,9 @@ var ToneMatrixView = Backbone.View.extend({
 		}
 		for(var n = 0; n < data.length; i += 1){
 			for(var n = 0; n < data[i].length; n += 1){
-				if	(data[i][n]<0.3)	this.densityArray[i][n] = 0; 
-				else if(data[i][n]<0.6)	this.densityArray[i][n] = 1; 
-				else 					this.densityArray[i][n] = 2; 
 				
 				this.context.fillStyle = "#FFFFFF";
-				this.context.globalAlpha = this.densityArray[i][n]/4;
+				this.context.globalAlpha = this.data[i][n]/4;
 				this.context.fillRect(i*this.hzLength,n*this.vtLength, this.hzLength, this.vtLength);
 			}
 		}
@@ -293,7 +580,6 @@ var ToneMatrixView = Backbone.View.extend({
 
 });
 
-
 // Knob View
 //-----------------------------------------//
 var KnobView = Backbone.View.extend({
@@ -370,7 +656,7 @@ var KnobView = Backbone.View.extend({
 				item.rotation += 90;
 
 
-				if(item.rotation > 120 && item.rotation < 150) 		item.rotation = 125;
+				if(item.rotation > 120 && item.rotation < 150 && item.knobValue <= 2) item.rotation = 125;
 				else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
 				else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
 				else if(item.rotation > 130) 						item.rotation = -125;
