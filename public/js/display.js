@@ -18,3 +18,4 @@ var application = new DisplayView({ header: header, content: content});
 $('body').append(application.el);
 $('.square').height($('.square-container').width());
 
+$('body').append('<h1>#BigKC is making noise!</h1><h5>Soundprint lets you create custom songs from the movement of everyone in the room.</h5>'

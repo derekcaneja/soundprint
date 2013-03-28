@@ -24,7 +24,8 @@ var synthMatrix = function(instrument, scale, width, height){
 	this.width 		= width;
 	this.height 	= height;
 	this.matrix 	= new Array();
-
+	this.waveform   = this.instrument.cells[1];
+	console.log(this.instrument.cells);
 	var count = 0;
 
 	for(var n = 0; n < this.height; n++) {
@@ -45,6 +46,8 @@ var G_SynthMatrix = new synthMatrix('PluckGen', G_Major_PentonicScale, 16, 16);
 var D_SynthMatrix = new synthMatrix('OscGen', D_Major_PentonicScale, 16, 16);
 var A_SynthMatrix = new synthMatrix('PluckGen', A_Major_PentonicScale, 16, 16);
 
+
+
 var metronome = T('interval', { interval: 'BPM' + BPM + ' L16' }, function(count) {
 	C_SynthMatrix.instrument.noteOn(C_SynthMatrix.matrix[count % 16][0] + 53, 80);
 	G_SynthMatrix.instrument.noteOn(G_SynthMatrix.matrix[count % 16][0] + 53, 80);
@@ -53,3 +56,8 @@ var metronome = T('interval', { interval: 'BPM' + BPM + ' L16' }, function(count
 });
 
 //metronome.start();
+// var waveformView = new WaveViewer(this.waveform, 200, document.getElementById('BassWaveform'), 311, 80);
+// waveformView.start();
+// var fft = T("scope", {size:'.04', interval:5000}).on("data", function() {
+//   fft.plot({target:document.getElementById('BassWaveform')});
+// }).listen(metronome);

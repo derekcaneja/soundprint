@@ -40,7 +40,7 @@ function connectTo(ip){
 }
 
 $(window).mouseup(function(){ 
-	toneMatrix1.reverb.rotating = false;
+	toneMatrix1.reverb.rotate = false;
 	toneMatrix1.delay.rotate = false;
 	toneMatrix1.gain.rotate = false;
 	toneMatrix2.reverb.rotate = false;

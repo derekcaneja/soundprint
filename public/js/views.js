@@ -11,7 +11,7 @@ var ApplicationView = Backbone.View.extend({
 	initialize: function(options) {
 		this.$el.append(options.header.el);
 		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
-		this.$el.append(options.footer.el)
+		//this.$el.append(options.footer.el)
 		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
 
 		this.count = 0;
@@ -394,17 +394,6 @@ var DisplayToneMatrixView = Backbone.View.extend({
 		}
 		
 	},
-	events: {
-		'mouseover'						: 'mouseover',
-		'mouseleave'					: 'mouseleave',
-		'mouseover .dropdown-toggle'	: 'dropdownhover',
-		'mouseout .dropdown-toggle'		: 'dropdownleave',
-		'click .dropdown-toggle'		: 'btnclick',
-		'mouseover .instrument-item'	: 'listhover',
-		'mouseout .instrument-item'		: 'listleave',
-		'click .lock'					: 'lockMatrix',
-		'click .flip'					: 'flipMatrix'
-	},
 	
 	resize: function(){
 		this.canvas.width = this.canvas2.width = this.ww;
@@ -429,94 +418,6 @@ var DisplayToneMatrixView = Backbone.View.extend({
 		}
 		
 		this.altImage = this.context2.getImageData(0,0,this.canvas2.width, this.canvas2.height);
-	},
-	mouseover: function(){
-		this.$('.square-border').css({'visibility': 'visible','border-color': this.model.get('gridcolor')});
-		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
-	},
-	mouseleave: function(){
-		this.$('.square-border').css({'visibility': 'hidden','border-color': this.model.get('gridcolor')});
-		//$('.square-container').transition({opacity: 1});
-	},
-	dropdownhover: function(){
-		this.$('.btn').addClass('btnhover');
-
-		this.$('.caret').addClass('carethover');
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
-			
-		this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
-		this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
-		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
-		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
-		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
-		//console.log(this.rgbaColor);
-
-	},
-	dropdownleave: function(){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '.5';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		if(!this.$('.instrument').hasClass('open')){
-			//this.rgbaColor = '.5';
-			this.$('.btn').removeClass('btnhover');
-			this.$('.caret').removeClass('carethover');
-			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor}, 300);
-			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'}, 300);
-			this.$('.dropdown-toggle').css({'box-shadow': 'none'});
-
-			//console.log(this.rgbaColor);
-		}
-
-	},
-	btnclick: function(){
-		this.dropdownOpen = "true";
-	},
-	listhover: function(ev){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		$(ev.target).css({'background-color': this.rgbaColor});
-	},
-	listleave: function(ev){
-		$(ev.target).css({'background-color': 'transparent'});
-
-	},
-	lockMatrix: function(){
-		if(!this.locked){
-			this.$('.lock').removeClass('icon-unlock');
-			this.$('.lock').addClass('icon-lock');
-			this.$('.lock').addClass('iconselected');
-			this.locked = true;
-		} else{
-			this.$('.lock').removeClass('iconselected');
-			this.$('.lock').removeClass('icon-lock');
-			this.$('.lock').addClass('icon-unlock');
-			this.locked = false;
-		}
-	},
-	flipMatrix: function(ev){
-		//console.log($(ev.target));
-		// $(ev.target).parent().addClass('fliprotate', function(){
-		// setTimeout(function() {
-		// 	$(ev.target).parent().removeClass('fliprotate');
-		// }, 200);
-		// });
-		
-		
-
-
 	}
 
 });

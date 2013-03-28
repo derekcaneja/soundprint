@@ -23,10 +23,11 @@ var WaveViewer = (function() {
         this.context = canvas.getContext("2d");
         this.width  = canvas.width  = width;
         this.height = canvas.height = height;
-        this.context.fillStyle   = "rgba(255, 255, 255, 0.4)";
+        //this.context.fillStyle   = "rgba(0, 0, 0, 0)";
         this.context.strokeStyle = "rgba(  0, 128, 255, 0.8)";
         this.context.lineWidth = 2;
         this.range = [-1, +1];
+        //console.log(this.target);
     };
     
     $this.start = function() {
