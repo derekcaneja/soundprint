@@ -703,6 +703,9 @@ var SliderView = Backbone.View.extend({
 
 	}
 });
+
+// Footer View
+//-----------------------------------------//
 var FooterView = Backbone.View.extend({
 	tagName: 'footer',
 	className: 'footer',

@@ -17,4 +17,3 @@ var content = [toneMatrix1, toneMatrix2, toneMatrix3, toneMatrix4];
 var application = new DisplayView({ header: header, content: content });
 $('body').append(application.el);
 $('.square').height($('.square-container').width());
-

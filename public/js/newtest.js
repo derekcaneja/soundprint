@@ -156,5 +156,3 @@ function connectTo(ip, num){
 	});
 	
 }
-
-
