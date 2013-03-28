@@ -1,3 +1,4 @@
+
 var WaveViewer = (function() {
     var WaveViewer = function() {
         initialize.apply(this, arguments);

@@ -1,3 +1,4 @@
+
 //-----------------------------------------//
 //------------------Views------------------//
 //-----------------------------------------//
@@ -9,12 +10,19 @@ var ApplicationView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'application',
 	initialize: function(options) {
+		_.bindAll(this, 'resize');
 		this.$el.append(options.header.el);
 		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
 		//this.$el.append(options.footer.el)
 		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
 
 		this.count = 0;
+	},
+	resize: function(){
+		$('.square').height($('.square-container').width());
+		$('.square-border').height($('.square').height()+$('.tool-container').height()+15);
+		$('.square-border').width($('.square-border').parent('.square-container').width() + 8);
+		$('.square').css('margin-top', ($('.square-border').height() * -1) - 12);
 	},
 	play: function() {
 		this.interval = setInterval(function(){
@@ -75,7 +83,7 @@ var ToneMatrixView = Backbone.View.extend({
 	
 		this.$el.attr('rel', this.model.get('title'));
 		this.$el.append('<div class="square-border"></div><div class="square"></div><div class="tool-container"></div>');
-		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></div></div>');
+		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3><div class="btn-group instrument"><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul></div><div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></canvas></div></div>');
 		
 		//this.$('.square').css({
 		//	'margin-top': '-742px'
@@ -276,7 +284,7 @@ var ToneMatrixView = Backbone.View.extend({
 					this.model.get('instrument').noteOn(item.model.get('matrix')[item.playBeat][i] + 53, 10).plot({ 
 						target		: canvas, 
 						foreground	: item.model.get('color'), 
-						background	: '#233140', 
+						color2	: item.model.get('color'), 
 						lineWidth	: 3 
 					});
 
@@ -597,13 +605,13 @@ var KnobView = Backbone.View.extend({
 		//console.log(this.knobValue);
 		this.rotation = -125;
 
-		this.$('.tick').css({
-			'transform-origin' 			: '50% 515%',
-			'-ms-transform-origin' 		: '50% 515%',
-			'-webkit-transform-origin' 	: '50% 515%',
-			'-moz-transform-origin' 	: '50% 515%',
-			'-o-transform-origin' 		: '50% 515%'
-		});
+		// this.$('.tick').css({
+		// 	'transform-origin' 			: '50% 515%',
+		// 	'-ms-transform-origin' 		: '50% 515%',
+		// 	'-webkit-transform-origin' 	: '50% 515%',
+		// 	'-moz-transform-origin' 	: '50% 515%',
+		// 	'-o-transform-origin' 		: '50% 515%'
+		// });
 
 		this.render();
 	},
@@ -630,7 +638,8 @@ var KnobView = Backbone.View.extend({
 	events:{
 		'mouseover' : 'mouseover',
 		'mouseleave': 'mouseleave',
-		'mousedown'	: 'mousedown'
+		'mousedown'	: 'mousedown',
+		'mouseup'	: 'mouseup'
 	},
 	mouseover: function(){
 		document.onselectstart = function(){ return false; };
@@ -638,6 +647,7 @@ var KnobView = Backbone.View.extend({
 	mouseleave: function(){
 		if(!this.knob_dragging){
 		   document.onselectstart = null;
+		   
 		}
 	},
 	mousedown: function() {
@@ -648,7 +658,8 @@ var KnobView = Backbone.View.extend({
 		this.$el.children().css({'cursor': 'pointer'});
 
 		this.rotate = true;
-		
+		$('body').css({'cursor': 'pointer'});
+
 		$(window).mousemove(function(e){
 			if(item.rotate){
 				item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
@@ -666,6 +677,9 @@ var KnobView = Backbone.View.extend({
 				item.render();
 			}
 		});
+	},
+	mouseup: function(){
+		$('body').css({'cursor': 'default'});
 	}
 });
 
