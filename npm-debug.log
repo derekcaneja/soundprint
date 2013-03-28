@@ -2,55 +2,299 @@
 1 verbose cli [ 'C:\\Program Files\\nodejs\\\\node.exe',
 1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
 1 verbose cli   'install',
-1 verbose cli   'fs' ]
+1 verbose cli   'opencv' ]
 2 info using npm@1.1.65
 3 info using node@v0.8.14
 4 verbose node symlink C:\Program Files\nodejs\\node.exe
-5 verbose read json C:\Users\Jack\Desktop\Git\soundprint\package.json
-6 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\assert\package.json
-7 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\camelot\package.json
-8 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\express\package.json
-9 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\fs\package.json
-10 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\hbs\package.json
-11 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\imagesnap\package.json
-12 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\opencv\package.json
-13 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\socket.io\package.json
-14 verbose read json C:\Users\Jack\Desktop\Git\soundprint\node_modules\timbre\package.json
-15 warn package.json assert@0.4.9 No README.md file found!
-16 verbose from cache C:\Users\Jack\Desktop\Git\soundprint\package.json
-17 verbose readDependencies using package.json deps
-18 verbose cache add [ 'fs@*', null ]
-19 silly cache add name=undefined spec="fs@*" args=["fs@*",null]
-20 verbose parsed url { pathname: 'fs@*', path: 'fs@*', href: 'fs@*' }
-21 silly cache add name="fs" spec="*" args=["fs","*"]
-22 verbose parsed url { pathname: '*', path: '*', href: '*' }
-23 verbose addNamed [ 'fs', '*' ]
-24 verbose addNamed [ null, '' ]
-25 silly lockFile d8bf140d-fs fs@*
-26 verbose lock fs@* C:\Users\Jack\AppData\Roaming\npm-cache\d8bf140d-fs.lock
-27 silly addNameRange { name: 'fs', range: '', hasData: false }
-28 verbose url raw fs
-29 verbose url resolving [ 'https://registry.npmjs.org/', './fs' ]
-30 verbose url resolved https://registry.npmjs.org/fs
-31 info trying registry request attempt 1 at 15:15:18
-32 http GET https://registry.npmjs.org/fs
-33 http 404 https://registry.npmjs.org/fs
-34 silly registry.get cb [ 404,
-34 silly registry.get   { server: 'CouchDB/1.2.1 (Erlang OTP/R15B03)',
-34 silly registry.get     date: 'Tue, 26 Mar 2013 20:15:57 GMT',
-34 silly registry.get     'content-type': 'application/json',
-34 silly registry.get     'content-length': '52',
-34 silly registry.get     'cache-control': 'must-revalidate' } ]
-35 silly lockFile d8bf140d-fs fs@*
-36 error 404 'fs' is not in the npm registry.
-36 error 404 You should bug the author to publish it
-36 error 404
-36 error 404 Note that you can also install from a
-36 error 404 tarball, folder, or http url, or git url.
-37 error System Windows_NT 6.1.7600
-38 error command "C:\\Program Files\\nodejs\\\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "fs"
-39 error cwd C:\Users\Jack\Desktop\Git\soundprint
-40 error node -v v0.8.14
-41 error npm -v 1.1.65
-42 error code E404
-43 verbose exit [ 1, true ]
+5 verbose read json C:\Users\Jack\Desktop\git\spn\package.json
+6 verbose read json C:\Users\Jack\Desktop\git\spn\node_modules\express\package.json
+7 verbose read json C:\Users\Jack\Desktop\git\spn\node_modules\fs\package.json
+8 verbose read json C:\Users\Jack\Desktop\git\spn\node_modules\hbs\package.json
+9 verbose read json C:\Users\Jack\Desktop\git\spn\node_modules\socket.io\package.json
+10 verbose read json C:\Users\Jack\Desktop\git\spn\node_modules\timbre\package.json
+11 verbose from cache C:\Users\Jack\Desktop\git\spn\package.json
+12 verbose readDependencies using package.json deps
+13 verbose cache add [ 'opencv', null ]
+14 silly cache add name=undefined spec="opencv" args=["opencv",null]
+15 verbose parsed url { pathname: 'opencv', path: 'opencv', href: 'opencv' }
+16 silly lockFile 34897cde-opencv opencv
+17 verbose lock opencv C:\Users\Jack\AppData\Roaming\npm-cache\34897cde-opencv.lock
+18 silly lockFile 34897cde-opencv opencv
+19 verbose addNamed [ 'opencv', '' ]
+20 verbose addNamed [ null, '' ]
+21 silly lockFile 4da5a9ce-opencv opencv@
+22 verbose lock opencv@ C:\Users\Jack\AppData\Roaming\npm-cache\4da5a9ce-opencv.lock
+23 silly addNameRange { name: 'opencv', range: '', hasData: false }
+24 verbose url raw opencv
+25 verbose url resolving [ 'https://registry.npmjs.org/', './opencv' ]
+26 verbose url resolved https://registry.npmjs.org/opencv
+27 info trying registry request attempt 1 at 05:19:19
+28 verbose etag "LVZP9DRVAEDJP7DXF1POP31F"
+29 http GET https://registry.npmjs.org/opencv
+30 http 304 https://registry.npmjs.org/opencv
+31 silly registry.get cb [ 304,
+31 silly registry.get   { server: 'CouchDB/1.2.1 (Erlang OTP/R15B03)',
+31 silly registry.get     etag: '"LVZP9DRVAEDJP7DXF1POP31F"',
+31 silly registry.get     date: 'Thu, 28 Mar 2013 10:19:20 GMT',
+31 silly registry.get     'content-length': '0' } ]
+32 verbose etag opencv from cache
+33 silly addNameRange number 2 { name: 'opencv', range: '', hasData: true }
+34 silly addNameRange versions [ 'opencv',
+34 silly addNameRange   [ '0.0.1',
+34 silly addNameRange     '0.0.2',
+34 silly addNameRange     '0.0.3',
+34 silly addNameRange     '0.0.4',
+34 silly addNameRange     '0.0.5',
+34 silly addNameRange     '0.0.6',
+34 silly addNameRange     '0.0.7',
+34 silly addNameRange     '0.0.8',
+34 silly addNameRange     '0.0.9',
+34 silly addNameRange     '0.0.10',
+34 silly addNameRange     '0.0.11',
+34 silly addNameRange     '0.0.12' ] ]
+35 verbose addNamed [ 'opencv', '0.0.12' ]
+36 verbose addNamed [ '0.0.12', '0.0.12' ]
+37 silly lockFile abade6f9-opencv-0-0-12 opencv@0.0.12
+38 verbose lock opencv@0.0.12 C:\Users\Jack\AppData\Roaming\npm-cache\abade6f9-opencv-0-0-12.lock
+39 verbose read json C:\Users\Jack\AppData\Roaming\npm-cache\opencv\0.0.12\package\package.json
+40 silly lockFile abade6f9-opencv-0-0-12 opencv@0.0.12
+41 silly lockFile 4da5a9ce-opencv opencv@
+42 silly resolved [ { name: 'opencv',
+42 silly resolved     description: 'Node Bindings to OpenCV',
+42 silly resolved     author: { name: 'Peter Braden', email: 'peterbraden@peterbraden.co.uk' },
+42 silly resolved     dependencies: { buffers: '0.1.1' },
+42 silly resolved     version: '0.0.12',
+42 silly resolved     devDependencies: { vows: '*' },
+42 silly resolved     engine: 'node >= 0.4.1',
+42 silly resolved     scripts:
+42 silly resolved      { preinstall: 'node-gyp clean rebuild',
+42 silly resolved        test: 'vows test/unit.js' },
+42 silly resolved     keywords: [ 'opencv', 'computer', 'vision', 'quadrocopter' ],
+42 silly resolved     main: './lib/opencv',
+42 silly resolved     readme: '# node-opencv \n\n[![Build Status](https://secure.travis-ci.org/peterbraden/node-opencv.png)](http://travis-ci.org/peterbraden/node-opencv)\n\n\n[OpenCV](http://opencv.willowgarage.com/wiki/) bindings for Node.js. OpenCV is the defacto computer vision library - by interfacing with it natively in node, we get powerful real time vision in js.\n\nPeople are using node-opencv to fly control quadrocoptors, detect faces from webcam images and annotate video streams. If you\'re using it for something cool, I\'d love to hear about it!\n\n## Install\n\nYou\'ll need OpenCV 2.3.1 installed.\n\nThen:\n\n\n        npm install opencv\n\n\nOr to build the repo:\n\n\n        node-gyp rebuild\n\n\n## Examples\n\n### Face Detection\n\n\n        cv.readImage("./examples/test.jpg", function(err, im){\n          im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){\n            for (var i=0;i<faces.length; i++){\n              var x = faces[i]\n              im.ellipse(x.x + x.width/2, x.y + x.height/2, x.width/2, x.height/2);\n            }\n            im.save(\'./out.jpg\');\n          });\n        })\n\n\n\n## API Documentation\n\n### Matrix\n\nThe [matrix](http://opencv.jp/opencv-2svn_org/cpp/core_basic_structures.html#mat) is the most useful\nbase datastructure in OpenCV. Things like images are just matrices of pixels.\n\n#### Creation\n\n        new Matrix(rows, cols)\n\nOr if you\'re thinking of a Matrix as an image:\n\n        new Matrix(height, width)\n\nOr you can use opencv to read in image files. Supported formats are in the OpenCV docs, but jpgs etc are supported.\n\n        cv.readImage(filename, function(mat){\n          ...\n        })\n\n        cv.readImage(buffer, function(mat){\n          ...\n        })\n\nIf you need to pipe data into an image, you can use an ImageDataStream:\n\n        var s = new cv.ImageDataStream()\n\n        s.on(\'load\', function(matrix){\n          ...\n        })\n\n        fs.createReadStream(\'./examples/test.jpg\').pipe(s);\n\nIf however, you have a series of images, and you wish to stream them into a\nstream of Matrices, you can use an ImageStream. Thus:\n\n        var s = new cv.ImageStream()\n\n        s.on(\'data\', function(matrix){\n           ...\n        })\n\n        ardrone.createPngStream().pipe(s);\n\nNote: Each \'data\' event into the ImageStream should be a complete image buffer.\n\n\n\n#### Accessing Data\n\n        var mat = new cv.Matrix.Eye(4,4); // Create identity matrix\n\n        mat.get(0,0) // 1\n\n        mat.row(0)  // [1,0,0,0]\n        mat.col(4)  // [0,0,0,1]\n\n\n##### Save\n\n        mat.save(\'./pic.jpg\')\n\nor:\n\n        var buff = mat.toBuffer()\n\n\n#### Image Processing\n\n        im.convertGrayscale()\n        im.canny(5, 300)\n        im.houghLinesP()\n\n\n\n#### Simple Drawing\n\n        im.ellipse(x, y)\n        im.line([x1,y1], [x2, y2])\n\n\n#### Object Detection\n\nThere is a shortcut method for \n[Viola-Jones Haar Cascade](http://www.cognotics.com/opencv/servo_2007_series/part_2/sidebar.html) object \ndetection. This can be used for face detection etc.\n\n\n        mat.detectObject(haar_cascade_xml, opts, function(err, matches){})\n\nFor convenience in face recognition, cv.FACE_CASCADE is a cascade that can be used for frontal face recognition.\n\nAlso:\n\n        mat.goodFeaturesToTrack\n\n\n#### Contours\n\n        mat.findCountours\n        mat.drawContour\n        mat.drawAllContours\n\n### Using Contours\n\n`findContours` returns a `Contours` collection object, not a native array. This object provides\nfunctions for accessing, computing with, and altering the contours contained in it.\nSee [relevant source code](src/Contours.cc) and [examples](examples/)\n\n        var contours = im.findContours;\n\n        # Count of contours in the Contours object\n        contours.size();\n\n        # Count of corners(verticies) of contour `index`\n        contours.cornerCount(index);\n\n        # Access vertex data of contours\n        for(var c = 0; c < contours.size(); ++c) {\n          console.log("Contour " + c);\n          for(var i = 0; i < contours.cornerCount(c); ++i) {\n            var point = contours.point(c, i);\n            console.log("(" + point.x + "," + point.y + ")");"\n          }\n        }\n\n        # Computations of contour `index`\n        contours.area(index);\n        contours.arcLength(index, isClosed);\n        contours.boundingRect(index);\n        contours.minAreaRect(index);\n        contours.isConvex(index);\n\n        # Destructively alter contour `index`\n        contours.approxPolyDP(index, epsilon, isClosed);\n        contours.convexHull(index, clockwise);\n\n## MIT License\nThe library is distributed under the MIT License - if for some reason that \ndoesn\'t work for you please get in touch.\n\n## Changelog\n\n#### 0.0.12\n- Matrix clone()\n- NamedWindow Support\n\n#### 0.0.11\n\n- Bug Fixes\n- ImageStream becomes ImageDataStream, and new ImageStream allows multiple images to be\nstreamed as matrices, for example, with an object detection stream.\n- @ryansouza improved documentation\n- Correcting matrix constructor (thanks @gluxon)\n- @Michael Smith expanded Contours functionality.\n\nThanks all!\n\n#### 0.0.10\n\n- Bug Fixes\n- @Contra added code that allows thickness and color args for ellipse\n- Camshift Support\n- @jtlebi added bindings for erode, gaussianBlur, arcLength, approxPolyDP, isConvex, cornerCount\n- @gluxon added bindings for inRange\n\nThanks everyone!\n\n#### 0.0.9\n\n- toBuffer can now take a callback and be run async (re #21)\n',
+42 silly resolved     readmeFilename: 'README.md',
+42 silly resolved     _id: 'opencv@0.0.12',
+42 silly resolved     _from: 'opencv' } ]
+43 info install opencv@0.0.12 into C:\Users\Jack\Desktop\git\spn
+44 info installOne opencv@0.0.12
+45 verbose from cache C:\Users\Jack\AppData\Roaming\npm-cache\opencv\0.0.12\package\package.json
+46 info C:\Users\Jack\Desktop\git\spn\node_modules\opencv unbuild
+47 verbose read json C:\Users\Jack\Desktop\git\spn\node_modules\opencv\package.json
+48 verbose tar unpack C:\Users\Jack\AppData\Roaming\npm-cache\opencv\0.0.12\package.tgz
+49 silly lockFile 580fb63d-ktop-git-spn-node-modules-opencv C:\Users\Jack\Desktop\git\spn\node_modules\opencv
+50 verbose lock C:\Users\Jack\Desktop\git\spn\node_modules\opencv C:\Users\Jack\AppData\Roaming\npm-cache\580fb63d-ktop-git-spn-node-modules-opencv.lock
+51 silly gunzTarPerm modes [ '755', '644' ]
+52 silly gunzTarPerm extractEntry package.json
+53 silly gunzTarPerm modified mode [ 'package.json', 438, 420 ]
+54 silly gunzTarPerm extractEntry .npmignore
+55 silly gunzTarPerm modified mode [ '.npmignore', 438, 420 ]
+56 silly gunzTarPerm extractEntry README.md
+57 silly gunzTarPerm modified mode [ 'README.md', 438, 420 ]
+58 silly gunzTarPerm extractEntry data/haarcascade_mcs_eyepair_big.xml
+59 silly gunzTarPerm modified mode [ 'data/haarcascade_mcs_eyepair_big.xml', 438, 420 ]
+60 silly gunzTarPerm extractEntry data/haarcascade_eye.xml
+61 silly gunzTarPerm modified mode [ 'data/haarcascade_eye.xml', 438, 420 ]
+62 silly gunzTarPerm extractEntry data/haarcascade_frontalface_alt.xml
+63 silly gunzTarPerm modified mode [ 'data/haarcascade_frontalface_alt.xml', 438, 420 ]
+64 silly gunzTarPerm extractEntry data/haarcascade_frontalface_alt2.xml
+65 silly gunzTarPerm modified mode [ 'data/haarcascade_frontalface_alt2.xml', 438, 420 ]
+66 silly gunzTarPerm extractEntry data/haarcascade_frontalface_alt_tree.xml
+67 silly gunzTarPerm modified mode [ 'data/haarcascade_frontalface_alt_tree.xml', 438, 420 ]
+68 silly gunzTarPerm extractEntry data/haarcascade_frontalface_default.xml
+69 silly gunzTarPerm modified mode [ 'data/haarcascade_frontalface_default.xml', 438, 420 ]
+70 silly gunzTarPerm extractEntry data/haarcascade_fullbody.xml
+71 silly gunzTarPerm modified mode [ 'data/haarcascade_fullbody.xml', 438, 420 ]
+72 silly gunzTarPerm extractEntry data/haarcascade_lefteye_2splits.xml
+73 silly gunzTarPerm modified mode [ 'data/haarcascade_lefteye_2splits.xml', 438, 420 ]
+74 silly gunzTarPerm extractEntry data/haarcascade_lowerbody.xml
+75 silly gunzTarPerm modified mode [ 'data/haarcascade_lowerbody.xml', 438, 420 ]
+76 silly gunzTarPerm extractEntry data/haarcascade_eye_tree_eyeglasses.xml
+77 silly gunzTarPerm modified mode [ 'data/haarcascade_eye_tree_eyeglasses.xml', 438, 420 ]
+78 silly gunzTarPerm extractEntry data/haarcascade_mcs_eyepair_small.xml
+79 silly gunzTarPerm modified mode [ 'data/haarcascade_mcs_eyepair_small.xml', 438, 420 ]
+80 silly gunzTarPerm extractEntry data/haarcascade_mcs_lefteye.xml
+81 silly gunzTarPerm modified mode [ 'data/haarcascade_mcs_lefteye.xml', 438, 420 ]
+82 silly gunzTarPerm extractEntry data/haarcascade_mcs_mouth.xml
+83 silly gunzTarPerm modified mode [ 'data/haarcascade_mcs_mouth.xml', 438, 420 ]
+84 silly gunzTarPerm extractEntry data/haarcascade_mcs_nose.xml
+85 silly gunzTarPerm modified mode [ 'data/haarcascade_mcs_nose.xml', 438, 420 ]
+86 silly gunzTarPerm extractEntry data/haarcascade_mcs_righteye.xml
+87 silly gunzTarPerm modified mode [ 'data/haarcascade_mcs_righteye.xml', 438, 420 ]
+88 silly gunzTarPerm extractEntry data/haarcascade_mcs_upperbody.xml
+89 silly gunzTarPerm modified mode [ 'data/haarcascade_mcs_upperbody.xml', 438, 420 ]
+90 silly gunzTarPerm extractEntry data/haarcascade_profileface.xml
+91 silly gunzTarPerm modified mode [ 'data/haarcascade_profileface.xml', 438, 420 ]
+92 silly gunzTarPerm extractEntry data/haarcascade_righteye_2splits.xml
+93 silly gunzTarPerm modified mode [ 'data/haarcascade_righteye_2splits.xml', 438, 420 ]
+94 silly gunzTarPerm extractEntry data/haarcascade_upperbody.xml
+95 silly gunzTarPerm modified mode [ 'data/haarcascade_upperbody.xml', 438, 420 ]
+96 silly gunzTarPerm extractEntry .package.json.un~
+97 silly gunzTarPerm modified mode [ '.package.json.un~', 438, 420 ]
+98 silly gunzTarPerm extractEntry .README.md.un~
+99 silly gunzTarPerm modified mode [ '.README.md.un~', 438, 420 ]
+100 silly gunzTarPerm extractEntry .temp.coffee.un~
+101 silly gunzTarPerm modified mode [ '.temp.coffee.un~', 438, 420 ]
+102 silly gunzTarPerm extractEntry .temp.js.un~
+103 silly gunzTarPerm modified mode [ '.temp.js.un~', 438, 420 ]
+104 silly gunzTarPerm extractEntry .travis.yml
+105 silly gunzTarPerm modified mode [ '.travis.yml', 438, 420 ]
+106 silly gunzTarPerm extractEntry binding.gyp
+107 silly gunzTarPerm modified mode [ 'binding.gyp', 438, 420 ]
+108 silly gunzTarPerm extractEntry ..travis.yml.un~
+109 silly gunzTarPerm modified mode [ '..travis.yml.un~', 438, 420 ]
+110 silly gunzTarPerm extractEntry examples/Face.js
+111 silly gunzTarPerm modified mode [ 'examples/Face.js', 438, 420 ]
+112 silly gunzTarPerm extractEntry examples/camera.js
+113 silly gunzTarPerm modified mode [ 'examples/camera.js', 438, 420 ]
+114 silly gunzTarPerm extractEntry examples/color_filter.js
+115 silly gunzTarPerm modified mode [ 'examples/color_filter.js', 438, 420 ]
+116 silly gunzTarPerm extractEntry examples/contours.js
+117 silly gunzTarPerm modified mode [ 'examples/contours.js', 438, 420 ]
+118 silly gunzTarPerm extractEntry examples/convert_image.js
+119 silly gunzTarPerm modified mode [ 'examples/convert_image.js', 438, 420 ]
+120 silly gunzTarPerm extractEntry examples/addweighted.js
+121 silly gunzTarPerm modified mode [ 'examples/addweighted.js', 438, 420 ]
+122 silly gunzTarPerm extractEntry examples/face-proxy.js
+123 silly gunzTarPerm modified mode [ 'examples/face-proxy.js', 438, 420 ]
+124 silly gunzTarPerm extractEntry examples/face_detection.js
+125 silly gunzTarPerm modified mode [ 'examples/face_detection.js', 438, 420 ]
+126 silly gunzTarPerm extractEntry examples/motion-track.js
+127 silly gunzTarPerm modified mode [ 'examples/motion-track.js', 438, 420 ]
+128 silly gunzTarPerm extractEntry examples/quad-crosses.js
+129 silly gunzTarPerm modified mode [ 'examples/quad-crosses.js', 438, 420 ]
+130 silly gunzTarPerm extractEntry examples/salt.js
+131 silly gunzTarPerm modified mode [ 'examples/salt.js', 438, 420 ]
+132 silly gunzTarPerm extractEntry examples/detect-shapes.js
+133 silly gunzTarPerm modified mode [ 'examples/detect-shapes.js', 438, 420 ]
+134 silly gunzTarPerm extractEntry examples/coin2.jpg
+135 silly gunzTarPerm modified mode [ 'examples/coin2.jpg', 438, 420 ]
+136 silly gunzTarPerm extractEntry examples/make-example-files.sh
+137 silly gunzTarPerm modified mode [ 'examples/make-example-files.sh', 438, 420 ]
+138 silly gunzTarPerm extractEntry examples/mona.png
+139 silly gunzTarPerm modified mode [ 'examples/mona.png', 438, 420 ]
+140 silly gunzTarPerm extractEntry examples/.make-example-files.sh.un~
+141 silly gunzTarPerm modified mode [ 'examples/.make-example-files.sh.un~', 438, 420 ]
+142 silly gunzTarPerm extractEntry examples/motion.mov
+143 silly gunzTarPerm modified mode [ 'examples/motion.mov', 438, 420 ]
+144 silly gunzTarPerm extractEntry examples/over_text.png
+145 silly gunzTarPerm modified mode [ 'examples/over_text.png', 438, 420 ]
+146 silly gunzTarPerm extractEntry examples/coin1.jpg
+147 silly gunzTarPerm modified mode [ 'examples/coin1.jpg', 438, 420 ]
+148 silly gunzTarPerm extractEntry examples/quads.jpg
+149 silly gunzTarPerm modified mode [ 'examples/quads.jpg', 438, 420 ]
+150 silly gunzTarPerm extractEntry examples/.motion-track.js.un~
+151 silly gunzTarPerm modified mode [ 'examples/.motion-track.js.un~', 438, 420 ]
+152 silly gunzTarPerm extractEntry examples/shapes.jpg
+153 silly gunzTarPerm modified mode [ 'examples/shapes.jpg', 438, 420 ]
+154 silly gunzTarPerm extractEntry examples/stuff.png
+155 silly gunzTarPerm modified mode [ 'examples/stuff.png', 438, 420 ]
+156 silly gunzTarPerm extractEntry index.html
+157 silly gunzTarPerm modified mode [ 'index.html', 438, 420 ]
+158 silly gunzTarPerm extractEntry lib/bindings.js
+159 silly gunzTarPerm modified mode [ 'lib/bindings.js', 438, 420 ]
+160 silly gunzTarPerm extractEntry lib/opencv.js
+161 silly gunzTarPerm modified mode [ 'lib/opencv.js', 438, 420 ]
+162 silly gunzTarPerm extractEntry lib/.opencv.js.un~
+163 silly gunzTarPerm modified mode [ 'lib/.opencv.js.un~', 438, 420 ]
+164 silly gunzTarPerm extractEntry MIT-LICENSE.txt
+165 silly gunzTarPerm modified mode [ 'MIT-LICENSE.txt', 438, 420 ]
+166 silly gunzTarPerm extractEntry .binding.gyp.un~
+167 silly gunzTarPerm modified mode [ '.binding.gyp.un~', 438, 420 ]
+168 silly gunzTarPerm extractEntry ..gitignore.un~
+169 silly gunzTarPerm modified mode [ '..gitignore.un~', 438, 420 ]
+170 silly gunzTarPerm extractEntry smoke/smoketest.js
+171 silly gunzTarPerm modified mode [ 'smoke/smoketest.js', 438, 420 ]
+172 silly gunzTarPerm extractEntry smoke/.smoke.sh.un~
+173 silly gunzTarPerm modified mode [ 'smoke/.smoke.sh.un~', 438, 420 ]
+174 silly gunzTarPerm extractEntry smoke/.smoketest.js.un~
+175 silly gunzTarPerm modified mode [ 'smoke/.smoketest.js.un~', 438, 420 ]
+176 silly gunzTarPerm extractEntry smoke/smoke.sh
+177 silly gunzTarPerm modified mode [ 'smoke/smoke.sh', 438, 420 ]
+178 silly gunzTarPerm extractEntry src/Contours.cc
+179 silly gunzTarPerm modified mode [ 'src/Contours.cc', 438, 420 ]
+180 silly gunzTarPerm extractEntry src/.CamShift.cc.un~
+181 silly gunzTarPerm modified mode [ 'src/.CamShift.cc.un~', 438, 420 ]
+182 silly gunzTarPerm extractEntry src/.HighGUI.cc.un~
+183 silly gunzTarPerm modified mode [ 'src/.HighGUI.cc.un~', 438, 420 ]
+184 silly gunzTarPerm extractEntry src/.HighGUI.h.un~
+185 silly gunzTarPerm modified mode [ 'src/.HighGUI.h.un~', 438, 420 ]
+186 silly gunzTarPerm extractEntry src/.init.cc.un~
+187 silly gunzTarPerm modified mode [ 'src/.init.cc.un~', 438, 420 ]
+188 silly gunzTarPerm extractEntry src/.Matrix.cc.un~
+189 silly gunzTarPerm modified mode [ 'src/.Matrix.cc.un~', 438, 420 ]
+190 silly gunzTarPerm extractEntry src/.Matrix.h.un~
+191 silly gunzTarPerm modified mode [ 'src/.Matrix.h.un~', 438, 420 ]
+192 silly gunzTarPerm extractEntry src/.OpenCV.h.un~
+193 silly gunzTarPerm modified mode [ 'src/.OpenCV.h.un~', 438, 420 ]
+194 silly gunzTarPerm extractEntry src/.VideoCaptureWrap.cc.un~
+195 silly gunzTarPerm modified mode [ 'src/.VideoCaptureWrap.cc.un~', 438, 420 ]
+196 silly gunzTarPerm extractEntry src/CamShift.cc
+197 silly gunzTarPerm modified mode [ 'src/CamShift.cc', 438, 420 ]
+198 silly gunzTarPerm extractEntry src/CamShift.h
+199 silly gunzTarPerm modified mode [ 'src/CamShift.h', 438, 420 ]
+200 silly gunzTarPerm extractEntry src/CascadeClassifierWrap.cc
+201 silly gunzTarPerm modified mode [ 'src/CascadeClassifierWrap.cc', 438, 420 ]
+202 silly gunzTarPerm extractEntry src/CascadeClassifierWrap.h
+203 silly gunzTarPerm modified mode [ 'src/CascadeClassifierWrap.h', 438, 420 ]
+204 silly gunzTarPerm extractEntry src/.CamShift.h.un~
+205 silly gunzTarPerm modified mode [ 'src/.CamShift.h.un~', 438, 420 ]
+206 silly gunzTarPerm extractEntry src/Contours.h
+207 silly gunzTarPerm modified mode [ 'src/Contours.h', 438, 420 ]
+208 silly gunzTarPerm extractEntry src/HighGUI.cc
+209 silly gunzTarPerm modified mode [ 'src/HighGUI.cc', 438, 420 ]
+210 silly gunzTarPerm extractEntry src/HighGUI.h
+211 silly gunzTarPerm modified mode [ 'src/HighGUI.h', 438, 420 ]
+212 silly gunzTarPerm extractEntry src/init.cc
+213 silly gunzTarPerm modified mode [ 'src/init.cc', 438, 420 ]
+214 silly gunzTarPerm extractEntry src/Matrix.cc
+215 silly gunzTarPerm modified mode [ 'src/Matrix.cc', 438, 420 ]
+216 silly gunzTarPerm extractEntry src/Matrix.h
+217 silly gunzTarPerm modified mode [ 'src/Matrix.h', 438, 420 ]
+218 silly gunzTarPerm extractEntry src/OpenCV.cc
+219 silly gunzTarPerm modified mode [ 'src/OpenCV.cc', 438, 420 ]
+220 silly gunzTarPerm extractEntry src/OpenCV.h
+221 silly gunzTarPerm modified mode [ 'src/OpenCV.h', 438, 420 ]
+222 silly gunzTarPerm extractEntry src/Point.cc
+223 silly gunzTarPerm modified mode [ 'src/Point.cc', 438, 420 ]
+224 silly gunzTarPerm extractEntry src/Point.h
+225 silly gunzTarPerm modified mode [ 'src/Point.h', 438, 420 ]
+226 silly gunzTarPerm extractEntry src/VideoCaptureWrap.cc
+227 silly gunzTarPerm modified mode [ 'src/VideoCaptureWrap.cc', 438, 420 ]
+228 silly gunzTarPerm extractEntry src/VideoCaptureWrap.h
+229 silly gunzTarPerm modified mode [ 'src/VideoCaptureWrap.h', 438, 420 ]
+230 silly gunzTarPerm extractEntry test/unit.js
+231 silly gunzTarPerm modified mode [ 'test/unit.js', 438, 420 ]
+232 silly gunzTarPerm extractEntry test/.temp.js.un~
+233 silly gunzTarPerm modified mode [ 'test/.temp.js.un~', 438, 420 ]
+234 silly gunzTarPerm extractEntry test/.unit.js.un~
+235 silly gunzTarPerm modified mode [ 'test/.unit.js.un~', 438, 420 ]
+236 verbose read json C:\Users\Jack\Desktop\git\spn\node_modules\opencv\package.json
+237 silly lockFile 580fb63d-ktop-git-spn-node-modules-opencv C:\Users\Jack\Desktop\git\spn\node_modules\opencv
+238 info preinstall opencv@0.0.12
+239 verbose unsafe-perm in lifecycle true
+240 silly exec cmd "/c" "node-gyp clean rebuild"
+241 silly cmd,/c,node-gyp clean rebuild,C:\Users\Jack\Desktop\git\spn\node_modules\opencv spawning
+242 info opencv@0.0.12 Failed to exec preinstall script
+243 info C:\Users\Jack\Desktop\git\spn\node_modules\opencv unbuild
+244 verbose from cache C:\Users\Jack\Desktop\git\spn\node_modules\opencv\package.json
+245 info preuninstall opencv@0.0.12
+246 info uninstall opencv@0.0.12
+247 verbose true,C:\Users\Jack\Desktop\git\spn\node_modules,C:\Users\Jack\Desktop\git\spn\node_modules unbuild opencv@0.0.12
+248 info postuninstall opencv@0.0.12
+249 error opencv@0.0.12 preinstall: `node-gyp clean rebuild`
+249 error `cmd "/c" "node-gyp clean rebuild"` failed with 1
+250 error Failed at the opencv@0.0.12 preinstall script.
+250 error This is most likely a problem with the opencv package,
+250 error not with npm itself.
+250 error Tell the author that this fails on your system:
+250 error     node-gyp clean rebuild
+250 error You can get their info via:
+250 error     npm owner ls opencv
+250 error There is likely additional logging output above.
+251 error System Windows_NT 6.1.7600
+252 error command "C:\\Program Files\\nodejs\\\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "opencv"
+253 error cwd C:\Users\Jack\Desktop\git\spn
+254 error node -v v0.8.14
+255 error npm -v 1.1.65
+256 error code ELIFECYCLE
+257 verbose exit [ 1, true ]
