@@ -275,7 +275,7 @@ var ToneMatrixView = Backbone.View.extend({
 
 					var instrument = this.model.get('instrument');
 
-					instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 53, 40);//.plot({ 
+					instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 48, 40);//.plot({ 
 					// 	target		: canvas, 
 					// 	foreground	: item.model.get('color'), 
 					// 	background	: '#233140', 
