@@ -6,8 +6,10 @@ var express = require('express')
   , hbs = require('hbs')
   , io = require('socket.io')
   , routes = require('./routes')
-  , http = require('http')
-  , path = require('path');
+  , http = require('http'),
+  , path = require('path'),
+  , cv  = require('opencv');
+  
  
 var app = express();
 
