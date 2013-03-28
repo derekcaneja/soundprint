@@ -6964,6 +6964,8 @@ header.header .navbar-inner {
   margin-top: 0px;
   text-align: center;
   width: 100%;
+  border-top: 1px solid #161f29;
+  border-bottom: 1px solid #304357;
   height: 80px;
   -webkit-box-shadow: inset 0px 4px 20px #1c2732;
   -moz-box-shadow: inset 0px 4px 20px #1c2732;
