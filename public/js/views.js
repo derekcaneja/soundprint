@@ -656,7 +656,7 @@ var KnobView = Backbone.View.extend({
 				item.rotation += 90;
 
 
-				if(item.rotation > 120 && item.rotation < 150 && item.knobValue <= 2) item.rotation = 125;
+				if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
 				else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
 				else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
 				else if(item.rotation > 130) 						item.rotation = -125;
