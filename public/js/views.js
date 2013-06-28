@@ -85,6 +85,7 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$el.append('<div class="square-border accelerate"></div><div class="wrapwrap"><div class="square"></div><div class="tool-container"><div class="tools-header"></div></div></div>');
 		this.$('.tools-header').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3>', new DropdownView({ model: this.model }).el, '<div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div></div>');
 		this.$('.tools-header').after('<div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></canvas></div>');
+
 		//this.$('.square').css({
 		//	'margin-top': '-742px'
 		//});
@@ -98,6 +99,7 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$('#'+this.model.get('title')+'Waveform').height('80px');
 		this.$('#'+this.model.get('title')+'Waveform').width('100%');
 		
+
 		//console.log(this.$('.tool-row').height());
 
 		this.pitch = new KnobView({ model:new Knob({title: 'Pitch'}) });
@@ -251,6 +253,7 @@ var ToneMatrixView = Backbone.View.extend({
 			}
 		}	
 		this.context.globalAlpha = 1;
+		this.$('.lockflip i').tooltip();
 	},
 	setBar: function(yy, frames){
 		var item = this;
