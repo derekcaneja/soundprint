@@ -624,11 +624,11 @@ var DropdownView = Backbone.View.extend({
 		// this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
 	},
 	dropdownleave: function(){
-			// this.$('.btn').removeClass('btnhover');
-			// this.$('.caret').removeClass('carethover');
-			// if(!this.$('.btn').hasClass('btnhover') && !this.$('.caret').hasClass('carethover')){
-			// 	this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorLight, 'outline-color': 'rgba(0,0,0,0)'}, 100);
-			// }
+		// this.$('.btn').removeClass('btnhover');
+		// this.$('.caret').removeClass('carethover');
+		// if(!this.$('.btn').hasClass('btnhover') && !this.$('.caret').hasClass('carethover')){
+		// 	this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorLight, 'outline-color': 'rgba(0,0,0,0)'}, 100);
+		// }
 			
 	},
 	btnclick: function(){
