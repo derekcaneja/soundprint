@@ -45,22 +45,28 @@ io.configure('development', function(){
 
 var cameraSocket = io.of('/camera');
 var applicationSocket = io.of('/application');
-var cameraClient;
+var cameraClient = [];;
 var applicationClient = [];
 var cameraData = [];
+var onCam = 0;
+var onCamMaybe = 0;
+var maxTimeOut = 3;
+var timeOut = [0,0,0,0];
 
 for(var i = 0; i < 4; i+=1) cameraData[i] = null;
 	
 cameraSocket.on('connection', function(socket){	
-	socket.emit('handshake');
-	cameraClient = socket;
-
+	socket.emit('handshake', onCam);
+	cameraClient.push(socket);
+	onCam += 1;
 	socket.on('setCam', function(number){
 		console.log('Connected Camera Number ' + number);
 	});
 
 	socket.on('frame', function(data){
+		console.log('got frame', data.cam);
 		if(data && applicationClient){
+			timeOut[data.cam] = maxTimeOut;
 			for(var i = 0; i < applicationClient.length; i++) {
 				applicationClient[i].volatile.emit('sendCamData',{
 					cam: data.cam,
@@ -76,3 +82,22 @@ applicationSocket.on('connection', function(socket) {
 	applicationClient.push(socket);
 	socket.emit('handshake');
 });
+
+setInterval(checkTimeOut, 1000)
+
+function checkTimeOut(){
+	for(var ii = 0; ii < timeOut.length; ii+=1){
+		if(timeOut[ii] > 0){
+			timeOut[ii] = timeOut[ii] - 1;
+			if(timeOut[ii]<=0){
+				console.log('timeout on cam', ii);
+				if(cameraClient[ii]){
+					cameraClient[ii].send('timeOut');
+					cameraClient[ii] = null;
+				}
+			}
+		}else{
+			onCam = Math.min(onCam, ii);
+		}
+	}
+}

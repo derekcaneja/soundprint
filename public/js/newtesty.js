@@ -105,6 +105,7 @@ function drawDensityToCanvas(ar){
 
 
 //Networking
+var mainIP;
 var camNumber = null;
 function connectTo(ip, num){
 	camNumber = num||0;
@@ -118,4 +119,7 @@ function connectTo(ip, num){
 			grabBG();
 		}, 1000);
 	});
+}
+function reconnect(){
+	try(
 }
