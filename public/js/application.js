@@ -3,10 +3,10 @@
 //---------------Application---------------//
 //-----------------------------------------//
 var squareSize = 23/100 * $(window).width() * 92/100;
-var toneMatrix1 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#3498DB', instrument: bassSynth, 	  matrix: synthMatrixFinal.matrix, title: 'Bass', gridcolor: '#2980B9' });
-var toneMatrix2 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#2ECC71', instrument: rhythmSynth,  matrix: synthMatrixFinal.matrix, title: 'Rhythm', gridcolor: '#27AE60' });
-var toneMatrix3 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#F1C40F', instrument: harmonySynth, matrix: synthMatrixFinal.matrix, title: 'Harmony', gridcolor: '#F39C12' });
-var toneMatrix4 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#E74C3C', instrument: melodySynth,  matrix: synthMatrixFinal.matrix, title: 'Melody', gridcolor: '#C0392B' });
+var toneMatrix1 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#3498DB', instrument: null, matrix: null, title: 'Bass', gridcolor: '#2980B9' });
+var toneMatrix2 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#2ECC71', instrument: null, matrix: null, title: 'Rhythm', gridcolor: '#27AE60' });
+var toneMatrix3 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#F1C40F', instrument: null, matrix: null, title: 'Harmony', gridcolor: '#F39C12' });
+var toneMatrix4 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#E74C3C', instrument: null, matrix: null, title: 'Melody', gridcolor: '#C0392B' });
 
 toneMatrix1 = new ToneMatrixView({ model: toneMatrix1 });
 toneMatrix2 = new ToneMatrixView({ model: toneMatrix2 });
@@ -123,9 +123,6 @@ function startthis(){
 			}
 			
 		}, fpsTime);
-		T('audio', { loop: true }).load('/js/libs/timbre/drum.wav', function(){
-			this.play();
-		});
 	}
 }
 

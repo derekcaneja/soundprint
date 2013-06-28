@@ -15,17 +15,26 @@ var ToneMatrix =  Backbone.Model.extend({
 		matrix		: null
 	}
 });
+
 var Knob = Backbone.Model.extend({
 	defaults: {
 		title		: 'Knob',
 		value		: '0'
 	}
 });
+
 var Slider = Backbone.Model.extend({
 	defaults: {
 		title		: 'Slider',
 		value		: '0',
 		type		: null,
 		color		: '#1abc9c',
+	}
+});
+
+var Instrument = Backbone.Model.extend({
+	defaults: {
+		title		: 'Instrument',
+		audio		: null
 	}
 });
