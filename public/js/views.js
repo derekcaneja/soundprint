@@ -89,11 +89,11 @@ var ToneMatrixView = Backbone.View.extend({
 		//	'margin-top': '-742px'
 		//});
 		
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '.5';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.instrument').children('.btn').css({'border-color': this.rgbaColor});
+		// this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 	// 	this.rgbaColor = this.rgbaColor.toRgbaString();
+ 	// 	this.borderAlpha = '.5';
+ 	// 	this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		// this.$('.instrument').children('.btn').css({'border-color': this.rgbaColor});
 
 		this.$('#'+this.model.get('title')+'Waveform').height('80px');
 		this.$('#'+this.model.get('title')+'Waveform').width('100%');
@@ -293,11 +293,6 @@ var ToneMatrixView = Backbone.View.extend({
 	events: {
 		'mouseover'						: 'mouseover',
 		'mouseleave'					: 'mouseleave',
-		'mouseover .dropdown-toggle'	: 'dropdownhover',
-		'mouseout .dropdown-toggle'		: 'dropdownleave',
-		'click .dropdown-toggle'		: 'btnclick',
-		'mouseover .instrument-item'	: 'listhover',
-		'mouseout .instrument-item'		: 'listleave',
 		'click .lock'					: 'lockMatrix',
 		'click .flip'					: 'flipMatrix'
 	},
@@ -309,61 +304,6 @@ var ToneMatrixView = Backbone.View.extend({
 	mouseleave: function(){
 		this.$('.square-border').css({'border-color': 'rgba(0,0,0,0)'});
 		
-	},
-	dropdownhover: function(){
-		this.$('.btn').addClass('btnhover');
-
-		this.$('.caret').addClass('carethover');
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
-			
-		this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
-		this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
-		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
-		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
-		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
-		//console.log(this.rgbaColor);
-
-	},
-	dropdownleave: function(){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '.5';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		if(!this.$('.instrument').hasClass('open')){
-			//this.rgbaColor = '.5';
-			this.$('.btn').removeClass('btnhover');
-			this.$('.caret').removeClass('carethover');
-			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor}, 300);
-			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'}, 300);
-			this.$('.dropdown-toggle').css({'box-shadow': 'none'});
-
-			//console.log(this.rgbaColor);
-		}
-
-	},
-	btnclick: function(){
-		this.dropdownOpen = "true";
-	},
-	listhover: function(ev){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		$(ev.target).css({'background-color': this.rgbaColor});
-	},
-	listleave: function(ev){
-		$(ev.target).css({'background-color': 'transparent'});
-
 	},
 	lockMatrix: function(){
 		if(!this.locked){
@@ -563,7 +503,7 @@ var KnobView = Backbone.View.extend({
 		'mouseup'	: 'mouseup'
 	},
 	mouseover: function(){
-		document.onselectstart = function(){ return false; };
+		//document.onselectstart = function(){ return false; };
 	},
 	mouseleave: function(){
 		if(!this.knob_dragging) document.onselectstart = null;
@@ -665,9 +605,11 @@ var DropdownView = Backbone.View.extend({
 		for(var i = 0; i < 3; i++) this.$('.dropdown-menu').append('<li><a class="instrument-item">' + this.model.get('title') + ' ' + (i + 1) + '</a></li>');
 			this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
+ 		this.borderAlpha = '.4';
  		this.dropdownOpen = false;
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+ 		this.rgbaColorDark = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + "1" + ')';
+		this.rgbaColorLight = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		this.$('.btn').css({'border-color': this.rgbaColorLight});
 		this.$('.dropdown-toggle').dropdown();
 	},
 	events: {
@@ -682,7 +624,7 @@ var DropdownView = Backbone.View.extend({
 
 		this.$('.caret').addClass('carethover');
 		
-		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor,'outline-color': this.rgbaColor, 'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor},300);
+		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorDark,'outline-color': this.rgbaColorDark, 'box-shadow': '0px 0px 0px 1px ' + this.rgbaColorDark}, 300);
 			
 		// this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
 		// this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
@@ -695,7 +637,7 @@ var DropdownView = Backbone.View.extend({
 			//this.rgbaColor = '.5';
 			this.$('.btn').removeClass('btnhover');
 			this.$('.caret').removeClass('carethover');
-			this.$('.dropdown-toggle').css({'box-shadow': 'none'}).transition({'border-color': this.rgbaColor, 'outline-color': 'rgba(0,0,0,0)'}, 300);
+			this.$('.dropdown-toggle').css({'box-shadow': 'none'}).transition({'border-color': this.rgbaColorLight, 'outline-color': 'rgba(0,0,0,0)'}, 300);
 	},
 	btnclick: function(){
 		this.dropdownOpen = true;
