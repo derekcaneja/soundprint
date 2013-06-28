@@ -83,7 +83,7 @@ var ToneMatrixView = Backbone.View.extend({
 	
 		this.$el.attr('rel', this.model.get('title'));
 		this.$el.append('<div class="square-border accelerate"></div><div class="wrapwrap"><div class="square"></div><div class="tool-container"><div class="tools-header"></div></div></div>');
-		this.$('.tools-header').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3>', new DropdownView({ model: this.model }).el, '<div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div></div>');
+		this.$('.tools-header').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3>', new DropdownView({ model: this.model }).el, '<div class="lockflip"><i class="videoicon icon-facetime-video"></i><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div></div>');
 		this.$('.tools-header').after('<div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></canvas></div>');
 
 		//this.$('.square').css({
@@ -605,30 +605,32 @@ var DropdownView = Backbone.View.extend({
 	initialize: function() {
 		this.$el.append('<a class="btn dropdown-toggle accelerate" data-toggle="dropdown" href="#">Default<span class="caret accelerate"></span></a><ul class="dropdown-menu accelerate"><div class="dropdownarrow"></div></ul>');
 	
-		for(var i = 0; i < 3; i++) this.$('.dropdown-menu').append('<li><a class="instrument-item">' + this.model.get('title') + ' ' + (i + 1) + '</a></li>');
+		for(var i = 0; i < 3; i++) this.$('.dropdown-menu').append('<li class="accelerate"><a class="instrument-item accelerate">' + this.model.get('title') + ' ' + (i + 1) + '</a></li>');
 			this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '.4';
  		this.dropdownOpen = false;
  		this.rgbaColorDark = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + "1" + ')';
 		this.rgbaColorLight = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.btn').css({'border-color': this.rgbaColorLight});
+		//this.$('.btn').css({'border-color': this.rgbaColorLight});
 		this.$('.dropdown-toggle').dropdown();
+		this.$('.dropdown-toggle').attr("rgbacolordark", this.rgbaColorDark);
+		this.$('.dropdown-toggle').attr("rgbacolorlight", this.rgbaColorLight);
 	},
 	events: {
-		'mouseover .dropdown-toggle'	: 'dropdownhover',
-		'mouseout .dropdown-toggle'		: 'dropdownleave',
+		'mouseenter .dropdown-toggle'	: 'dropdownhover',
+		'mouseleave .dropdown-toggle'		: 'dropdownleave',
 		'click .dropdown-toggle'		: 'btnclick',
-		'mouseover .instrument-item'	: 'listhover',
-		'mouseout .instrument-item'		: 'listleave'
+		'mouseenter .instrument-item'	: 'listhover',
+		'mouseleave .instrument-item'		: 'listleave'
 	},
 	dropdownhover: function(){
-		this.$('.btn').addClass('btnhover');
 
-		this.$('.caret').addClass('carethover');
-		
-		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorDark,'outline-color': this.rgbaColorDark, 'box-shadow': '0px 0px 0px 1px ' + this.rgbaColorDark}, 300);
-			
+		// if(!this.$('.btn').hasClass('btnhover') && !this.$('.caret').hasClass('carethover')){
+		// 	this.$('.btn').addClass('btnhover');
+		// 	this.$('.caret').addClass('carethover');
+		// 	//this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorDark,'outline-color': this.rgbaColorDark}, 300);
+		// }
 		// this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
 		// this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
 		// this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
@@ -636,11 +638,12 @@ var DropdownView = Backbone.View.extend({
 		// this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
 	},
 	dropdownleave: function(){
-		
-			//this.rgbaColor = '.5';
-			this.$('.btn').removeClass('btnhover');
-			this.$('.caret').removeClass('carethover');
-			this.$('.dropdown-toggle').css({'box-shadow': 'none'}).transition({'border-color': this.rgbaColorLight, 'outline-color': 'rgba(0,0,0,0)'}, 300);
+			// this.$('.btn').removeClass('btnhover');
+			// this.$('.caret').removeClass('carethover');
+			// if(!this.$('.btn').hasClass('btnhover') && !this.$('.caret').hasClass('carethover')){
+			// 	this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorLight, 'outline-color': 'rgba(0,0,0,0)'}, 100);
+			// }
+			
 	},
 	btnclick: function(){
 		this.dropdownOpen = true;
