@@ -57,9 +57,9 @@ $('body').append(application.el);
 
 
 $('.square').height($('.square-container').width());
-$('.square-border').height($('.square').height()+$('.tool-container').height()+15);
+//$('.square-border').height($('.square').height()+$('.tool-container').height()+15);
 $('.square-border').width($('.square-border').parent().width() + 8);
-$('.square').css('margin-top', ($('.square-border').height() * -1) - 12);//- $(this).height());
+//$('.square').css('margin-top', ($('.square-border').height() * -1) - 12);//- $(this).height());
 
 
 var toneMatrix = [	toneMatrix1,
