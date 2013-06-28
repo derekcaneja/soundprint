@@ -16,10 +16,22 @@ var AS = 10;
 var B  = 11;
 
 var onScale = 0;
-var scales = [[C, D, E, G, A, C + 12, D + 12, E + 12],
-              [D, E, G, A, B, D + 12, E + 12, G + 12],
-              [A, B, D, E, FS, A + 12, B + 12, D + 12 ],
-              [CS, E, FS, A, B, CS + 12, E + 12, FS + 12]];
+var scalesPerMeasure = 1;
+var scales = [];
+var numScales = 4;
+var toScales = [	[C, D, E, G, A, C + 12, D + 12, E + 12],
+					[D, E, G, A, B, D + 12, E + 12, G + 12],
+					[A, B, D, E, FS, A + 12, B + 12, D + 12 ],
+					//[C, D, E, G, A, C + 12, D + 12, E + 12]]
+					[CS, E, FS, A, B, CS + 12, E + 12, FS + 12]];
+					
+var lastScale = 0;
+var newScale
+for(var ii = 0; ii < numScales; ii+=1){
+	//while(newScale==null||newScale==lastScale)newScale = Math.floor(Math.random()*toScales.length)
+	scales.push(toScales[ii]);
+	//lastScale = newScale;
+}
 			  
 var scale = scales[0];
 
@@ -42,24 +54,31 @@ function SPI(options){
 	this.poly = options.poly||3;
 	this.noteLength = options.noteLength||300;
 	this.sinType = options.sinType||'sin';
+	this.oct = options.oct||3;
+	this.dist = options.dist;
 	
 	this.main = T(this.type, { mul: this.mul, poly: this.poly }).play();
-	this.env = T("adsr", { d: this.noteLength, s: 0, r: 600 });
+	this.env = T("adsr", { d: this.noteLength, s: 0, r: 0 });
 	this.clone = null
 
 	this.main.def = function(opts) {
 		scope.clone = scope.env.clone()
 		
 		if(scope.fx == 1){
-			var op1 = T("sin", { freq: opts.freq * 3, fb: 0.25, mul: 0.4})
+			var op1 = T("sin", { freq: opts.freq * 1, fb: 0.25, mul: 0.4})
 			var op2 = T(scope.sinType, { freq: opts.freq, phase: op1, mul: opts.velocity/128 });
+			if(scope.dist){
+				//op2 = T("dist", {pre:40, post:-10, cutoff:5}, op2)
+				op2 = T("comp", {thresh:-90, knee:100, ratio:30, gain:40}, op2)
+			}
 
 			scope.clone.append(op2);
 		}else if(scope.fx == 2){
 		
-			var op2 = T(scope.sinType, { freq: opts.freq, mul: opts.velocity/128 });
+			var op1 = T(scope.sinType, { freq: opts.freq, mul: opts.velocity/128 });
+			if(scope.dist)op1 = T("dist", {pre:60, post:-2, cutoff:1000}, op1)
 
-			scope.clone.append(op2);
+			scope.clone.append(op1);
 		}
 		
 		return scope.clone.on("ended", opts.doneAction).bang();
@@ -73,7 +92,7 @@ SPI.prototype.playNote = function(beat){
 		for(var ii = 0; ii < 8; ii++) {
 			//if(this.matrix[Math.floor(beat / this.hitRate)%8][ii] == 1){
 			if(Math.random()<0.3){
-				if(this.main)this.main.noteOn(scale[ii] + 60, 80);
+				if(this.main)this.main.noteOn(scale[ii] + (this.oct*12), 80, 10);
 			}
 		}
 	}	
@@ -83,23 +102,39 @@ SPI.prototype.playNote = function(beat){
 var ins1 = new SPI({ 
   hr: 1,
   type:'SynthDef',
-  poly:3,
-  noteLength:400,
-  sinType:'sin',
+  poly:1,
+  noteLength:10,
+  sinType:'saw',
   mul:0.5,
-  fx:1
+  fx:1,
+  oct:6
  });
 
 var ins2 = new SPI({ 
+  hr: 4,
+  type:'PluckGen',
+  poly:1,
+  noteLength:10000,
+  mul:0.15,
+  dist:true,
+  fx:2,
+  oct:1,
+});
+ 
+var ins3 = new SPI({ 
   hr: 2,
   type:'PluckGen',
   poly:1,
-  noteLength:300,
-  mul:1,
-  fx:2
+  noteLength:200,
+  sinType:'saw',
+  dist:true,
+  mul:0.2,
+  fx:2,
+  oct:3
  });
  
-var instruments = [ins1,ins2  ,null,null]
+ 
+var instruments = [ins1,ins2 ,ins3,null]
 
 //ON HIT
 function hitNote(count){
@@ -118,7 +153,7 @@ function hitNote(count){
 		if(instruments[ii])instruments[ii].playNote(i);
 	}
 
-	if(i % (measure*2) == 0){
+	if(i % (measure*scalesPerMeasure) == 0){
 		scale = scales[onScale]
 		onScale += 1;
 		if(onScale>=scales.length)onScale = 0;
@@ -127,7 +162,7 @@ function hitNote(count){
 
 
 //SET UP
-timbre.setup({ samplerate: timbre.samplerate * 0.5 });
+timbre.setup({ samplerate: timbre.samplerate/2});
 
 T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	BD  = this.slice(   0,  500).set({bang:false, mul:1});
@@ -136,6 +171,6 @@ T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	HH2 = this.slice(1500, 2000).set({bang:false, mul:0.2});
 	CYM = this.slice(2000).set({bang:false, mul:0.2});
 
-	drum = T("lowshelf", { freq: 110, gain: 8, mul: 1}, BD, SD, HH1, HH2, CYM).play();
+	drum = T("lowshelf", { freq: 110, gain: 8, mul: 0.6}, BD, SD, HH1, HH2, CYM).play();
 	T("interval", {interval:"BPM64 L16"}, hitNote).start();
 })
