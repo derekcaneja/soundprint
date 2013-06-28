@@ -24,7 +24,7 @@
     var ACCEPT_SAMPLERATES = [8000,11025,12000,16000,22050,24000,32000,44100,48000];
     var ACCEPT_CELLSIZES = [32,64,128,256];
 
-    var _ver = "13.03.10";
+    var _ver = "13.05.03";
     var _sys = null;
     var _constructors = {};
     var _factories    = {};
@@ -35,7 +35,7 @@
     var _bpm = 120;
 
     var T = function() {
-        var args = slice.call(arguments), key = args[0], t;
+        var args = slice.call(arguments), key = args[0], t, m;
 
         switch (typeof key) {
         case "string":
@@ -43,6 +43,19 @@
                 t = new _constructors[key](args.slice(1));
             } else if (_factories[key]) {
                 t = _factories[key](args.slice(1));
+            } else {
+                m = /^(.+?)(?:\.(ar|kr))?$/.exec(key);
+                if (m) {
+                    key = m[1];
+                    if (_constructors[key]) {
+                        t = new _constructors[key](args.slice(1));
+                    } else if (_factories[key]) {
+                        t = _factories[key](args.slice(1));
+                    }
+                    if (t && m[2]) {
+                        t[m[2]]();
+                    }
+                }
             }
             break;
         case "number":
@@ -72,7 +85,6 @@
         if (t === undefined) {
             t = new AddNode(args.slice(1));
             console.warn("T(\"" + key + "\") is not defined.");
-            
         }
 
         var _ = t._;
@@ -342,7 +354,7 @@
     };
 
     fn.pointer = function(src, offset, length) {
-        offset = src.byteOffset + offset * src.BYTES_PER_ELEMENT;
+        offset = src.byteOffset + offset * src.constructor.BYTES_PER_ELEMENT;
         if (typeof length === "number") {
             return new src.constructor(src.buffer, offset, length);
         } else {
@@ -378,6 +390,15 @@
     };
     fn.changeWithValue.unremovable = true;
 
+    fn.clone = function(src) {
+        var new_instance = new src.constructor([]);
+        new_instance._.ar  = src._.ar;
+        new_instance._.mul = src._.mul;
+        new_instance._.add = src._.add;
+        new_instance._.bypassed = src._.bypassed;
+        return new_instance;
+    };
+
     fn.timer = (function() {
         var make_onstart = function(self) {
             return function() {
@@ -385,6 +406,7 @@
                     _sys.timers.push(self);
                     _sys.events.emit("addObject");
                     self._.emit("start");
+                    fn.buddies_start(self);
                 }
             };
         };
@@ -395,12 +417,14 @@
                     _sys.timers.splice(i, 1);
                     self._.emit("stop");
                     _sys.events.emit("removeObject");
+                    fn.buddies_stop(self);
                 }
             };
         };
         return function(self) {
             var onstart = make_onstart(self);
             var onstop  = make_onstop(self);
+            self.nodeType = TimbreObject.TIMER;
             self.start = function() {
                 _sys.nextTick(onstart);
                 return self;
@@ -420,6 +444,7 @@
                     _sys.listeners.push(self);
                     _sys.events.emit("addObject");
                     self._.emit("listen");
+                    fn.buddies_start(self);
                 }
             };
         };
@@ -430,13 +455,15 @@
                     _sys.listeners.splice(i, 1);
                     self._.emit("unlisten");
                     _sys.events.emit("removeObject");
+                    fn.buddies_stop(self);
                 }
             };
         };
         return function(self) {
             var onlisten = make_onlisten(self);
             var onunlisten = make_onunlisten(self);
-            self.listen = function() {
+            self.nodeType = TimbreObject.LISTENER;
+            self.listen = function(buddies) {
                 if (arguments.length) {
                     self.append.apply(self, arguments);
                 }
@@ -632,11 +659,47 @@
         }
     };
 
+    fn.buddies_start = function(self) {
+        var buddies = self._.buddies;
+        var node, i, imax;
+        for (i = 0, imax = buddies.length; i < imax; ++i) {
+            node = buddies[i];
+            switch (node.nodeType) {
+            case TimbreObject.DSP:
+                node.play();
+                break;
+            case TimbreObject.TIMER:
+                node.start();
+                break;
+            case TimbreObject.LISTENER:
+                node.listen();
+                break;
+            }
+        }
+    };
+
+    fn.buddies_stop = function(self) {
+        var buddies = self._.buddies;
+        var node, i, imax;
+        for (i = 0, imax = buddies.length; i < imax; ++i) {
+            node = buddies[i];
+            switch (node.nodeType) {
+            case TimbreObject.DSP:
+                node.pause();
+                break;
+            case TimbreObject.TIMER:
+                node.stop();
+                break;
+            case TimbreObject.LISTENER:
+                node.unlisten();
+                break;
+            }
+        }
+    };
+
     fn.fix_iOS6_1_problem = function(flag) {
         _sys.fix_iOS6_1_problem(flag);
     };
-
-    
 
     var modules = timbre.modules = {};
 
@@ -1039,8 +1102,16 @@
             };
             if (isDictionary(_args[0])) {
                 var params = _args.shift();
+                var _in = params["in"];
                 this.once("init", function() {
                     this.set(params);
+                    if (_in) {
+                        if (isArray(_in)) {
+                            this.append.apply(this, _in);
+                        } else if (_in instanceof TimbreObject) {
+                            this.append(_in);
+                        }
+                    }
                 });
             }
 
@@ -1066,6 +1137,7 @@
                 break;
             }
             this.playbackState = PLAYING_STATE;
+            this.nodeType = TimbreObject.DSP;
 
             this._.ar  = true;
             this._.mul = 1;
@@ -1075,7 +1147,11 @@
             this._.meta = {};
             this._.samplerate = _sys.samplerate;
             this._.cellsize   = _sys.cellsize;
+            this._.buddies    = [];
         }
+        TimbreObject.DSP      = 1;
+        TimbreObject.TIMER    = 2;
+        TimbreObject.LISTENER = 3;
 
         var $ = TimbreObject.prototype;
 
@@ -1120,6 +1196,19 @@
                 },
                 get: function() {
                     return this._.add;
+                }
+            },
+            buddies: {
+                set: function(value) {
+                    if (!isArray(value)) {
+                        value = [value];
+                    }
+                    this._.buddies = value.filter(function(node) {
+                        return node instanceof TimbreObject;
+                    });
+                },
+                get: function() {
+                    return this._.buddies;
                 }
             }
         });
@@ -1184,6 +1273,71 @@
             if (item) {
                 this.nodes.splice(index, 1);
                 this._.emit("remove", [item]);
+            }
+            return this;
+        };
+
+        $.postMessage = function(message) {
+            this._.emit("message", message);
+            return this;
+        };
+
+        $.to = function(object) {
+            if (object instanceof TimbreObject) {
+                object.append(this);
+            } else {
+                var args = slice.call(arguments);
+                if (isDictionary(args[1])) {
+                    args.splice(2, 0, this);
+                } else {
+                    args.splice(1, 0, this);
+                }
+                object = T.apply(null, args);
+            }
+            return object;
+        };
+
+        $.splice = function(ins, obj, rem) {
+            var i;
+            if (!obj) {
+                if (this._.dac) {
+                    if (ins instanceof TimbreObject) {
+                        if (rem instanceof TimbreObject) {
+                            if (rem._.dac) {
+                                rem._.dac._.node = ins;
+                                ins._.dac = rem._.dac;
+                                rem._.dac = null;
+                                ins.nodes.push(this);
+                            }
+                        } else {
+                            if (this._.dac) {
+                                this._.dac._.node = ins;
+                                ins._.dac = this._.dac;
+                                this._.dac = null;
+                                ins.nodes.push(this);
+                            }
+                        }
+                    } else if (rem instanceof TimbreObject) {
+                        if (rem._.dac) {
+                            rem._.dac._.node = this;
+                            this._.dac = rem._.dac;
+                            rem._.dac = null;
+                        }
+                    }
+                }
+            } else {
+                if (obj instanceof TimbreObject) {
+                    i = obj.nodes.indexOf(rem);
+                    if (i !== -1) {
+                        obj.nodes.splice(i, 1);
+                    }
+                    if (ins instanceof TimbreObject) {
+                        ins.nodes.push(this);
+                        obj.nodes.push(ins);
+                    } else {
+                        obj.nodes.push(this);
+                    }
+                }
             }
             return this;
         };
@@ -1273,10 +1427,10 @@
             if (dac === null) {
                 dac = this._.dac = new SystemInlet(this);
             }
-            if (dac.playbackState === FINISHED_STATE) {
-                dac.play();
+            if (dac.play()) {
                 this._.emit.apply(this, ["play"].concat(slice.call(arguments)));
             }
+            fn.buddies_start(this);
             return this;
         };
 
@@ -1287,6 +1441,7 @@
                 this._.dac = null;
                 this._.emit("pause");
             }
+            fn.buddies_stop(this);
             return this;
         };
 
@@ -1358,16 +1513,15 @@
                 var y, dy, y0;
                 var i, imax = data.length;
 
-                canvas.width = canvas.width;
                 context.save();
 
                 context.rect(offset_x, offset_y, width, height);
                 // context.clip();
 
-                /*if (background !== null) {
+                if (background !== null) {
                     context.fillStyle = background;
                     context.fillRect(offset_x, offset_y, width, height);
-                }*/
+                }
                 if (_.plotBefore) {
                     _.plotBefore.call(
                         this, context, offset_x, offset_y, width, height
@@ -1387,26 +1541,8 @@
                     context.strokeStyle = foreground;
                     context.lineWidth   = lineWidth;
 
-                    context.lineWidth=3;
                     context.beginPath();
-                    x  = 0;
-                    y0 = height - (data[0] - rangeMin) * rangeDelta;
-                    context.moveTo(x + offset_x, y0 + offset_y);
-                    for (i = 1; i < imax; ++i) {
-                        x += dx;
-                        y = height - (data[i] - rangeMin) * rangeDelta;
-                        context.lineTo(x + offset_x, y + offset_y);
-                    }
-                    if (cyclic) {
-                        context.lineTo(x + dx + offset_x, y0 + offset_y);
-                    } else {
-                        context.lineTo(x + dx + offset_x, y  + offset_y);
-                    }
-                    context.stroke();
 
-                    context.lineWidth/=2;
-                    context.strokeStyle = $.Color(opts.foreground).lightness(.3);
-                    context.beginPath();
                     x  = 0;
                     y0 = height - (data[0] - rangeMin) * rangeDelta;
                     context.moveTo(x + offset_x, y0 + offset_y);
@@ -1636,7 +1772,11 @@
     var ArrayWrapper = (function() {
         function ArrayWrapper(_args) {
             TimbreObject.call(this, 1, []);
-            fn.fixKR(this);
+
+            var i, imax;
+            for (i = 0, imax = _args[0].length; i < imax; ++i) {
+              this.append(_args[0][i]);
+            }
 
             if (isDictionary(_args[1])) {
                 var params = _args[1];
@@ -1652,6 +1792,40 @@
         Object.defineProperties($, {
 
         });
+
+        $.bang = function() {
+            var args = ["bang"].concat(slice.call(arguments));
+            var nodes = this.nodes;
+            var i, imax;
+            for (i = 0, imax = nodes.length; i < imax; ++i) {
+                nodes[i].bang.apply(nodes[i], args);
+            }
+            return this;
+        };
+
+        $.postMessage = function(message) {
+            var nodes = this.nodes;
+            var i, imax;
+            for (i = 0, imax = nodes.length; i < imax; ++i) {
+                nodes[i].postMessage(message);
+            }
+            return this;
+        };
+
+        $.process = function(tickID) {
+            var _ = this._;
+            if (this.tickID !== tickID) {
+                this.tickID = tickID;
+                if (_.ar) {
+                    fn.inputSignalAR(this);
+                    fn.outputSignalAR(this);
+                } else {
+                    this.cells[0][0] = fn.inputSignalKR(this);
+                    fn.outputSignalKR(this);
+                }
+            }
+            return this;
+        };
 
         return ArrayWrapper;
     })();
@@ -1718,6 +1892,7 @@
 
         $.play = function() {
             _sys.nextTick(this._.onplay);
+            return (_sys.inlets.indexOf(this) === -1);
         };
 
         $.pause = function() {
@@ -1725,8 +1900,7 @@
         };
 
         $.process = function(tickID) {
-            var node  = this._.node;
-
+            var node = this._.node;
             if (node.playbackState & 1) {
                 node.process(tickID);
                 this.cells[1].set(node.cells[1]);
@@ -2303,34 +2477,67 @@
             };
         };
     } else {
-        // Flash fallback
-        (function() {
-            if (_envtype !== "browser" || _envmobile) {
-                return;
-            }
-            var nav = navigator;
+        ImplClass = function(sys) {
+            this.maxSamplerate     = 48000;
+            this.defaultSamplerate = 44100;
+            this.env = "nop";
+            this.play  = function() {};
+            this.pause = function() {};
+        };
+    }
+    /*global webkitAudioContext:false */
 
-            /*jshint latedef:true */
-            if (getFlashPlayerVersion(0) < 10) {
-                return;
-            }
-            /*jshint latedef:false */
-            var swf, PlayerDivID = "TimbreFlashPlayerDiv";
-            var src = (function() {
-                var scripts = document.getElementsByTagName("script");
-                if (scripts && scripts.length) {
-                    for (var m, i = 0, imax = scripts.length; i < imax; ++i) {
-                        if ((m = /^(.*\/)timbre(.*)\.js$/i.exec(scripts[i].src))) {
-                            return m[1] + "timbre.swf";
-                        }
+    _sys = new SoundSystem().bind(ImplClass);
+
+    var exports = timbre;
+
+    if (_envtype === "node") {
+        module.exports = global.timbre = exports;
+    } else if (_envtype === "browser") {
+        exports.noConflict = (function() {
+           var _t = window.timbre, _T = window.T;
+            return function(deep) {
+                if (window.T === exports) {
+                    window.T = _T;
+                }
+                if (deep && window.timbre === exports) {
+                    window.timbre = _t;
+                }
+                return exports;
+            };
+        })();
+
+        window.timbre = window.T = exports;
+    }
+
+    // Flash fallback
+    (function() {
+        if (_sys.impl.env !== "nop" || _envtype !== "browser" || _envmobile) {
+            return;
+        }
+        var nav = navigator;
+
+        /*jshint latedef:true */
+        if (getFlashPlayerVersion(0) < 10) {
+            return;
+        }
+        /*jshint latedef:false */
+
+        var swf, PlayerDivID = "TimbreFlashPlayerDiv";
+        var src = (function() {
+            var scripts = document.getElementsByTagName("script");
+            if (scripts && scripts.length) {
+                for (var m, i = 0, imax = scripts.length; i < imax; ++i) {
+                    if ((m = /^(.*\/)timbre(?:\.dev)?\.js$/i.exec(scripts[i].src))) {
+                        return m[1] + "timbre.swf";
                     }
                 }
-            })();
+            }
+        })();
 
+        window.timbrejs_flashfallback_init = function() {
             function TimbreFlashPlayer(sys) {
                 var timerId = 0;
-
-                initialize();
 
                 this.maxSamplerate     = 44100;
                 this.defaultSamplerate = 44100;
@@ -2377,98 +2584,56 @@
                     }
                 };
             }
+            _sys.bind(TimbreFlashPlayer);
+            delete window.timbrejs_flashfallback_init;
+        };
 
-            function initialize() {
-                var o, p;
-                var swfSrc  = src;
-                var swfName = swfSrc + "?" + (+new Date());
-                var swfId   = "TimbreFlashPlayer";
-                var div = document.createElement("div");
-                div.id = PlayerDivID;
-                div.style.display = "inline";
-                div.width = div.height = 1;
+        var o, p;
+        var swfSrc  = src;
+        var swfName = swfSrc + "?" + (+new Date());
+        var swfId   = "TimbreFlashPlayer";
+        var div = document.createElement("div");
+        div.id = PlayerDivID;
+        div.style.display = "inline";
+        div.width = div.height = 1;
 
-                if (nav.plugins && nav.mimeTypes && nav.mimeTypes.length) {
-                    // ns
-                    o = document.createElement("object");
-                    o.id = swfId;
-                    o.classid = "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
-                    o.width = o.height = 1;
-                    o.setAttribute("data", swfName);
-                    o.setAttribute("type", "application/x-shockwave-flash");
-                    p = document.createElement("param");
-                    p.setAttribute("name", "allowScriptAccess");
-                    p.setAttribute("value", "always");
-                    o.appendChild(p);
-                    div.appendChild(o);
-                } else {
-                    // ie
-                    /*jshint quotmark:single */
-                    o = '<object id="' + swfId + '" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="1" height="1">';
-                    o += '<param name="movie" value="' + swfName + '" />';
-                    o += '<param name="bgcolor" value="#FFFFFF" />';
-                    o += '<param name="quality" value="high" />';
-                    o += '<param name="allowScriptAccess" value="always" />';
-                    o += '</object>';
-                    /*jshint quotmark:double */
-                    div.innerHTML = o;
-                }
-                window.addEventListener("load", function() {
-                    document.body.appendChild(div);
-                    swf = document[swfId];
-                });
-            }
-
-            function getFlashPlayerVersion(subs) {
-                /*global ActiveXObject:true */
-                try {
-                    if (nav.plugins && nav.mimeTypes && nav.mimeTypes.length) {
-                        return nav.plugins["Shockwave Flash"].description.match(/([0-9]+)/)[subs];
-                    }
-                    return (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")).GetVariable("$version").match(/([0-9]+)/)[subs];
-                } catch (e) {
-                    return -1;
-                }
-                /*global ActiveXObject:false */
-            }
-
-            ImplClass = TimbreFlashPlayer;
-        })();
-
-        if (!ImplClass) {
-            ImplClass = function() {
-                this.maxSamplerate     = 48000;
-                this.defaultSamplerate =  8000;
-                this.env = "nop";
-                this.play  = fn.nop;
-                this.pause = fn.nop;
-            };
+        if (nav.plugins && nav.mimeTypes && nav.mimeTypes.length) {
+            // ns
+            o = document.createElement("object");
+            o.id = swfId;
+            o.classid = "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
+            o.width = o.height = 1;
+            o.setAttribute("data", swfName);
+            o.setAttribute("type", "application/x-shockwave-flash");
+            p = document.createElement("param");
+            p.setAttribute("name", "allowScriptAccess");
+            p.setAttribute("value", "always");
+            o.appendChild(p);
+            div.appendChild(o);
+        } else {
+            // ie
+            /*jshint quotmark:single */
+            div.innerHTML = '<object id="' + swfId + '" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="1" height="1"><param name="movie" value="' + swfName + '" /><param name="bgcolor" value="#FFFFFF" /><param name="quality" value="high" /><param name="allowScriptAccess" value="always" /></object>';
+            /*jshint quotmark:double */
         }
-    }
-    /*global webkitAudioContext:false */
+        window.addEventListener("load", function() {
+            document.body.appendChild(div);
+            swf = document[swfId];
+        });
 
-    _sys = new SoundSystem().bind(ImplClass);
-
-    var exports = timbre;
-
-    if (_envtype === "node") {
-        module.exports = global.timbre = exports;
-    } else if (_envtype === "browser") {
-        exports.noConflict = (function() {
-           var _t = window.timbre, _T = window.T;
-            return function(deep) {
-                if (window.T === exports) {
-                    window.T = _T;
+        function getFlashPlayerVersion(subs) {
+            /*global ActiveXObject:true */
+            try {
+                if (nav.plugins && nav.mimeTypes && nav.mimeTypes.length) {
+                    return nav.plugins["Shockwave Flash"].description.match(/([0-9]+)/)[subs];
                 }
-                if (deep && window.timbre === exports) {
-                    window.timbre = _t;
-                }
-                return exports;
-            };
-        })();
-
-        window.timbre = window.T = exports;
-    }
+                return (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")).GetVariable("$version").match(/([0-9]+)/)[subs];
+            } catch (e) {
+                return -1;
+            }
+            /*global ActiveXObject:false */
+        }
+    })();
 
     function setupTypedArray() {
         var unsigned = 0, signed = 1, floating  = 2;
@@ -3358,7 +3523,7 @@
         }
         if (Decoder.webkit_decode) {
             if (typeof src === "object") {
-                return Decoder.webkit_decode(src.data, onloadedmetadata, onloadeddata);
+                return Decoder.webkit_decode(src.data||src, onloadedmetadata, onloadeddata);
             } else {
                 return Decoder.webkit_decode(src, onloadedmetadata, onloadeddata);
             }
@@ -3431,14 +3596,23 @@
             var samplerate = data[24] + (data[25]<<8) + (data[26]<<16) + (data[27]<<24);
             var bitSize    = data[34] + (data[35]<<8);
 
-            if (String.fromCharCode(data[36], data[37], data[38], data[39]) !== "data") {
+            var i = 36;
+            while (i < data.length) {
+                if (String.fromCharCode(data[i], data[i+1], data[i+2], data[i+3]) === "data") {
+                    break;
+                }
+                i += 1;
+            }
+            if (i >= data.length) {
                 return onloadedmetadata(false);
             }
+            i += 4;
 
-            var l2 = data[40] + (data[41]<<8) + (data[42]<<16) + (data[43]<<24);
+            var l2 = data[i] + (data[i+1]<<8) + (data[i+2]<<16) + (data[i+3]<<24);
             var duration = ((l2 / channels) >> 1) / samplerate;
+            i += 4;
 
-            if (l2 > data.length - 44) {
+            if (l2 > data.length - i) {
                 return onloadedmetadata(false);
             }
 
@@ -3457,16 +3631,16 @@
             });
 
             if (bitSize === 8) {
-                data = new Int8Array(data.buffer, 44);
+                data = new Int8Array(data.buffer, i);
             } else if (bitSize === 16) {
-                data = new Int16Array(data.buffer, 44);
+                data = new Int16Array(data.buffer, i);
             } else if (bitSize === 32) {
-                data = new Int32Array(data.buffer, 44);
+                data = new Int32Array(data.buffer, i);
             } else if (bitSize === 24) {
-                data = _24bit_to_32bit(new Uint8Array(data.buffer, 44));
+                data = _24bit_to_32bit(new Uint8Array(data.buffer, i));
             }
 
-            var i, imax, j, k = 1 / ((1 << (bitSize-1)) - 1), x;
+            var imax, j, k = 1 / ((1 << (bitSize-1)) - 1), x;
             if (channels === 2) {
                 for (i = j = 0, imax = mixdown.length; i < imax; ++i) {
                     x =  bufferL[i] = data[j++] * k;
@@ -3513,7 +3687,6 @@
                 samplerate = ctx.sampleRate;
                 channels   = buffer.numberOfChannels;
                 if (channels === 2) {
-                    console.log(buffer);
                     bufferL = buffer.getChannelData(0);
                     bufferR = buffer.getChannelData(1);
                 } else {
@@ -4291,10 +4464,20 @@
         } else if (typeof value === "string") {
             if ((dx = getWavetable(value)) !== undefined) {
                 this.wave.set(dx);
-                
             }
         }
         this.wave[TABLE_SIZE] = this.wave[0];
+    };
+
+    $.clone = function() {
+        var new_instance = new Oscillator(this.samplerate);
+        new_instance.wave      = this.wave;
+        new_instance.step      = this.step;
+        new_instance.frequency = this.frequency;
+        new_instance.value     = this.value;
+        new_instance.phase     = this.phase;
+        new_instance.feedback  = this.feedback;
+        return new_instance;
     };
 
     $.reset = function() {
@@ -5119,6 +5302,19 @@
         return new_instance;
     };
 
+    Tape.prototype.getBuffer = function() {
+        var samplerate = 44100;
+        if (this.fragments.length > 0) {
+            samplerate = this.fragments[0].samplerate;
+        }
+        var stream = new TapeStream(this, samplerate);
+        var total_samples = (this.duration() * samplerate)|0;
+        return {
+            samplerate: samplerate,
+            buffer    : stream.fetch(total_samples)
+        };
+    };
+
     function Fragment(soundbuffer, start, duration, reverse, pitch, stretch, pan) {
         if (!soundbuffer) {
             soundbuffer = silencebuffer;
@@ -5703,7 +5899,10 @@
     "use strict";
 
     var fn = T.fn;
-    var isSignalArray = fn.isSignalArray;
+    var Tape = T.modules.Scissor.Tape;
+    var isSignalArray = function(obj) {
+        return fn.isSignalArray(obj) || obj instanceof Float32Array;
+    };
 
     function BufferNode(_args) {
         T.Object.call(this, 1, _args);
@@ -5745,10 +5944,16 @@
         var _ = this._;
         if (typeof value === "object") {
             var buffer = [], samplerate, channels;
+
             if (isSignalArray(value)) {
                 buffer[0] = value;
                 channels = 1;
             } else if (typeof value === "object") {
+                if (value instanceof T.Object) {
+                    value = value.buffer;
+                } else if (value instanceof Tape) {
+                    value = value.getBuffer();
+                }
                 if (Array.isArray(value.buffer)) {
                     if (isSignalArray(value.buffer[0])) {
                         if (isSignalArray(value.buffer[1]) &&
@@ -5850,7 +6055,7 @@
 
     $.clone = function() {
         var _ = this._;
-        var instance = T("buffer");
+        var instance = fn.clone(this);
 
         if (_.buffer.length) {
             setBuffer.call(instance, {
@@ -6799,9 +7004,8 @@
     });
 
     $.clone = function() {
-        var instance = new EnvNode([]);
+        var instance = fn.clone(this);
         instance._.env = this._.env.clone();
-        instance._.ar  = this._.ar;
         return instance;
     };
 
@@ -7006,8 +7210,8 @@
         }
 
         var opts = _args[0];
-        var a  = envValue(opts,   10,   10, "a" , "attackTime", timevalue);
-        var r  = envValue(opts,   10, 1000, "r" , "decayTime" , timevalue);
+        var a  = envValue(opts,   10,   10, "a" , "attackTime" , timevalue);
+        var r  = envValue(opts,   10, 1000, "r" , "releaseTime", timevalue);
         var lv = envValue(opts, ZERO,    1, "lv", "level"     );
 
         opts.table = [ZERO, [lv, a], [ZERO, r]];
@@ -8523,37 +8727,25 @@
         fn.fixKR(this);
 
         var _ = this._;
-        _.mml = "";
-        _.status = {t:120, l:4, o:4, v:12, q:6, dot:0, tie:false};
-        _.commands = [];
-        _.index    = 0;
-        _.queue    = [];
-        _.currentTime     = 0;
-        _.queueTime = 0;
-        _.segnoIndex  = -1;
-        _.loopStack   = [];
-        _.prevNote = 0;
-        _.remain   = Infinity;
-        _.onended  = fn.make_onended(this);
+        _.tracks  = [];
+        _.onended = fn.make_onended(this);
+        _.currentTime = 0;
 
         this.on("start", onstart);
     }
     fn.extend(MML);
 
     var onstart = function() {
-        var _ = this._;
+        var self = this, _ = this._;
+        var mml  = _.mml;
+        if (typeof mml === "string") {
+            mml = [mml];
+        }
+        _.tracks = mml.map(function(mml, i) {
+            return new MMLTrack(self, i, mml);
+        });
+        _.currentTime = 0;
         this.playbackState = fn.PLAYING_STATE;
-        _.commands = compile(_.mml);
-        _.index    = 0;
-        _.queue    = [];
-        _.currentTime   = 0;
-        _.queueTime = 0;
-        _.segnoIndex  = -1;
-        _.loopStack   = [];
-        _.prevNote = 0;
-        _.remain   = Infinity;
-
-        sched(this);
     };
     Object.defineProperty(onstart, "unremoved", {
         value:true, writable:false
@@ -8565,7 +8757,7 @@
         mml: {
             set: function(value) {
                 var _ = this._;
-                if (typeof value === "string") {
+                if (typeof value === "string" || Array.isArray(value)) {
                     _.mml = value;
                 }
             },
@@ -8630,43 +8822,18 @@
         if (this.tickID !== tickID) {
             this.tickID = tickID;
 
-            var nodes = this.nodes;
-            var queue  = _.queue;
-            var gen, i, imax;
+            var i, imax;
+            var tracks = _.tracks;
 
-            if (queue.length) {
-                while (queue[0][0] <= _.currentTime) {
-                    var nextItem = _.queue.shift();
-                    if (nextItem[1]) {
-                        for (i = 0, imax = nodes.length; i < imax; ++i) {
-                            gen = nodes[i];
-                            if (gen.noteOn) {
-                                gen.noteOn(nextItem[1], nextItem[3]);
-                            } else {
-                                gen.bang();
-                            }
-                        }
-                        _.remain = nextItem[4];
-                        _.emit("data", "noteOn", {noteNum:nextItem[1], velocity:nextItem[3]});
-                        sched(this);
-                    } else {
-                        for (i = 0, imax = nodes.length; i < imax; ++i) {
-                            gen = nodes[i];
-                            if (gen.noteOff) {
-                                gen.noteOff(nextItem[2], nextItem[3]);
-                            } else if (gen.release) {
-                                gen.release();
-                            }
-                        }
-                        _.emit("data", "noteOff", {noteNum:nextItem[2], velocity:nextItem[3]});
-                    }
-                    if (queue.length === 0) {
-                        break;
-                    }
+            for (i = 0, imax = tracks.length; i < imax; ++i) {
+                tracks[i].process();
+            }
+            while (i--) {
+                if (tracks[i].ended) {
+                    tracks.splice(i, 1);
                 }
             }
-            _.remain -= fn.currentTimeIncr;
-            if (queue.length === 0 && _.remain <= 0) {
+            if (tracks.length === 0) {
                 fn.nextTick(_.onended);
             }
             _.currentTime += fn.currentTimeIncr;
@@ -8675,271 +8842,388 @@
         return this;
     };
 
-    var sched = function(self) {
-        var _ = self._;
+    fn.register("mml", MML);
 
-        var cmd, commands = _.commands;
-        var queue  = _.queue;
-        var index  = _.index;
-        var status = _.status;
-        var queueTime = _.queueTime;
-        var loopStack = _.loopStack;
-        var tempo, val, len, dot, vel;
-        var duration, quantize, pending, _queueTime;
-        var peek;
-        var i, imax;
+    var MMLTrack = (function() {
+        function MMLTrack(sequencer, trackNum, mml) {
+            var _ = this._ = {};
+            _.sequencer = sequencer;
+            _.trackNum  = trackNum;
+            _.commands  = compile(mml);
+            _.status = {t:120, l:4, o:4, v:12, q:6, dot:0, tie:false};
+            _.index    = 0;
+            _.queue    = [];
+            _.currentTime = 0;
+            _.queueTime   = 0;
+            _.segnoIndex  = -1;
+            _.loopStack   = [];
+            _.prevNote = 0;
+            _.remain   = Infinity;
+            this.ended = false;
+            sched(this);
+        }
 
-        pending = [];
+        var EOF     = 0;
+        var NOTEON  = 1;
+        var NOTEOFF = 2;
+        var COMMAND = 3;
 
-        outer:
-        while (true) {
-            if (commands.length <= index) {
-                if (_.segnoIndex >= 0) {
-                    index = _.segnoIndex;
+        MMLTrack.prototype.process = function() {
+            var _ = this._;
+            var sequencer = _.sequencer;
+            var trackNum  = _.trackNum;
+            var queue  = _.queue;
+            var eof = false;
+
+            if (queue.length) {
+                while (queue[0][0] <= _.currentTime) {
+                    var nextItem = _.queue.shift();
+                    switch (nextItem[1]) {
+                    case NOTEON:
+                        noteOn(sequencer, trackNum, nextItem[2], nextItem[3]);
+                        _.remain = nextItem[4];
+                        sched(this);
+                        break;
+                    case NOTEOFF:
+                        noteOff(sequencer, trackNum, nextItem[2], nextItem[3]);
+                        break;
+                    case COMMAND:
+                        command(sequencer, nextItem[2]);
+                        break;
+                    case EOF:
+                        eof = true;
+                        break;
+                    }
+                    if (queue.length === 0) {
+                        break;
+                    }
+                }
+            }
+            _.remain -= fn.currentTimeIncr;
+            if (eof) {
+                this.ended = true;
+            }
+            _.currentTime += fn.currentTimeIncr;
+        };
+
+        var noteOn = function(sequencer, trackNum, noteNum, velocity) {
+            var gen, i, imax;
+            var nodes = sequencer.nodes;
+            for (i = 0, imax = nodes.length; i < imax; ++i) {
+                gen = nodes[i];
+                if (gen.noteOn) {
+                    gen.noteOn(noteNum, velocity);
                 } else {
+                    gen.bang();
+                }
+            }
+            sequencer._.emit("data", "noteOn", {
+                trackNum:trackNum, noteNum:noteNum, velocity:velocity
+            });
+        };
+
+        var noteOff = function(sequencer, trackNum, noteNum, velocity) {
+            var gen, i, imax;
+            var nodes = sequencer.nodes;
+            for (i = 0, imax = nodes.length; i < imax; ++i) {
+                gen = nodes[i];
+                if (gen.noteOff) {
+                    gen.noteOff(noteNum, velocity);
+                } else if (gen.release) {
+                    gen.release();
+                }
+            }
+            sequencer._.emit("data", "noteOff", {
+                trackNum:trackNum, noteNum:noteNum, velocity:velocity
+            });
+        };
+
+        var command = function(sequencer, cmd) {
+            sequencer._.emit("data", "command", {
+                command: cmd
+            });
+        };
+
+        var sched = function(self) {
+            var _ = self._;
+
+            var sequencer = _.sequencer;
+            var cmd, commands = _.commands;
+            var queue  = _.queue;
+            var index  = _.index;
+            var status = _.status;
+            var queueTime = _.queueTime;
+            var loopStack = _.loopStack;
+            var tempo, val, len, dot, vel;
+            var duration, quantize, pending, _queueTime;
+            var peek;
+            var i, imax;
+
+            pending = [];
+
+            outer:
+            while (true) {
+                if (commands.length <= index) {
+                    if (_.segnoIndex >= 0) {
+                        index = _.segnoIndex;
+                    } else {
+                        break;
+                    }
+                }
+                cmd = commands[index++];
+
+                switch (cmd.name) {
+                case "@":
+                    queue.push([queueTime, COMMAND, cmd.val]);
+                    break;
+                case "n":
+                    tempo = status.t || 120;
+                    if (cmd.len !== null) {
+                        len = cmd.len;
+                        dot = cmd.dot || 0;
+                    } else {
+                        len = status.l;
+                        dot = cmd.dot || status.dot;
+                    }
+                    duration = (60 / tempo) * (4 / len) * 1000;
+                    duration *= [1, 1.5, 1.75, 1.875][dot] || 1;
+
+                    vel = status.v << 3;
+                    if (status.tie) {
+                        for (i = queue.length; i--; ) {
+                            if (queue[i][2]) {
+                                queue.splice(i, 1);
+                                break;
+                            }
+                        }
+                        val = _.prevNote;
+                    } else {
+                        val = _.prevNote = (cmd.val) + (status.o + 1) * 12;
+                        queue.push([queueTime, NOTEON, val, vel, duration]);
+                    }
+
+                    if (len > 0) {
+                        quantize = status.q / 8;
+                        // noteOff
+                        if (quantize < 1) {
+                            _queueTime = queueTime + (duration * quantize);
+                            queue.push([_queueTime, NOTEOFF, val, vel]);
+                            for (i = 0, imax = pending.length; i < imax; ++i) {
+                                queue.push([_queueTime, NOTEOFF, pending[i], vel]);
+                            }
+                        }
+                        pending = [];
+                        queueTime += duration;
+                        if (!status.tie) {
+                            break outer;
+                        }
+                    } else {
+                        pending.push(val);
+                    }
+                    status.tie = false;
+                    break;
+                case "r":
+                    tempo = status.t || 120;
+                    if (cmd.len !== null) {
+                        len = cmd.len;
+                        dot = cmd.dot || 0;
+                    } else {
+                        len = status.l;
+                        dot = cmd.dot || status.dot;
+                    }
+                    if (len > 0) {
+                        duration = (60 / tempo) * (4 / len) * 1000;
+                        duration *= [1, 1.5, 1.75, 1.875][dot] || 1;
+                        queueTime += duration;
+                    }
+                    break;
+                case "l":
+                    status.l   = cmd.val;
+                    status.dot = cmd.dot;
+                    break;
+                case "o":
+                    status.o = cmd.val;
+                    break;
+                case "<":
+                    if (status.o < 9) {
+                        status.o += 1;
+                    }
+                    break;
+                case ">":
+                    if (status.o > 0) {
+                        status.o -= 1;
+                    }
+                    break;
+                case "v":
+                    status.v = cmd.val;
+                    break;
+                case "(":
+                    if (status.v < 15) {
+                        status.v += 1;
+                    }
+                    break;
+                case ")":
+                    if (status.v > 0) {
+                        status.v -= 1;
+                    }
+                    break;
+                case "q":
+                    status.q = cmd.val;
+                    break;
+                case "&":
+                    status.tie = true;
+                    break;
+                case "$":
+                    _.segnoIndex = index;
+                    break;
+                case "[":
+                    loopStack.push([index, null, null]);
+                    break;
+                case "|":
+                    peek = loopStack[loopStack.length - 1];
+                    if (peek) {
+                        if (peek[1] === 1) {
+                            loopStack.pop();
+                            index = peek[2];
+                        }
+                    }
+                    break;
+                case "]":
+                    peek = loopStack[loopStack.length - 1];
+                    if (peek) {
+                        if (peek[1] === null) {
+                            peek[1] = cmd.count;
+                            peek[2] = index;
+                        }
+                        peek[1] -= 1;
+                        if (peek[1] === 0) {
+                            loopStack.pop();
+                        } else {
+                            index = peek[0];
+                        }
+                    }
+                    break;
+                case "t":
+                    status.t = (cmd.val === null) ? 120 : cmd.val;
+                    break;
+                case "EOF":
+                    queue.push([queueTime, EOF]);
                     break;
                 }
             }
-            cmd = commands[index++];
+            _.index = index;
+            _.queueTime = queueTime;
+        };
 
-            switch (cmd.name) {
-            case "n":
-                tempo = status.t || 120;
-                if (cmd.len !== null) {
-                    len = cmd.len;
-                    dot = cmd.dot || 0;
-                } else {
-                    len = status.l;
-                    dot = cmd.dot || status.dot;
-                }
-                duration = (60 / tempo) * (4 / len) * 1000;
-                duration *= [1, 1.5, 1.75, 1.875][dot] || 1;
+        var compile = function(mml) {
+            var def, re, m, cmd;
+            var i, imax, j, jmax;
+            var checked = new Array(mml.length);
+            var commands = [];
 
-                vel = status.v << 3;
-                if (status.tie) {
-                    for (i = queue.length; i--; ) {
-                        if (queue[i][2]) {
-                            queue.splice(i, 1);
+            for (i = 0, imax = MMLCommands.length; i < imax; ++i) {
+                def = MMLCommands[i];
+                re  = def.re;
+                while ((m = re.exec(mml))) {
+                    if (!checked[m.index]) {
+                        for (j = 0, jmax = m[0].length; j < jmax; ++j) {
+                            checked[m.index + j] = true;
+                        }
+                        if (def.func) {
+                            cmd = def.func(m);
+                        } else {
+                            cmd = {name:m[0]};
+                        }
+                        if (cmd) {
+                            cmd.index = m.index;
+                            cmd.origin = m[0];
+                            commands.push(cmd);
+                        }
+                    }
+                    while (re.lastIndex < mml.length) {
+                        if (!checked[re.lastIndex]) {
                             break;
                         }
+                        ++re.lastIndex;
                     }
-                    val = _.prevNote;
-                } else {
-                    val = _.prevNote = (cmd.val) + (status.o + 1) * 12;
-                    queue.push([queueTime, val, null, vel, duration]);
-                }
-
-                if (len > 0) {
-                    quantize = status.q / 8;
-                    // noteOff
-                    if (quantize < 1) {
-                        _queueTime = queueTime + (duration * quantize);
-                        queue.push([_queueTime, null, val, vel]);
-                        for (i = 0, imax = pending.length; i < imax; ++i) {
-                            queue.push([_queueTime, null, pending[i], vel]);
-                        }
-                    }
-                    pending = [];
-                    queueTime += duration;
-                    if (!status.tie) {
-                        break outer;
-                    }
-                } else {
-                    pending.push(val);
-                }
-                status.tie = false;
-                break;
-            case "r":
-                tempo = status.t || 120;
-                if (cmd.len !== null) {
-                    len = cmd.len;
-                    dot = cmd.dot || 0;
-                } else {
-                    len = status.l;
-                    dot = cmd.dot || status.dot;
-                }
-                if (len > 0) {
-                    duration = (60 / tempo) * (4 / len) * 1000;
-                    duration *= [1, 1.5, 1.75, 1.875][dot] || 1;
-                    queueTime += duration;
-                }
-                break;
-            case "l":
-                status.l   = cmd.val;
-                status.dot = cmd.dot;
-                break;
-            case "o":
-                status.o = cmd.val;
-                break;
-            case "<":
-                if (status.o < 9) {
-                    status.o += 1;
-                }
-                break;
-            case ">":
-                if (status.o > 0) {
-                    status.o -= 1;
-                }
-                break;
-            case "v":
-                status.v = cmd.val;
-                break;
-            case "(":
-                if (status.v < 15) {
-                    status.v += 1;
-                }
-                break;
-            case ")":
-                if (status.v > 0) {
-                    status.v -= 1;
-                }
-                break;
-            case "q":
-                status.q = cmd.val;
-                break;
-            case "&":
-                status.tie = true;
-                break;
-            case "$":
-                _.segnoIndex = index;
-                break;
-            case "[":
-                loopStack.push([index, null, null]);
-                break;
-            case "|":
-                peek = loopStack[loopStack.length - 1];
-                if (peek) {
-                    if (peek[1] === 1) {
-                        loopStack.pop();
-                        index = peek[2];
-                    }
-                }
-                break;
-            case "]":
-                peek = loopStack[loopStack.length - 1];
-                if (peek) {
-                    if (peek[1] === null) {
-                        peek[1] = cmd.count;
-                        peek[2] = index;
-                    }
-                    peek[1] -= 1;
-                    if (peek[1] === 0) {
-                        loopStack.pop();
-                    } else {
-                        index = peek[0];
-                    }
-                }
-                break;
-            case "t":
-                status.t = (cmd.val === null) ? 120 : cmd.val;
-                break;
-            }
-        }
-        _.index = index;
-        _.queueTime = queueTime;
-    };
-
-    var compile = function(mml) {
-        var def, re, m, cmd;
-        var i, imax, j, jmax;
-        var checked = new Array(mml.length);
-        var commands = [];
-
-        for (i = 0, imax = MMLCommands.length; i < imax; ++i) {
-            def = MMLCommands[i];
-            re  = def.re;
-            while ((m = re.exec(mml))) {
-                if (!checked[m.index]) {
-                    for (j = 0, jmax = m[0].length; j < jmax; ++j) {
-                        checked[m.index + j] = true;
-                    }
-                    if (def.func) {
-                        cmd = def.func(m);
-                    } else {
-                        cmd = {name:m[0]};
-                    }
-                    if (cmd) {
-                        cmd.index = m.index;
-                        cmd.origin = m[0];
-                        commands.push(cmd);
-                    }
-                }
-                while (re.lastIndex < mml.length) {
-                    if (!checked[re.lastIndex]) {
-                        break;
-                    }
-                    ++re.lastIndex;
                 }
             }
-        }
-        commands.sort(function(a, b) {
-            return a.index - b.index;
-        });
-        return commands;
-    };
+            commands.sort(function(a, b) {
+                return a.index - b.index;
+            });
+            commands.push({name:"EOF"});
+            return commands;
+        };
 
-    var MMLCommands = [
-        { re:/([cdefgab])([\-+]?)(\d*)(\.*)/g, func: function(m) {
-            return {
-                name: "n",
-                val : {c:0,d:2,e:4,f:5,g:7,a:9,b:11}[m[1]] + ({"-":-1,"+":+1}[m[2]]||0),
-                len : (m[3] === "") ? null : Math.min(m[3]|0, 64),
-                dot : m[4].length
-            };
-        }},
-        { re:/r(\d*)(\.*)/g, func: function(m) {
-            return {
-                name: "r",
-                len : (m[1] === "") ? null : Math.max(1, Math.min(m[1]|0, 64)),
-                dot : m[2].length
-            };
-        }},
-        { re:/&/g },
-        { re:/l(\d*)(\.*)/g, func: function(m) {
-            return {
-                name: "l",
-                val : (m[1] === "") ? 4 : Math.min(m[1]|0, 64),
-                dot : m[2].length
-            };
-        }},
-        { re:/o([0-9])/g, func: function(m) {
-            return {
-                name: "o",
-                val : (m[1] === "") ? 4 : m[1]|0
-            };
-        }},
-        { re:/[<>]/g },
-        { re:/v(\d*)/g, func: function(m) {
-            return {
-                name: "v",
-                val : (m[1] === "") ? 12 : Math.min(m[1]|0, 15)
-            };
-        }},
-        { re:/[()]/g },
-        { re:/q([0-8])/g, func: function(m) {
-            return {
-                name: "q",
-                val : (m[1] === "") ? 6 : Math.min(m[1]|0, 8)
-            };
-        }},
-        { re:/\[/g },
-        { re:/\|/g },
-        { re:/\](\d*)/g, func: function(m) {
-            return {
-                name: "]",
-                count: (m[1]|0)||2
-            };
-        }},
-        { re:/t(\d*)/g, func: function(m) {
-            return {
-                name: "t",
-                val : (m[1] === "") ? null : Math.max(5, Math.min(m[1]|0, 300))
-            };
-        }},
-        { re:/\$/g }
-    ];
+        var MMLCommands = [
+            { re:/@(\d*)/g, func: function(m) {
+                return {
+                    name: "@",
+                    val: m[1] || null
+                };
+            }},
+            { re:/([cdefgab])([\-+]?)(\d*)(\.*)/g, func: function(m) {
+                return {
+                    name: "n",
+                    val : {c:0,d:2,e:4,f:5,g:7,a:9,b:11}[m[1]] + ({"-":-1,"+":+1}[m[2]]||0),
+                    len : (m[3] === "") ? null : Math.min(m[3]|0, 64),
+                    dot : m[4].length
+                };
+            }},
+            { re:/r(\d*)(\.*)/g, func: function(m) {
+                return {
+                    name: "r",
+                    len : (m[1] === "") ? null : Math.max(1, Math.min(m[1]|0, 64)),
+                    dot : m[2].length
+                };
+            }},
+            { re:/&/g },
+            { re:/l(\d*)(\.*)/g, func: function(m) {
+                return {
+                    name: "l",
+                    val : (m[1] === "") ? 4 : Math.min(m[1]|0, 64),
+                    dot : m[2].length
+                };
+            }},
+            { re:/o([0-9])/g, func: function(m) {
+                return {
+                    name: "o",
+                    val : (m[1] === "") ? 4 : m[1]|0
+                };
+            }},
+            { re:/[<>]/g },
+            { re:/v(\d*)/g, func: function(m) {
+                return {
+                    name: "v",
+                    val : (m[1] === "") ? 12 : Math.min(m[1]|0, 15)
+                };
+            }},
+            { re:/[()]/g },
+            { re:/q([0-8])/g, func: function(m) {
+                return {
+                    name: "q",
+                    val : (m[1] === "") ? 6 : Math.min(m[1]|0, 8)
+                };
+            }},
+            { re:/\[/g },
+            { re:/\|/g },
+            { re:/\](\d*)/g, func: function(m) {
+                return {
+                    name: "]",
+                    count: (m[1]|0)||2
+                };
+            }},
+            { re:/t(\d*)/g, func: function(m) {
+                return {
+                    name: "t",
+                    val : (m[1] === "") ? null : Math.max(5, Math.min(m[1]|0, 300))
+                };
+            }},
+            { re:/\$/g }
+        ];
 
-    fn.register("mml", MML);
+        return MMLTrack;
+    })();
 
 })(timbre);
 (function(T) {
@@ -9268,6 +9552,14 @@
         }
     });
 
+    $.clone = function() {
+        var instance = fn.clone(this);
+        instance._.osc = this._.osc.clone();
+        instance._.freq  = this._.freq;
+        instance._.phase = this._.phase;
+        return instance;
+    };
+
     $.bang = function() {
         this._.osc.reset();
         this._.emit("bang");
@@ -9483,11 +9775,26 @@
         _.curve   = "lin";
         _.counter = 0;
         _.ar = false;
-        _.onended = fn.make_onended(this);
+        _.onended = make_onended(this);
 
         this.on("ar", onar);
     }
     fn.extend(ParamNode);
+
+    var make_onended = function(self, lastValue) {
+        return function() {
+            if (typeof lastValue === "number") {
+                var cell  = self.cells[0];
+                var cellL = self.cells[1];
+                var cellR = self.cells[2];
+                var value = self._.env.value;
+                for (var i = 0, imax = cellL.length; i < imax; ++i) {
+                    cell[0] = cellL[i] = cellR[i] = value;
+                }
+            }
+            self._.emit("ended");
+        };
+    };
 
     var onar = function(value) {
         this._.env.step = (value) ? 1 : this._.cellsize;
@@ -9819,8 +10126,7 @@
 
         this._.freq   = 440;
         this._.buffer = null;
-        this._.readIndex  = 0;
-        this._.writeIndex = 0;
+        this._.index  = 0;
     }
     fn.extend(PluckNode);
 
@@ -9846,12 +10152,11 @@
         var _ = this._;
         var freq   = _.freq;
         var size   = (_.samplerate / freq + 0.5)|0;
-        var buffer = _.buffer = new fn.SignalArray(size << 1);
+        var buffer = _.buffer = new fn.SignalArray(size);
         for (var i = 0; i < size; ++i) {
             buffer[i] = Math.random() * 2 - 1;
         }
-        _.readIndex  = 0;
-        _.writeIndex = size;
+        _.index = 0;
         _.emit("bang");
         return this;
     };
@@ -9866,25 +10171,21 @@
             var buffer = _.buffer;
             if (buffer) {
                 var bufferLength = buffer.length;
-                var readIndex  = _.readIndex;
-                var writeIndex = _.writeIndex;
+                var index = _.index, write;
                 var mul = _.mul, add = _.add;
                 var x, i, imax = cell.length;
 
                 for (i = 0; i < imax; ++i) {
-                    x = buffer[readIndex++];
-                    if (readIndex >= bufferLength) {
-                        readIndex = 0;
+                    write = index;
+                    x = buffer[index++];
+                    if (index >= bufferLength) {
+                        index = 0;
                     }
-                    x = (x + buffer[readIndex]) * 0.5;
-                    buffer[writeIndex++] = x;
-                    if (writeIndex >= bufferLength) {
-                        writeIndex = 0;
-                    }
+                    x = (x + buffer[index]) * 0.5;
+                    buffer[write] = x;
                     cell[i] = x * mul + add;
                 }
-                _.readIndex  = readIndex;
-                _.writeIndex = writeIndex;
+                _.index = index;
             }
         }
 
@@ -10174,17 +10475,17 @@
         }
     });
 
-    $.sched = function(delta, item) {
+    $.sched = function(delta, item, args) {
         if (typeof delta === "string") {
             delta = timevalue(delta);
         }
         if (typeof delta === "number") {
-            this.schedAbs(this._.currentTime + delta, item);
+            this.schedAbs(this._.currentTime + delta, item, args);
         }
         return this;
     };
 
-    $.schedAbs = function(time, item) {
+    $.schedAbs = function(time, item, args) {
         if (typeof time === "string") {
             time = timevalue(time);
         }
@@ -10199,7 +10500,7 @@
                     break;
                 }
             }
-            queue.splice(i + 1, 0, [time, T(item)]);
+            queue.splice(i + 1, 0, [time, T(item), args]);
         }
         return this;
     };
@@ -10231,7 +10532,7 @@
             if (queue.length) {
                 while (queue[0][0] < _.currentTime) {
                     var nextItem = _.queue.shift();
-                    nextItem[1].bang(); // TODO: args?
+                    nextItem[1].bang(nextItem[2]);
                     emit = "sched";
                     if (queue.length === 0) {
                         emit = "empty";
@@ -10248,7 +10549,7 @@
     };
 
     fn.register("schedule", ScheduleNode);
-    fn.alias("sche", "schedule");
+    fn.alias("sched", "schedule");
 
 })(timbre);
 (function(T) {
@@ -10949,7 +11250,9 @@
             if (i !== -1) {
                 _.genList.splice(i, 1);
             }
-            _.genDict[gen.noteNum] = null;
+            if (typeof gen.noteNum !== "undefined") {
+                _.genDict[gen.noteNum] = null;
+            }
         };
     };
 
@@ -10970,7 +11273,8 @@
         var opts = {
             freq    : freq,
             noteNum : noteNum,
-            velocity: velocity
+            velocity: velocity,
+            mul     : velocity * 0.0078125
         };
         if (_opts) {
             for (var key in _opts) {
@@ -10979,7 +11283,7 @@
         }
         opts.doneAction = make_doneAction(this, opts);
 
-        gen = this._.synthdef.call(this, opts);
+        gen = _.synthdef.call(this, opts);
 
         if (gen instanceof T.Object) {
             gen.noteNum = noteNum;
@@ -11053,6 +11357,33 @@
         }
     };
 
+    $.synth = function(_opts) {
+        var _ = this._;
+        var list = _.genList;
+        var gen, opts = {};
+
+        if (_opts) {
+            for (var key in _opts) {
+                opts[key] = _opts[key];
+            }
+        }
+        opts.doneAction = make_doneAction(this, opts);
+
+        gen = _.synthdef.call(this, opts);
+
+        if (gen instanceof T.Object) {
+            list.push(gen);
+            opts.gen = gen;
+            this.playbackState = fn.PLAYING_STATE;
+
+            if (list.length > _.poly) {
+                _.remGen(list[0]);
+            }
+        }
+
+        return this;
+    };
+
     $.process = function(tickID) {
         var cell = this.cells[0];
         var _ = this._;
@@ -11115,6 +11446,17 @@
 
     fn.register("OscGen", (function() {
 
+        var osc_desc = {
+            set: function(value) {
+                if (value instanceof T.Object) {
+                    this._.osc = value;
+                }
+            },
+            get: function() {
+                return this._.osc;
+            }
+        };
+
         var wave_desc = {
             set: function(value) {
                 if (typeof value === "string") {
@@ -11128,12 +11470,24 @@
 
         var synthdef = function(opts) {
             var _ = this._;
-            var synth, env, envtype;
+            var synth, osc, env, envtype;
 
+            osc = _.osc || null;
             env = _.env || {};
             envtype = env.type || "perc";
 
-            synth = T("osc", {wave:_.wave, freq:opts.freq, mul:opts.velocity/128});
+            if (osc instanceof T.Object) {
+                if (typeof osc.clone === "function") {
+                    osc = osc.clone();
+                }
+            }
+            if (!osc) {
+                osc = T("osc", {wave:_.wave});
+            }
+            osc.freq = opts.freq;
+            osc.mul  = osc.mul * opts.velocity/128;
+
+            synth = osc;
             if (env instanceof T.Object) {
                 if (typeof env.clone === "function") {
                     synth = env.clone().append(synth);
@@ -11152,7 +11506,7 @@
             instance._.wave = "sin";
 
             Object.defineProperties(instance, {
-                env: env_desc, wave: wave_desc
+                env: env_desc, osc: osc_desc, wave: wave_desc
             });
 
             instance.def = synthdef;
@@ -11225,11 +11579,20 @@
                     this.playbackState = fn.PLAYING_STATE;
                     this._.tape = tape;
                     this._.tapeStream = new TapeStream(tape, this._.samplerate);
-                } else if (typeof tape === "object") {
-                    if (Array.isArray(tape.buffer) && isSignalArray(tape.buffer[0])) {
-                        this.playbackState = fn.PLAYING_STATE;
-                        this._.tape = new Scissor(tape);
-                        this._.tapeStream = new TapeStream(tape, this._.samplerate);
+                    this._.tapeStream.isLooped = this._.isLooped;
+                } else {
+                    if (tape instanceof T.Object) {
+                        if (tape.buffer) {
+                            tape = tape.buffer;
+                        }
+                    }
+                    if (typeof tape === "object") {
+                        if (Array.isArray(tape.buffer) && isSignalArray(tape.buffer[0])) {
+                            this.playbackState = fn.PLAYING_STATE;
+                            this._.tape = new Scissor(tape);
+                            this._.tapeStream = new TapeStream(this._.tape, this._.samplerate);
+                            this._.tapeStream.isLooped = this._.isLooped;
+                        }
                     }
                 }
             },
@@ -11240,6 +11603,13 @@
         isLooped: {
             get: function() {
                 return this._.isLooped;
+            }
+        },
+        buffer: {
+            get: function() {
+                if (this._.tape) {
+                    return this._.tape.getBuffer();
+                }
             }
         }
     });
@@ -11259,6 +11629,12 @@
         }
         this._.emit("bang");
         return this;
+    };
+
+    $.getBuffer = function() {
+        if (this._.tape) {
+            return this._.tape.getBuffer();
+        }
     };
 
     $.process = function(tickID) {
@@ -11287,6 +11663,144 @@
     };
 
     fn.register("tape", ScissorNode);
+
+})(timbre);
+(function(T) {
+    "use strict";
+
+    var fn = T.fn;
+    var timevalue = T.timevalue;
+    var FunctionWrapper = T(function(){}).constructor;
+
+    function TaskNode(_args) {
+        T.Object.call(this, 1, _args);
+        fn.timer(this);
+
+        var _ = this._;
+        this.playbackState = fn.FINISHED_STATE;
+        _.task = [];
+        _.i     = 0;
+        _.j     = 0;
+        _.imax  = 0;
+        _.jmax  = 0;
+        _.wait  = 0;
+        _.count = 0;
+        _.args  = {};
+        _.doNum = 1;
+        _.initFunc = fn.nop;
+        _.onended = make_onended(this);
+
+        this.on("start", onstart);
+    }
+    fn.extend(TaskNode);
+
+    var onstart = function() {
+        var _ = this._, args;
+        this.playbackState = fn.PLAYING_STATE;
+        _.task = this.nodes.map(function(x) {
+            return x instanceof FunctionWrapper ? x.func : false;
+        }).filter(function(x) {
+            return !!x;
+        });
+        _.i = _.j = 0;
+        _.imax = _.doNum;
+        _.jmax = _.task.length;
+        args = _.initFunc();
+        if (!fn.isDictionary(args)) {
+            args = {param:args};
+        }
+        _.args = args;
+    };
+
+    var make_onended = function(self) {
+        return function() {
+            self.playbackState = fn.FINISHED_STATE;
+            var _ = self._;
+            var cell  = self.cells[0];
+            var cellL = self.cells[1];
+            var cellR = self.cells[2];
+            var lastValue = _.args;
+            if (typeof lastValue === "number") {
+                for (var i = 0, imax = cellL.length; i < imax; ++i) {
+                    cell[0] = cellL[i] = cellR[i] = lastValue;
+                }
+            }
+            _.emit("ended", _.args);
+        };
+    };
+
+    var $ = TaskNode.prototype;
+
+    Object.defineProperties($, {
+        "do": {
+            set: function(value) {
+                if (typeof value === "number" && value > 0) {
+                    this._.doNum = value === Infinity ? Infinity : value|0;
+                }
+            },
+            get: function() {
+                return this._.doNum;
+            }
+        },
+        init: {
+            set: function(value) {
+                if (typeof value === "function") {
+                    this._.initFunc = value;
+                }
+            },
+            get: function() {
+                return this._.initFunc;
+            }
+        }
+    });
+
+    $.bang = function() {
+        var _ = this._;
+        _.count  = 0;
+        _.emit("bang");
+        return this;
+    };
+
+    $.wait = function(time) {
+        if (typeof time === "string") {
+            time = timevalue(time);
+        }
+        if (typeof time === "number" && time > 0) {
+            this._.count += (this._.samplerate * time * 0.001)|0;
+        }
+        return this;
+    };
+
+    $.process = function(tickID) {
+        var cell = this.cells[0];
+        var _ = this._;
+        var args, func;
+
+        if (this.tickID !== tickID) {
+            this.tickID = tickID;
+            if (_.i < _.imax) {
+                while (_.count <= 0) {
+                    if (_.j >= _.jmax) {
+                        ++_.i;
+                        if (_.i >= _.imax) {
+                            fn.nextTick(_.onended);
+                            break;
+                        }
+                        _.j = 0;
+                    }
+                    func = _.task[_.j++];
+                    if (func) {
+                        func.call(this, _.i, _.args);
+                    }
+                }
+                _.count -= cell.length;
+            }
+        }
+
+        return this;
+    };
+
+    fn.register("task", TaskNode);
 
 })(timbre);
 (function(T) {
