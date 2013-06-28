@@ -130,12 +130,12 @@ function hitNote(count){
 timbre.setup({ samplerate: timbre.samplerate * 0.5 });
 
 T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
-	BD  = this.slice(   0,  500).set({bang:false, mul:0.6});
+	BD  = this.slice(   0,  500).set({bang:false, mul:1});
 	SD  = this.slice( 500, 1000).set({bang:false});
 	HH1 = this.slice(1000, 1500).set({bang:false, mul:0.2});
 	HH2 = this.slice(1500, 2000).set({bang:false, mul:0.2});
 	CYM = this.slice(2000).set({bang:false, mul:0.2});
 
-	drum = T("lowshelf", { freq: 110, gain: 8, mul: 0.6}, BD, SD, HH1, HH2, CYM).play();
+	drum = T("lowshelf", { freq: 110, gain: 8, mul: 1}, BD, SD, HH1, HH2, CYM).play();
 	T("interval", {interval:"BPM64 L16"}, hitNote).start();
 })
