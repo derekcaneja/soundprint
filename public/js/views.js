@@ -171,6 +171,9 @@ var ToneMatrixView = Backbone.View.extend({
 		
 		this.rot = 0;
 		
+
+		this.$el.addClass('accelerate');
+
 		this.sendData();
 		this.drawGrid();
 		this.render();
@@ -532,6 +535,7 @@ var KnobView = Backbone.View.extend({
 		else this.rotation = -125;
 
 		this.render();
+		this.$el.addClass('accelerate');
 	},
 	render: function(){
 		if(this.model.get('title') == 'Pitch') {
@@ -553,10 +557,10 @@ var KnobView = Backbone.View.extend({
 		});
 	},
 	events:{
-		// 'mouseover' : 'mouseover',
-		// 'mouseleave': 'mouseleave',
-		// 'mousedown'	: 'mousedown',
-		// 'mouseup'	: 'mouseup'
+		'mouseover' : 'mouseover',
+		'mouseleave': 'mouseleave',
+		'mousedown'	: 'mousedown',
+		'mouseup'	: 'mouseup'
 	},
 	mouseover: function(){
 		document.onselectstart = function(){ return false; };
@@ -565,7 +569,7 @@ var KnobView = Backbone.View.extend({
 		if(!this.knob_dragging) document.onselectstart = null;
 	},
 	mousedown: function() {
-		/*var item = this;
+		var item = this;
 		var offsetX = this.$('.knob').offset().left + this.$('.knob').width() / 2;
 		var offsetY = this.$('.knob').offset().top + this.$('.knob').height() / 2;
 		this.$el.css({'cursor': 'pointer'});
@@ -573,21 +577,25 @@ var KnobView = Backbone.View.extend({
 
 		this.rotate = true;
 		$('body').css({'cursor': 'pointer'});
+		$(window).mousemove(function(e){
 
-		if(item.rotate){
-			item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
+			
 
-			item.rotation += 90;
+			if(item.rotate){
+				item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
 
-			if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
-			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
-			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
-			else if(item.rotation > 130) 						item.rotation = -125;
+				item.rotation += 90;
 
-			item.rotation = Math.round(item.rotation / 25) * 25;
+				if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
+				else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
+				else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
+				else if(item.rotation > 130) 						item.rotation = -125;
 
-			item.render();
-		}*/
+				item.rotation = Math.round(item.rotation / 25) * 25;
+
+				item.render();
+			}
+		});
 	},
 	mouseup: function(){
 		$('body').css({'cursor': 'default'});
