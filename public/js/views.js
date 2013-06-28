@@ -20,9 +20,9 @@ var ApplicationView = Backbone.View.extend({
 	},
 	resize: function(){
 		$('.square').height($('.square-container').width());
-		$('.square-border').height($('.square').height()+$('.tool-container').height()+15);
+		//$('.square-border').height($('.square').outerHeight() + $('.tool-container').outerHeight());
 		$('.square-border').width($('.square-border').parent('.square-container').width() + 8);
-		$('.square').css('margin-top', ($('.square-border').height() * -1) - 12);
+		//$('.square').css('margin-top', ($('.square-border').height() * -1));
 	},
 	play: function() {
 		this.interval = setInterval(function(){
@@ -42,8 +42,8 @@ var DisplayView = Backbone.View.extend({
 	className: 'display',
 	initialize: function(options) {
 		this.$el.append(options.header.el);
-		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
-		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
+		this.$el.append('<div class="content-wrapper"></div>');//<div class="square-wrapper"></div>
+		for(var i = 0; i < options.content.length; i++) this.$('.content-wrapper').append(options.content[i].el);
 		// for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
 
 		// this.count = 0;
@@ -82,22 +82,24 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$el.attr('rel', this.model.get('title'));
 	
 		this.$el.attr('rel', this.model.get('title'));
-		this.$el.append('<div class="square-border"></div><div class="square"></div><div class="tool-container"></div>');
-		this.$('.tool-container').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3>', new DropdownView({ model: this.model }).el, '<div class="lockflip"><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div><div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></canvas></div></div>');
-		
+		this.$el.append('<div class="square-border accelerate"></div><div class="wrapwrap"><div class="square"></div><div class="tool-container"><div class="tools-header"></div></div></div>');
+		this.$('.tools-header').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3>', new DropdownView({ model: this.model }).el, '<div class="lockflip"><i class="videoicon icon-facetime-video"></i><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div></div>');
+		this.$('.tools-header').after('<div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></canvas></div>');
+
 		//this.$('.square').css({
 		//	'margin-top': '-742px'
 		//});
 		
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '.5';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.instrument').children('.btn').css({'border-color': this.rgbaColor});
+		// this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 	// 	this.rgbaColor = this.rgbaColor.toRgbaString();
+ 	// 	this.borderAlpha = '.5';
+ 	// 	this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		// this.$('.instrument').children('.btn').css({'border-color': this.rgbaColor});
 
 		this.$('#'+this.model.get('title')+'Waveform').height('80px');
 		this.$('#'+this.model.get('title')+'Waveform').width('100%');
 		
+
 		//console.log(this.$('.tool-row').height());
 
 		this.pitch = new KnobView({ model:new Knob({title: 'Pitch'}) });
@@ -110,13 +112,13 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$('.tool-row:nth-of-type(2)').append(this.pitch.el, this.distortion.el, this.reverb.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
 		
-		this.$('.tool-row:nth-of-type(3)').append(this.balance.el, this.volume.el);
+		this.$('.tool-row:nth-of-type(3)').addClass('sliderrow').append(this.balance.el, this.volume.el);
 
 
 		this.locked = false;
 		this.flip = null;
 
-		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
+		//this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
 		
 
 
@@ -171,6 +173,9 @@ var ToneMatrixView = Backbone.View.extend({
 		
 		this.rot = 0;
 		
+
+		this.$el.addClass('accelerate');
+
 		this.sendData();
 		this.drawGrid();
 		this.render();
@@ -248,6 +253,7 @@ var ToneMatrixView = Backbone.View.extend({
 			}
 		}	
 		this.context.globalAlpha = 1;
+		this.$('.lockflip i').tooltip();
 	},
 	setBar: function(yy, frames){
 		var item = this;
@@ -290,76 +296,17 @@ var ToneMatrixView = Backbone.View.extend({
 	events: {
 		'mouseover'						: 'mouseover',
 		'mouseleave'					: 'mouseleave',
-		'mouseover .dropdown-toggle'	: 'dropdownhover',
-		'mouseout .dropdown-toggle'		: 'dropdownleave',
-		'click .dropdown-toggle'		: 'btnclick',
-		'mouseover .instrument-item'	: 'listhover',
-		'mouseout .instrument-item'		: 'listleave',
 		'click .lock'					: 'lockMatrix',
 		'click .flip'					: 'flipMatrix'
 	},
 	mouseover: function(){
-		this.$('.square-border').css({'visibility': 'visible','border-color': this.model.get('gridcolor')});
+		
+		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
 		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
 	},
 	mouseleave: function(){
-		this.$('.square-border').css({'visibility': 'hidden','border-color': this.model.get('gridcolor')});
-		//$('.square-container').transition({opacity: 1});
-	},
-	dropdownhover: function(){
-		this.$('.btn').addClass('btnhover');
-
-		this.$('.caret').addClass('carethover');
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
-			
-		this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
-		this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
-		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
-		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
-		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
-		//console.log(this.rgbaColor);
-
-	},
-	dropdownleave: function(){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '.5';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		if(!this.$('.instrument').hasClass('open')){
-			//this.rgbaColor = '.5';
-			this.$('.btn').removeClass('btnhover');
-			this.$('.caret').removeClass('carethover');
-			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor}, 300);
-			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'}, 300);
-			this.$('.dropdown-toggle').css({'box-shadow': 'none'});
-
-			//console.log(this.rgbaColor);
-		}
-
-	},
-	btnclick: function(){
-		this.dropdownOpen = "true";
-	},
-	listhover: function(ev){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		$(ev.target).css({'background-color': this.rgbaColor});
-	},
-	listleave: function(ev){
-		$(ev.target).css({'background-color': 'transparent'});
-
+		this.$('.square-border').css({'border-color': 'rgba(0,0,0,0)'});
+		
 	},
 	lockMatrix: function(){
 		if(!this.locked){
@@ -484,11 +431,11 @@ var DisplayToneMatrixView = Backbone.View.extend({
 		this.altImage = this.context2.getImageData(0,0,this.canvas2.width, this.canvas2.height);
 	},
 	mouseover: function(){
-		this.$('.square-border').css({'visibility': 'visible','border-color': this.model.get('gridcolor')});
+		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
 		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
 	},
 	mouseleave: function(){
-		this.$('.square-border').css({'visibility': 'hidden','border-color': this.model.get('gridcolor')});
+		this.$('.square-border').css({'border-color': 'rgba(0,0,0,0)'});
 		//$('.square-container').transition({opacity: 1});
 	},
 	lockMatrix: function(){
@@ -525,12 +472,13 @@ var KnobView = Backbone.View.extend({
 		this.knobValue = 0;
 		this.knobValuePrev = 0;
 		
-		this.$el.append('<div class="knob" knob-value="0"></div><div class="tick"></div><h5>' + this.model.get('title') + '</h5>');
+		this.$el.append('<div class="knob accelerate" knob-value="0"></div><div class="tick accelerate"></div><h5>' + this.model.get('title') + '</h5>');
 		
 		if(this.model.get('title') == 'Pitch') this.rotation = 0;
 		else this.rotation = -125;
 
 		this.render();
+		this.$el.addClass('accelerate');
 	},
 	render: function(){
 		if(this.model.get('title') == 'Pitch') {
@@ -552,19 +500,19 @@ var KnobView = Backbone.View.extend({
 		});
 	},
 	events:{
-		// 'mouseover' : 'mouseover',
-		// 'mouseleave': 'mouseleave',
-		// 'mousedown'	: 'mousedown',
-		// 'mouseup'	: 'mouseup'
+		'mouseover' : 'mouseover',
+		'mouseleave': 'mouseleave',
+		'mousedown'	: 'mousedown',
+		'mouseup'	: 'mouseup'
 	},
 	mouseover: function(){
-		document.onselectstart = function(){ return false; };
+		//document.onselectstart = function(){ return false; };
 	},
 	mouseleave: function(){
 		if(!this.knob_dragging) document.onselectstart = null;
 	},
 	mousedown: function() {
-		/*var item = this;
+		var item = this;
 		var offsetX = this.$('.knob').offset().left + this.$('.knob').width() / 2;
 		var offsetY = this.$('.knob').offset().top + this.$('.knob').height() / 2;
 		this.$el.css({'cursor': 'pointer'});
@@ -572,21 +520,22 @@ var KnobView = Backbone.View.extend({
 
 		this.rotate = true;
 		$('body').css({'cursor': 'pointer'});
+		$(window).mousemove(function(e){
+			if(item.rotate){
+				item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
 
-		if(item.rotate){
-			item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
+				item.rotation += 90;
 
-			item.rotation += 90;
+				if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
+				else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
+				else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
+				else if(item.rotation > 130) 						item.rotation = -125;
 
-			if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
-			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
-			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
-			else if(item.rotation > 130) 						item.rotation = -125;
+				item.rotation = Math.round(item.rotation / 25) * 25;
 
-			item.rotation = Math.round(item.rotation / 25) * 25;
-
-			item.render();
-		}*/
+				item.render();
+			}
+		});
 	},
 	mouseup: function(){
 		$('body').css({'cursor': 'default'});
@@ -600,11 +549,11 @@ var SliderView = Backbone.View.extend({
 	className: 'slider-container',
 	initialize: function() {
 		var item = this;
-		this.$el.attr('rel', this.model.get('type'))
+		this.$el.addClass("slider" + this.model.get('type'));
 		this.$el.append('<span class="balance-lr">L</span><div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><div class="ui-slider-segment"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 50%;"></a></div><span class="balance-lr">R</span><h5>' + this.model.get('title') + '</h5>');
 		this.handleColor = this.model.get('handlecolor');
 
-		if(this.$el.attr('rel') == 'balance'){
+		if(this.$el.hasClass('sliderbalance')){
 			this.$('.slider').slider({
 		        min: 1,
 		        max: 5,
@@ -615,7 +564,7 @@ var SliderView = Backbone.View.extend({
 		        }
 	   	 	});
 		}
-		if(this.$el.attr('rel') == 'volume'){
+		if(this.$el.hasClass('slidervolume')){
 			this.$('.slider').slider({
 		        min: 0,
 		        max: 10,
@@ -654,66 +603,55 @@ var DropdownView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'btn-group instrument',
 	initialize: function() {
-		this.$el.append('<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Default<span class="caret"></span></a><ul class="dropdown-menu"><div class="dropdownarrow"></div></ul>');
+		this.$el.append('<a class="btn dropdown-toggle accelerate" data-toggle="dropdown" href="#">Default<span class="caret accelerate"></span></a><ul class="dropdown-menu accelerate"><div class="dropdownarrow"></div></ul>');
 	
-		for(var i = 0; i < 3; i++) this.$('.dropdown-menu').append('<li><a class="instrument-item">' + this.model.get('title') + ' ' + (i + 1) + '</a></li>');
-
+		for(var i = 0; i < 3; i++) this.$('.dropdown-menu').append('<li class="accelerate"><a class="instrument-item accelerate">' + this.model.get('title') + ' ' + (i + 1) + '</a></li>');
+			this.rgbaColor = jQuery.Color(this.model.get('color'));
+ 		this.rgbaColor = this.rgbaColor.toRgbaString();
+ 		this.borderAlpha = '.4';
+ 		this.dropdownOpen = false;
+ 		this.rgbaColorDark = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + "1" + ')';
+		this.rgbaColorLight = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
+		//this.$('.btn').css({'border-color': this.rgbaColorLight});
 		this.$('.dropdown-toggle').dropdown();
+		this.$('.dropdown-toggle').attr("rgbacolordark", this.rgbaColorDark);
+		this.$('.dropdown-toggle').attr("rgbacolorlight", this.rgbaColorLight);
 	},
 	events: {
-		'mouseover .dropdown-toggle'	: 'dropdownhover',
-		'mouseout .dropdown-toggle'		: 'dropdownleave',
+		'mouseenter .dropdown-toggle'	: 'dropdownhover',
+		'mouseleave .dropdown-toggle'		: 'dropdownleave',
 		'click .dropdown-toggle'		: 'btnclick',
-		'mouseover .instrument-item'	: 'listhover',
-		'mouseout .instrument-item'		: 'listleave'
+		'mouseenter .instrument-item'	: 'listhover',
+		'mouseleave .instrument-item'		: 'listleave'
 	},
 	dropdownhover: function(){
-		this.$('.btn').addClass('btnhover');
 
-		this.$('.caret').addClass('carethover');
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor}, 300);
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor}, 300);
-			
-		this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
-		this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
-		this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
-		this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
-		this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
-
-		this.$('.dropdown-toggle').transition({'outline': '1px solid ' + this.rgbaColor});
-		this.$('.dropdown-toggle').css({'box-shadow': '0px 0px 0px 1px ' + this.rgbaColor});
+		// if(!this.$('.btn').hasClass('btnhover') && !this.$('.caret').hasClass('carethover')){
+		// 	this.$('.btn').addClass('btnhover');
+		// 	this.$('.caret').addClass('carethover');
+		// 	//this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorDark,'outline-color': this.rgbaColorDark}, 300);
+		// }
+		// this.dropdownButtonWidth = ((this.$('.btn').outerWidth()) * 0.5);
+		// this.dropdownmenuMargin = (((this.$('.dropdown-menu').outerWidth() - this.$('.btn').outerWidth()) * -0.5) + 4);
+		// this.$('.instrument-item').css({'color': jQuery.Color(this.model.get('color')).lightness('.2')});
+		// this.$('.dropdown-menu').css({'border': '4px solid ' + this.model.get('color'), 'left': this.dropdownmenuMargin})
+		// this.$('.dropdownarrow').css({'margin-left': ((this.$('.dropdown-menu').outerWidth() * 0.5) - 12), 'border-bottom-color': this.model.get('color')});
 	},
 	dropdownleave: function(){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '.5';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
-		if(!this.$('.instrument').hasClass('open')){
-			//this.rgbaColor = '.5';
-			this.$('.btn').removeClass('btnhover');
-			this.$('.caret').removeClass('carethover');
-			this.$('.dropdown-toggle').transition({'border-color': this.rgbaColor}, 300);
-			this.$('.dropdown-toggle').transition({'outline': '1px solid transparent'}, 300);
-			this.$('.dropdown-toggle').css({'box-shadow': 'none'});
-		}
+			// this.$('.btn').removeClass('btnhover');
+			// this.$('.caret').removeClass('carethover');
+			// if(!this.$('.btn').hasClass('btnhover') && !this.$('.caret').hasClass('carethover')){
+			// 	this.$('.dropdown-toggle').transition({'border-color': this.rgbaColorLight, 'outline-color': 'rgba(0,0,0,0)'}, 100);
+			// }
+			
 	},
 	btnclick: function(){
-		this.dropdownOpen = "true";
+		this.dropdownOpen = true;
 	},
 	listhover: function(ev){
-		this.rgbaColor = jQuery.Color(this.model.get('color'));
- 		this.rgbaColor = this.rgbaColor.toRgbaString();
- 		this.borderAlpha = '1';
- 		this.rgbaColor = this.rgbaColor.substring(0, 3) + 'a' + this.rgbaColor.substring(3, this.rgbaColor.length - 1) + ',' + this.borderAlpha + ')';
 		$(ev.target).css({'background-color': this.rgbaColor});
 	},
 	listleave: function(ev){
-		$(ev.target).css({'background-color': 'transparent'});
+		$(ev.target).css({'background-color': 'rgba(0,0,0,0)'});
 	}
 });
