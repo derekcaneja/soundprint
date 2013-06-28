@@ -171,6 +171,10 @@ T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	HH2 = this.slice(1500, 2000).set({bang:false, mul:0.2});
 	CYM = this.slice(2000).set({bang:false, mul:0.2});
 
+//<<<<<<< HEAD
 	drum = T("lowshelf", { freq: 110, gain: 8, mul: 0.6}, BD, SD, HH1, HH2, CYM).play();
+// =======
+// 	drum = T("lowshelf", { freq: 110, gain: 8, mul: 1}, BD, SD, HH1, HH2, CYM);//
+// >>>>>>> mergefriday
 	T("interval", {interval:"BPM64 L16"}, hitNote).start();
 })
