@@ -299,12 +299,13 @@ var ToneMatrixView = Backbone.View.extend({
 		'click .flip'					: 'flipMatrix'
 	},
 	mouseover: function(){
-		this.$('.square-border').css({'visibility': 'visible','border-color': this.model.get('gridcolor')});
+		
+		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
 		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
 	},
 	mouseleave: function(){
-		this.$('.square-border').css({'visibility': 'hidden','border-color': this.model.get('gridcolor')});
-		//$('.square-container').transition({opacity: 1});
+		this.$('.square-border').css({'border-color': 'rgba(0,0,0,0)'});
+		
 	},
 	dropdownhover: function(){
 		this.$('.btn').addClass('btnhover');
