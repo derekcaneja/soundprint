@@ -285,13 +285,13 @@ var ToneMatrixView = Backbone.View.extend({
 
 					var instrument = this.model.get('instrument');
 
-					console.log(item.delay.model.get('value'))
+					//console.log(item.delay.model.get('value'))
 
-					instrument.env = T('+', 
+					/*instrument.env = T('+', 
 						T('delay', { time: item.delay.model.get('value') * 100, fb: 1 }),
 						T('reverb', { damp: item.delay.model.get('value') / 10 }),
 						T('dist', { pre: 40 * item.delay.model.get('value') / 10, post: -12 * item.delay.model.get('value') / 10, cutoff: 400 + (40 * item.delay.model.get('value') / 10) })
-					);
+					);*/
 
 					instrument.noteOn(item.model.get('matrix')[item.playBeat][i] + 60 + item.pitch.model.get('value'), item.volume.model.get('value') * 8).plot({ 
 						target		: canvas, 
