@@ -33,9 +33,9 @@ var clientSocket = null;
 var sentData = null;
 var camNumber = null;
 
-var rColors = [0.7,0.7,1,1.2];
-var bColors = [1.2,0.7,1,0.7];
-var gColors = [0.7,1.2,1,0.7];
+var rColors = [0.7,0.7,1.1,1.2];
+var gColors = [0.7,1.2,1.1,0.7];
+var bColors = [1.2,0.7,0.7,0.7];
 var rColor = bColor = gColor = 0;
 
 
@@ -46,8 +46,8 @@ function connectTo(ip, num){
 	clientSocket.on('handshake', function(data){
 		camNumber = data;
 		rColor = rColors[camNumber];
-		bColor = bColors[camNumber];
 		gColor = gColors[camNumber];
+		bColor = bColors[camNumber];
 		clientSocket.emit('setCam', camNumber );
 		console.log("Connected Camera as "+ camNumber);
 		setInterval(processAndRender, 1000/20);
@@ -112,8 +112,8 @@ function processAndRender(){
 	for(var ii = 0; ii < newData.data.length; ii+=4){
 		var grey = (newData.data[ii+0]+newData.data[ii+1]+newData.data[ii+2])/3;
 		newData.data[ii+0] = Math.min(Math.round(grey * (rColor)),255);
-		newData.data[ii+1] = Math.min(Math.round(grey * (bColor)),255);
-		newData.data[ii+2] = Math.min(Math.round(grey * (gColor)),255);
+		newData.data[ii+1] = Math.min(Math.round(grey * (gColor)),255);
+		newData.data[ii+2] = Math.min(Math.round(grey * (bColor)),255);
 	}
 	context.putImageData(newData,0,0);
 	newData = newData.data;

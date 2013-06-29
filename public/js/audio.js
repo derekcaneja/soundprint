@@ -32,7 +32,7 @@ for(var ii = 0; ii < numScales; ii+=1){
 	scales.push(toScales[ii]);
 	//lastScale = newScale;
 }
-			  
+
 var scale = scales[0];
 
 var measure = 32;
