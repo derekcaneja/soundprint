@@ -1,5 +1,5 @@
 //DRUMS DEF
-var BD,SD,HH1,HH2,CYM,drum;
+var BD, SD, HH1, HH2, CYM, drum, drumFill;
 
 //SCALES
 var C  = 0;
@@ -99,42 +99,143 @@ SPI.prototype.playNote = function(beat){
 }
 
 //SET UP INSTRUMENTS
-var ins1 = new SPI({ 
-  hr: 1,
-  type:'SynthDef',
-  poly:1,
-  noteLength:10,
-  sinType:'saw',
-  mul:0.5,
-  fx:1,
-  oct:6
- });
+var bass1 = { 
+    hr          : 2,
+    type        : 'SynthDef',
+    poly        : 1,
+    noteLength  : 1000,
+    mul         : 1,
+    fx          : 1,
+    oct         : 1
+}
 
-var ins2 = new SPI({ 
-  hr: 4,
-  type:'PluckGen',
-  poly:1,
-  noteLength:10000,
-  mul:0.15,
-  dist:true,
-  fx:2,
-  oct:1,
-});
- 
-var ins3 = new SPI({ 
-  hr: 2,
-  type:'PluckGen',
-  poly:1,
-  noteLength:200,
-  sinType:'saw',
-  dist:true,
-  mul:0.2,
-  fx:2,
-  oct:3
- });
- 
- 
-var instruments = [ins1,ins2 ,ins3,null]
+var bass2 = { 
+    hr          : 4,
+    type        : 'SynthDef',
+    poly        : 1,
+    noteLength  : 500,
+    mul         : 1,
+    fx          : 2,
+    oct         : 1
+}
+
+var bass3 = { 
+    hr          : 8,
+    type        : 'SynthDef',
+    poly        : 1,
+    noteLength  : 3000,
+    mul         : 1,
+    fx          : 2,
+    oct         : 1
+}
+
+var melody1 = { 
+    hr: 1,
+    type:'SynthDef',
+    poly:1,
+    noteLength:10,
+    sinType:'saw',
+    mul:0.5,
+    fx:1,
+    oct:6
+}
+
+var melody2 = { 
+    hr: 4,
+    type:'SynthDef',
+    poly:3,
+    noteLength:1000,
+    mul:0.05    ,
+    fx:1,
+    oct:6
+}
+
+var melody3 = { 
+    hr: 16,
+    type:'OscGen',
+    poly:6,
+    noteLength:10000,
+    mul:0.03    ,
+    fx:1,
+    oct:6
+}
+
+
+var rhythm1 = { 
+    hr: 2,
+    type:'PluckGen',
+    poly:3,
+    noteLength:200,
+    sinType:'saw',
+    dist:true,
+    mul:0.1,
+    fx:2,
+    oct:4
+}
+
+var rhythm2 = { 
+    hr: 2,
+    type:'PluckGen',
+    poly:3,
+    noteLength:1000,
+    sinType:'sin',  
+    mul:0.1,
+    fx:2,
+    oct:3
+}
+
+var rhythm3 = { 
+    hr: 4,
+    type:'PluckGen',
+    poly:2,
+    noteLength:1000,
+    sinType:'sin',  
+    mul:0.5,
+    fx:2,
+    oct:4
+}
+
+var harmony1 = { 
+    hr: 2,
+    type:'PluckGen',
+    poly:1,
+    noteLength:600,
+    mul:0.15,
+    fx:2,
+    oct:5
+}
+
+var harmony2 = { 
+    hr: 2,
+    type:'SynthDef',
+    sinType:'saw',
+    poly:1,
+    noteLength:800,
+    mul:0.05,
+    fx:1,
+    oct:4
+}
+
+var harmony3 = { 
+    hr: 1,
+    type:'PluckGen',
+    poly:1,
+    noteLength:200,
+    dist:true,
+    mul:0.1,
+    fx:2,
+    oct:5
+}
+
+var ins1 = new SPI([melody1, melody2, melody3][Math.floor(Math.random()* 3)]);
+
+var ins2 = new SPI([bass1, bass2, bass3][Math.floor(Math.random()* 3)]);
+
+var ins3 = new SPI([rhythm1, rhythm2, rhythm3][Math.floor(Math.random()* 3)]);
+
+var ins4 = new SPI([harmony1, harmony2, harmony3][Math.floor(Math.random()* 3)]);
+
+var instruments = [ins1,ins2, ins3, ins4]
 
 //ON HIT
 function hitNote(count){
@@ -162,7 +263,7 @@ function hitNote(count){
 
 
 //SET UP
-timbre.setup({ samplerate: timbre.samplerate/2});
+timbre.setup({ samplerate: timbre.samplerate});
 
 T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	BD  = this.slice(   0,  500).set({bang:false, mul:1});
@@ -171,10 +272,14 @@ T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	HH2 = this.slice(1500, 2000).set({bang:false, mul:0.2});
 	CYM = this.slice(2000).set({bang:false, mul:0.2});
 
-//<<<<<<< HEAD
-	drum = T("lowshelf", { freq: 110, gain: 8, mul: 0.6}, BD, SD, HH1, HH2, CYM).play();
-// =======
-// 	drum = T("lowshelf", { freq: 110, gain: 8, mul: 1}, BD, SD, HH1, HH2, CYM);//
-// >>>>>>> mergefriday
+    drum = T("lowshelf", { freq: 110, gain: 8, mul: 0.3}, BD, SD, HH1, HH2, CYM).play();
+    // drumFill = function() {
+    //     BD.bang();
+    //     SD.bang();
+    //     HH1.bang();
+    //     HH2.bang();
+    //     CYM.bang();
+    // }
+
 	T("interval", {interval:"BPM64 L16"}, hitNote).start();
 })
