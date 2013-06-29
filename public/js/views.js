@@ -108,10 +108,12 @@ var ToneMatrixView = Backbone.View.extend({
 		//console.log(this.$('.tool-row').height());
 
 		var scope = this;
+
 		this.pitch = new KnobView({ 
-			model:
-				new Knob({
-				title: 'Pitch', min: 1, max: 6,
+			model: new Knob({
+				title: 'Pitch', 
+				min: 1, 
+				max: 6,
 				onChange: function(aa){
 					scope.ins.defOct = aa;
 					scope.ins.rebuild();
@@ -120,19 +122,22 @@ var ToneMatrixView = Backbone.View.extend({
 			})
 		});
 
-		this.distortion = new KnobView({ model: 
-			new Knob({
-				title: 'Sustain',
+		this.distortion = new KnobView({ 
+			model: new Knob({
+				title: 'Notes',
+				min: 0,
+				max: 6,
 				onChange: function(aa){
-					scope.ins.distort = aa;
+					scope.ins.poly = aa;
 					scope.ins.rebuild();
 					console.log(scope.ins.defOct);
 				}
 			})
 		});
-		this.reverb = new KnobView({ model: 
-			new Knob({
-				title: 'Length', min: 1,
+		this.reverb = new KnobView({ 
+			model: new Knob({
+				title: 'Length', 
+				min: 1,
 				onChange: function(aa){
 					scope.ins.noteLength = aa * 1000;
 					scope.ins.rebuild();
@@ -140,8 +145,32 @@ var ToneMatrixView = Backbone.View.extend({
 			})
 		});
 
-		this.balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
-		this.volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
+		this.balance = new SliderView({ 
+			model: new Slider({
+				title: 'Balance',
+				type: 'balance', 
+				value: 3,
+				onChange: function(aa){
+					scope.ins.mul = aa / 10;
+					scope.ins.rebuild();
+				}
+			})
+		});
+
+		this.volume = new SliderView({ 
+			model: new Slider({
+				title: 'Volume',
+				type: 'volume', 
+				value: 5, 
+				color: this.model.get('color'), 
+				handlecolor: this.model.get('gridcolor'),
+				onChange: function(aa){
+					scope.ins.mul = aa / 10;
+					scope.ins.rebuild();
+				}
+			})
+		});
+
 		this.$('.tools').append('<div class="tool-row"></div>');
 		this.$('.tool-row:nth-of-type(2)').append(this.pitch.el, this.distortion.el, this.reverb.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
@@ -344,7 +373,7 @@ var KnobView = Backbone.View.extend({
 	setValue: function(v){
 		this.rot = Math.round(Math.min(Math.max(v, this.min), this.max));
 		this.rotation = -125 + (25*this.rot);
-		//this.render();
+		this.render();
 	},
 	render: function(){
 		//this.knobValue = this.$('.knob').attr('knob-value');
@@ -429,6 +458,9 @@ var SliderView = Backbone.View.extend({
 		        orientation: "horizontal",
 		        slide: function(events, ui) {
 		        	item.model.set('value', ui.value);
+		        	if(item.model.attributes.onChange){
+						item.model.attributes.onChange.call(null, ui.value);
+					} else console.log('noo way');
 		        }
 	   	 	});
 		}
@@ -441,6 +473,9 @@ var SliderView = Backbone.View.extend({
 		        range: 'min',
 		        slide: function(events, ui) {
 		        	item.model.set('value', ui.value);
+		        	if(item.model.attributes.onChange){
+						item.model.attributes.onChange.call(null, ui.value);
+					} else console.log('noo way');
 		        }
 	   	 	});
 	   	 	this.$('.ui-slider-range').css({'background-color': this.model.get('color')});
@@ -522,8 +557,4 @@ var DropdownView = Backbone.View.extend({
 	listleave: function(ev){
 		$(ev.target).css({'background-color': 'rgba(0,0,0,0)'});
 	}
-});
-
-var InstrumentView = Backbone.View.extend({
-
 });
