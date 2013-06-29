@@ -3,10 +3,10 @@
 //---------------Application---------------//
 //-----------------------------------------//
 var squareSize = 23/100 * $(window).width() * 92/100;
-var toneMatrix1 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#3498DB', instrument: null, matrix: null, title: 'Bass', gridcolor: '#2980B9' });
-var toneMatrix2 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#2ECC71', instrument: null, matrix: null, title: 'Rhythm', gridcolor: '#27AE60' });
-var toneMatrix3 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#F1C40F', instrument: null, matrix: null, title: 'Harmony', gridcolor: '#F39C12' });
-var toneMatrix4 = new ToneMatrix({ width: squareSize, height: squareSize, color: '#E74C3C', instrument: null, matrix: null, title: 'Melody', gridcolor: '#C0392B' });
+var toneMatrix1 = new ToneMatrix({ width: squareSize, height: squareSize, index:0, color: '#3498DB', instrument: null, matrix: null, title: 'Bass', gridcolor: '#2980B9' });
+var toneMatrix2 = new ToneMatrix({ width: squareSize, height: squareSize, index:1, color: '#2ECC71', instrument: null, matrix: null, title: 'Rhythm', gridcolor: '#27AE60' });
+var toneMatrix3 = new ToneMatrix({ width: squareSize, height: squareSize, index:2, color: '#F1C40F', instrument: null, matrix: null, title: 'Harmony', gridcolor: '#F39C12' });
+var toneMatrix4 = new ToneMatrix({ width: squareSize, height: squareSize, index:3, color: '#E74C3C', instrument: null, matrix: null, title: 'Melody', gridcolor: '#C0392B' });
 
 toneMatrix1 = new ToneMatrixView({ model: toneMatrix1 });
 toneMatrix2 = new ToneMatrixView({ model: toneMatrix2 });
@@ -69,17 +69,22 @@ var toneMatrix = [	toneMatrix1,
 
 //Connections
 var clientSocket;
+var thisIndex = null;
 function connectTo(ip){
 	clientSocket = io.connect('http://'+ip+"/application");
 
-	clientSocket.on('handshake', function(){
-		console.log('handshake');
+	clientSocket.on('handshake', function(ind){
+		console.log('handshake as index', ind);
+		thisIndex = ind;
 		startthis();
 	});
 	
-	clientSocket.on('sendCamData', function(xx){
-		if(xx){
-			toneMatrix[xx.cam].sendData(xx);
+	clientSocket.on('sendData', function(data){
+		for(var ii = 0; ii < 4; ii += 1){
+			if(data.pics && data.pics[ii]){
+				content[ii].setPic(data.pics[ii]);
+				content[ii].setMat(data.density[ii]);
+			}
 		}
 		
 	});
@@ -100,23 +105,31 @@ $(window).mouseup(function(){
 });
 //
 var playing = false;
-var bpm = 50;
+var bpm = 64;
 var minute = 60 * 1000;
 var beatTime = (minute/bpm)/8;
 var onBeat = 0;
 var fpsTime = 1000/30;
+var requestRate = 30;
+var toReq = 0;
+var rr = 0;
+function requestData(){
+	if(clientSocket){
+		rr += 1;
+		clientSocket.emit('request', {
+			vids: (rr == 3),
+			index: thisIndex
+		})
+		if(rr == 3) rr = 0;
+	}	
+}
 
 function startthis(){
 	if(!playing){
 		playing = true;
-		setInterval(function(){
-			onBeat+=1
-			if(onBeat == 16)onBeat = 0;
-			for(var i = 0; i < toneMatrix.length; i+=1){
-				toneMatrix[i].setBar(onBeat, beatTime/fpsTime);
-			}
-			
-		}, beatTime);
+		setInterval(requestData, requestRate)
+		
+		
 		setInterval(function(){
 			for(var i = 0; i < toneMatrix.length; i+=1){
 				toneMatrix[i].render();

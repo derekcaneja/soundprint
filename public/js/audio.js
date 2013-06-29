@@ -16,21 +16,25 @@ var AS = 10;
 var B  = 11;
 
 var onScale = 0;
-var scalesPerMeasure = 1;
+var scalesPerMeasure = 0.5;
 var scales = [];
 var numScales = 4;
 var toScales = [	[C, D, E, G, A, C + 12, D + 12, E + 12],
 					[D, E, G, A, B, D + 12, E + 12, G + 12],
 					[A, B, D, E, FS, A + 12, B + 12, D + 12 ],
-					//[C, D, E, G, A, C + 12, D + 12, E + 12]]
-					[CS, E, FS, A, B, CS + 12, E + 12, FS + 12]];
+					[CS, E, FS, A, B, CS + 12, E + 12, FS + 12]]
+//var mainScale = Math.round(Math.random()*5)
 					
 var lastScale = 0;
-var newScale
-for(var ii = 0; ii < numScales; ii+=1){
-	//while(newScale==null||newScale==lastScale)newScale = Math.floor(Math.random()*toScales.length)
-	scales.push(toScales[ii]);
-	//lastScale = newScale;
+var newScale = 0;
+for(var ii = 0; ii < numScales; ii+=1){;
+	newScale = Math.floor(Math.random()*numScales)
+	while(newScale==null|| toScales[newScale]==null || Math.random()<0.9){
+		newScale = Math.floor(Math.random()*numScales);
+	}
+	console.log(newScale);
+	scales.push(toScales[newScale]);
+	toScales[newScale] = null
 }
 
 var scale = scales[0];
@@ -42,8 +46,9 @@ var eigth = measure/8
 var sxth = measure/16;
 
 //SOUND PRINT INSTRUMENT
-function SPI(options){
-	var scope = this;
+function SPI(g, o, options){
+	this.grid = g
+	this.grid.ins = this;
 	this.matrix = options.mat||null;
 	this.hitRate = options.hr || 4;
 	this.beatRate = options.br || 4;
@@ -56,7 +61,19 @@ function SPI(options){
 	this.sinType = options.sinType||'sin';
 	this.oct = options.oct||3;
 	this.dist = options.dist;
+	this.hitsPerChange = options.hits||1;
+	this.defOct = o;
+	this.grid.pitch.setValue(this.defOct);
 	
+	this.rebuild();
+	
+	this.grid.setNotes(this.hitRate);
+	
+}
+
+
+SPI.prototype.rebuild = function(){
+	var scope = this;
 	this.main = T(this.type, { mul: this.mul, poly: this.poly }).play();
 	this.env = T("adsr", { d: this.noteLength, s: 0, r: 0 });
 	this.clone = null
@@ -83,122 +100,132 @@ function SPI(options){
 		
 		return scope.clone.on("ended", opts.doneAction).bang();
 	}
-	
 }
-
 SPI.prototype.playNote = function(beat){
+	if(!this.grid || !this.grid.densityArray)return false;
 	if(beat % this.hitRate == 0) {
-		//(this.matrix||[0,0,0,0,0,0,0,0])[Math.floor(beat / this.beatRate)%8].length
-		for(var ii = 0; ii < 8; ii++) {
-			//if(this.matrix[Math.floor(beat / this.hitRate)%8][ii] == 1){
-			if(Math.random()<0.3){
-				if(this.main)this.main.noteOn(scale[ii] + (this.oct*12), 80, 10);
+		var beatIndex = Math.floor(beat / this.hitRate);
+		this.notes = [];
+		for(var ii = 0; ii < this.grid.densityArray[beatIndex].length; ii++) {
+			if(this.grid.densityArray[beatIndex][ii] > 0.3 + ((this.hitRate) * 0.1)){
+				this.notes.push([scale[ii] + (this.defOct*12), 80, beatIndex, ])
+				this.grid.notes.push({x: ii, y: beatIndex, a: 1});
+				if(this.main)this.main.noteOn( scale[ii] + (this.defOct*12), 80);
 			}
 		}
-	}	
+	}else if((beat*this.hitsPerChange) % (this.hitRate) == 0 && this.notes){
+		for(var ii = 0; ii < this.notes.length; ii += 1){
+			if(this.main)this.main.noteOn( this.notes[ii][0],this.notes[ii][1]);
+		}
+	}
 }
+		
 
 //SET UP INSTRUMENTS
 var bass1 = { 
-    hr          : 2,
+	name 		: 'bass 1',
+    hr          : 4,
     type        : 'SynthDef',
     poly        : 1,
     noteLength  : 1000,
     mul         : 1,
     fx          : 1,
-    oct         : 1
 }
 
 var bass2 = { 
-    hr          : 4,
+	name 		: 'bass 2',
+    hr          : 2,
     type        : 'SynthDef',
     poly        : 1,
     noteLength  : 500,
     mul         : 1,
     fx          : 2,
-    oct         : 1
 }
 
 var bass3 = { 
+	name 		: 'bass 3',
     hr          : 8,
     type        : 'SynthDef',
     poly        : 1,
-    noteLength  : 3000,
+    noteLength  : 1000,
     mul         : 1,
     fx          : 2,
-    oct         : 1
 }
 
 var melody1 = { 
-    hr: 1,
+	name : 'melody 1',
+    hr: 4,
     type:'SynthDef',
     poly:1,
     noteLength:10,
     sinType:'saw',
     mul:0.5,
     fx:1,
-    oct:6
 }
 
 var melody2 = { 
-    hr: 4,
+	name : 'melody 2',
+    hr: 8,
+	hits: 4 ,
     type:'SynthDef',
     poly:3,
     noteLength:1000,
     mul:0.05    ,
     fx:1,
-    oct:6
 }
 
 var melody3 = { 
-    hr: 16,
+	name : 'melody 3',
+    hr: 2,
     type:'OscGen',
     poly:6,
-    noteLength:10000,
+    noteLength:1000,
     mul:0.03    ,
     fx:1,
-    oct:6
 }
 
 
 var rhythm1 = { 
+	name : 'rhythm 1',
     hr: 2,
     type:'PluckGen',
     poly:3,
     noteLength:200,
     sinType:'saw',
-    dist:true,
-    mul:0.1,
+    mul:0.6,
     fx:2,
-    oct:4
 }
 
 var rhythm2 = { 
+	name : 'rhythm 2',
     hr: 2,
     type:'PluckGen',
     poly:3,
     noteLength:1000,
     sinType:'sin',  
-    mul:0.1,
+    mul:0.3,
     fx:2,
     oct:3
 }
 
 var rhythm3 = { 
+	name : 'rhythm 3',
     hr: 4,
     type:'PluckGen',
     poly:2,
     noteLength:1000,
     sinType:'sin',  
-    mul:0.5,
+    mul:0.3,
     fx:2,
     oct:4
 }
 
 var harmony1 = { 
-    hr: 2,
+	name : 'harmony 1',
+    hr: 4,
     type:'PluckGen',
     poly:1,
+	hits:2,
     noteLength:600,
     mul:0.15,
     fx:2,
@@ -206,6 +233,7 @@ var harmony1 = {
 }
 
 var harmony2 = { 
+	name : 'harmony 2',
     hr: 2,
     type:'SynthDef',
     sinType:'saw',
@@ -217,6 +245,7 @@ var harmony2 = {
 }
 
 var harmony3 = { 
+	name : 'harmony 3',
     hr: 1,
     type:'PluckGen',
     poly:1,
@@ -227,13 +256,13 @@ var harmony3 = {
     oct:5
 }
 
-var ins1 = new SPI([melody1, melody2, melody3][Math.floor(Math.random()* 3)]);
+var ins1 = new SPI(toneMatrix1, 1, [bass1, bass2, bass3][Math.floor(Math.random()* 3)]);
 
-var ins2 = new SPI([bass1, bass2, bass3][Math.floor(Math.random()* 3)]);
+var ins2 = new SPI(toneMatrix2, 3, [rhythm1, rhythm2, rhythm3][Math.floor(Math.random()* 3)]);
 
-var ins3 = new SPI([rhythm1, rhythm2, rhythm3][Math.floor(Math.random()* 3)]);
+var ins3 = new SPI(toneMatrix3, 4, [harmony1, harmony2, harmony3][Math.floor(Math.random()* 3)]);
 
-var ins4 = new SPI([harmony1, harmony2, harmony3][Math.floor(Math.random()* 3)]);
+var ins4 = new SPI(toneMatrix4, 6, [melody1, melody2, melody3][Math.floor(Math.random()* 3)]);
 
 var instruments = [ins1,ins2, ins3, ins4]
 
@@ -245,9 +274,7 @@ function hitNote(count){
 	if(i % eigth == 0 && i > 0) HH2.bang();
 	if(i % eigth == 0 || i > measure-eigth) SD.bang();
 	if(	i % quarter == 0 
-		|| (i > half && i % quarter == 0) 
-		|| (i > (measure-quarter) && i % sxth == 0) 
-		|| ( i > (measure-eigth))
+		|| (i > (measure-quarter) && i % sxth == 0)
 	) BD.bang();
 
 	for(var ii = 0; ii < instruments.length; ii += 1){
@@ -263,7 +290,7 @@ function hitNote(count){
 
 
 //SET UP
-timbre.setup({ samplerate: timbre.samplerate});
+timbre.setup({ samplerate: timbre.samplerate*0.5});
 
 T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	BD  = this.slice(   0,  500).set({bang:false, mul:1});

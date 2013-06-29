@@ -52,6 +52,9 @@ var onCam = 0;
 var onCamMaybe = 0;
 var maxTimeOut = 3;
 var timeOut = [0,0,0,0];
+var imd = [null, null, null, null];
+var dns = [null, null, null, null];
+var compression = 4;
 
 for(var i = 0; i < 4; i+=1) cameraData[i] = null;
 	
@@ -64,23 +67,28 @@ cameraSocket.on('connection', function(socket){
 	});
 
 	socket.on('frame', function(data){
-		console.log('got frame', data.cam);
-		if(data && applicationClient){
-			timeOut[data.cam] = maxTimeOut;
-			for(var i = 0; i < applicationClient.length; i++) {
-				applicationClient[i].volatile.emit('sendCamData',{
-					cam: data.cam,
-					density: data.density,
-					pic: data.pic
-				});
-			}
-		}
+		//console.log('frame from ',data.cam);
+		timeOut[data.cam] = maxTimeOut;
+		if(data.pic)imd[data.cam] = data.pic;
+		if(data.density)dns[data.cam] = data.density;
 	});
+	
+	
 });
 
 applicationSocket.on('connection', function(socket) {
 	applicationClient.push(socket);
-	socket.emit('handshake');
+	socket.emit('handshake', applicationClient.length-1);
+	
+	socket.on('request', function(dat){
+		//console.log('request', dat.vids);
+		if(applicationClient[dat.index]){
+			applicationClient[dat.index].volatile.emit('sendData',{
+				density: dns,
+				pics: ((dat.vids)?(imd):(null))
+			})
+		};
+	})
 });
 
 setInterval(checkTimeOut, 1000)
@@ -92,9 +100,12 @@ function checkTimeOut(){
 			if(timeOut[ii]<=0){
 				console.log('timeout on cam', ii);
 				if(cameraClient[ii]){
+					
 					cameraClient[ii].send('timeOut');
 					cameraClient[ii] = null;
 				}
+				imd[ii] = null;
+				dns[ii] = null;
 			}
 		}else{
 			onCam = Math.min(onCam, ii);

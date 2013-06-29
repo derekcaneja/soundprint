@@ -4,6 +4,10 @@
 //-----------------------------------------//
 
 
+var rColors = [0.7,0.7,1.1,1.2];
+var gColors = [0.7,1.2,1.1,0.7];
+var bColors = [1.2,0.7,0.7,0.7];
+var rColor = bColor = gColor = 0;
 // Application View
 //-----------------------------------------//
 var ApplicationView = Backbone.View.extend({
@@ -78,7 +82,7 @@ var HeaderView = Backbone.View.extend({
 var ToneMatrixView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'square-container',
-	initialize: function() {	
+	initialize: function() {
 		this.$el.attr('rel', this.model.get('title'));
 	
 		this.$el.attr('rel', this.model.get('title'));
@@ -86,6 +90,7 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$('.tools-header').append('<h3 style="color: ' + this.model.get('color') + '">' + this.model.get('title') + '</h3>', new DropdownView({ model: this.model }).el, '<div class="lockflip"><i class="videoicon icon-facetime-video"></i><i class="lock icon-unlock icon-mirrored"></i><i class="flip icon-undo"></i></div></div>');
 		this.$('.tools-header').after('<div class="tools"><div class="tool-row" tool-row="1"><canvas id="'+this.model.get('title')+'Waveform"></canvas></div>');
 
+		this.index = this.model.get('index');
 		//this.$('.square').css({
 		//	'margin-top': '-742px'
 		//});
@@ -102,7 +107,15 @@ var ToneMatrixView = Backbone.View.extend({
 
 		//console.log(this.$('.tool-row').height());
 
-		this.pitch = new KnobView({ model:new Knob({title: 'Pitch'}) });
+		var scope = this;
+		this.pitch = new KnobView({ model:new Knob({
+			title: 'Pitch', min: 1, max: 6,
+			onChange: function(aa){
+				scope.ins.defOct = aa;
+				scope.ins.rebuild();
+				console.log(scope.ins.defOct);
+			}
+		}) });
 		this.distortion = new KnobView({ model:new Knob({title: 'Distort'}) });
 		this.reverb = new KnobView({ model:new Knob({title: 'Reverb'}) });
 
@@ -115,16 +128,9 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$('.tool-row:nth-of-type(3)').addClass('sliderrow').append(this.balance.el, this.volume.el);
 
 
-		this.locked = false;
-		this.flip = null;
-
-		//this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
+		this.$el.addClass('accelerate');
 		
-
-
-		// this.$('.tool-row').append(delay.el);
-		// this.$('.tool-row').append(gain.el);
-		
+		//TMVars
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d');
 		this.canvas2 = document.createElement('canvas');
@@ -135,58 +141,38 @@ var ToneMatrixView = Backbone.View.extend({
 		
 		this.ww = this.model.get('width') + 7;
 		this.hh = this.model.get('height') + 7;
+		this.canvas.width = this.canvas2.width = this.canvas3.width = this.ww;
+		this.canvas.height = this.canvas2.height = this.canvas3.height = this.hh;
 		
-		this.hzSpaces = 16;
-		this.vtSpaces = 16;
-		
-		this.hzLength = this.ww / this.hzSpaces;
-		this.vtLength = this.hh / this.vtSpaces;
 		//
 		this.$('.square').append(this.canvas);
 		
 		//
 		this.minThreshold = 0.3
-		//
-		this.canvas.width = this.ww;
-		this.canvas.height = this.hh;
 		
-		//
-		this.hasDensity = false;
-		this.densityArray = [];
-		//
-		for(var i= 0; i < this.vtSpaces; i+=1){
-			var temp = [];
-			for(var n = 0; n < this.hzSpaces; n+=1){
-				temp.push(0);
-			}
-			this.densityArray.push(temp);
-		}
-		
-		this.pic = new Image();
-		
-		this.barY = 0;
-		
-		this.canvas.width = this.canvas3.width = this.ww;
-		this.canvas.height = this.canvas3.height = this.hh;
-		
-		this.notes = new myArray();
-		
+		this.locked = false;
+		this.capVid = true;
 		this.rot = 0;
+		this.pic = null
+		this.ins = null;
 		
-
-		this.$el.addClass('accelerate');
-
-		this.sendData();
-		this.drawGrid();
+		this.notes = [];
+		
+		this.setNotes(1);
 		this.render();
 		
 
 	},
-	drawGrid:function(){
-
+	setNotes:function(nn){
+		this.hzSpaces = 8;
+		this.vtSpaces = 32/(nn||1);
+		
+		
+		this.hzLength = this.ww / this.hzSpaces;
+		this.vtLength = this.hh / this.vtSpaces;
+		
 		//
-		this.context3.fillStyle = this.model.get('color');
-		this.context3.fillRect(0,0,this.canvas3.width, this.canvas3.height);
+		/*this.canvas3.width = this.canvas3.width;
 		this.context3.lineWidth = 1;
 		this.context3.strokeStyle = this.model.get('gridcolor');
 		for(var i = this.hzLength; i < this.ww - 2; i += this.hzLength){
@@ -202,158 +188,10 @@ var ToneMatrixView = Backbone.View.extend({
 			this.context3.lineTo(this.ww,n);
 			this.context3.closePath();
 			this.context3.stroke();
-		}
+		}*/
 	},
-	sendData: function(data){	
-		if(data){
-			if(!this.locked){
-				this.hasDensity = true;
-				for(var nn = 0; nn < data.density.length; nn += 1){
-					for(var ii = 0; ii < data.density[nn].length; ii += 1){
-						if(data.density[nn][ii]<0.3) this.densityArray[nn][ii] = 0; 
-						else this.densityArray[nn][ii] = 1; 
-					}
-				}
-				if(this.rot>=4)this.rot = 0;
-				for(var i = 0; i < this.rot; i+=1)this.densityArray = rotateMatrix(this.densityArray);
-			}
-		}
-	},
-	render: function(){
-		//
-		this.context.drawImage(this.canvas3,0,0);
-		this.context.lineWidth = 2;
-		this.context.strokeStyle = "#FFFFFF";
-		this.barY += this.barS;
-		//
-		if(this.hasDensity){
-			this.context.beginPath();
-			this.context.moveTo(0,this.barY);
-			this.context.lineTo(this.ww,this.barY);
-			this.context.closePath();
-			this.context.stroke();
-			//
-		}
-		//
-		this.context.fillStyle = "#FFFFFF";
-		for(var i = 0; i < this.notes.ar.length; i+=1){
-			this.note = this.notes.ar[i];
-			//
-			this.context.globalAlpha = this.note.a;
-			this.context.fillRect(	this.note.xx * this.hzLength,
-									this.note.yy * this.vtLength,
-									this.hzLength,
-									this.vtLength);
-				
-			//
-			this.note.a -= (this.locked)?0.002:0.01;
-			if(this.note.a <= 0){
-				this.notes.remove(this.note);
-				i -= 1;
-			}
-		}	
-		this.context.globalAlpha = 1;
-		this.$('.lockflip i').tooltip();
-	},
-	setBar: function(yy, frames){
-		var item = this;
-		var canvas = document.getElementById(item.model.get('title') + 'Waveform');		
-		var context = canvas.getContext('2d');
-		
-		this.playBeat = yy;
-		
-		if(this.hasDensity){
-			for(var i = 0; i < this.densityArray[this.playBeat].length; i+=1){
-				if(this.densityArray[this.playBeat][i]==1){
-					this.notes.ar.push({
-						yy:this.playBeat,
-						xx:i,
-						a:0.5,
-					});
-
-					context.clearRect(0, 0, canvas.width, canvas.height);
-
-				};
-			}
-		}
-		this.barY = (yy/this.vtSpaces)*this.hh;
-		this.barS = this.vtLength/frames
-	},
-	events: {
-		'mouseover'						: 'mouseover',
-		'mouseleave'					: 'mouseleave',
-		'click .lock'					: 'lockMatrix',
-		'click .flip'					: 'flipMatrix'
-	},
-	mouseover: function(){
-		
-		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
-		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
-	},
-	mouseleave: function(){
-		this.$('.square-border').css({'border-color': 'rgba(0,0,0,0)'});
-		
-	},
-	lockMatrix: function(){
-		if(!this.locked){
-			this.$('.lock').removeClass('icon-unlock');
-			this.$('.lock').addClass('icon-lock');
-			this.$('.lock').addClass('iconselected');
-			this.locked = true;
-		} else{
-			this.$('.lock').removeClass('iconselected');
-			this.$('.lock').removeClass('icon-lock');
-			this.$('.lock').addClass('icon-unlock');
-			this.locked = false;
-		}
-	},
-	flipMatrix: function(ev){
-		this.rot += 1;
-
-		for(var i = 0; i < this.notes.ar.length; i+=1){
-			notes[i].a = 0;
-		}
-	}
-
-});
-
-// Display Tone Matrix View
-//-----------------------------------------//
-var DisplayToneMatrixView = Backbone.View.extend({
-	tagName: 'div',
-	className: 'square-container',
-	initialize: function() {
-	
-		this.$el.attr('rel', this.model.get('title'));
-		this.$el.append('<div class="square"></div>');
-		
-		this.$('#'+this.model.get('title')+'Waveform').height('80px');
-		this.$('#'+this.model.get('title')+'Waveform').width('100%');
-		
-		this.canvas = document.createElement('canvas');
-		this.context = this.canvas.getContext('2d');
-		this.canvas2 = document.createElement('canvas');
-		this.context2 = this.canvas.getContext('2d');
-		
-		this.ww = this.model.get('width') + 7;
-		this.hh = this.model.get('height') + 7;
-		
-		this.hzSpaces = 16;
-		this.vtSpaces = 16;
-		
-		this.hzLength = this.ww / this.hzSpaces;
-		this.vtLength = this.hh / this.vtSpaces;
-		//
-		this.$('.square').append(this.canvas);
-		
-		//
-		this.minThreshold = 0.3
-		//
-		
-		this.resize();
-		this.render();
-
-		//
+	setMat: function(m){
+		if(this.locked)return false;
 		this.densityArray = [];
 		//
 		for(var i= 0; i < this.vtSpaces; i+=1){
@@ -363,28 +201,66 @@ var DisplayToneMatrixView = Backbone.View.extend({
 			}
 			this.densityArray.push(temp);
 		}
-
 		//
-		//setInterval( function(){this2.render();}, (1000/30));
-	},
-	render: function() {		
-		if(this.altImage){
-			this.context.globalAlpha = 1;
-			this.context.putImageData(this.altImage,0,0);
-		}
-	},
-	sendFrame: function(data){	
-		if(this.altImage){
-			this.context.putImageData(this.altImage,0,0);
-		}
-		for(var n = 0; n < data.length; i += 1){
-			for(var n = 0; n < data[i].length; n += 1){
-				
-				this.context.fillStyle = "#FFFFFF";
-				this.context.globalAlpha = this.data[i][n]/4;
-				this.context.fillRect(i*this.hzLength,n*this.vtLength, this.hzLength, this.vtLength);
+		for(var yyy = 0; yyy < m.length; yyy += 1){
+			for(var xxx = 0; xxx < m[yyy].length; xxx += 1){
+				this.densityArray
+					[Math.floor((yyy/m.length)*this.vtSpaces)]
+					[Math.floor((xxx/m[yyy].length)*this.hzSpaces)] += m[yyy][xxx];
 			}
 		}
+	},
+	setPic: function(p){
+		if(this.locked)return false;
+		this.pic = this.context.createImageData(Math.sqrt(p.length),Math.sqrt(p.length));
+		for(var bb = 0; bb < p.length; bb += 1){
+			//if(bb == p.length-1)console.log(p[bb]);
+			this.pic.data[bb*4]    	 = Math.round(p[bb] * rColors[this.index]);
+			this.pic.data[(bb*4) +1] = Math.round(p[bb] * gColors[this.index]);
+			this.pic.data[(bb*4) +2] = Math.round(p[bb] * bColors[this.index]);
+			this.pic.data[(bb*4) +3] = 255;
+		}
+		//console.log(p.length, this.pic.data.length)
+	},
+	render: function(beat){
+		//
+		this.context.globalAlpha = 1;
+		this.context.fillStyle = this.model.get('color');
+		this.context.fillRect(0,0,this.canvas.width, this.canvas.height);
+		if(this.pic){
+			this.canvas2.width = this.pic.width;
+			this.canvas2.height = this.pic.height;
+			this.context2.putImageData(this.pic,0,0)
+			this.context.globalAlpha = 0.3;
+			this.context.drawImage(this.canvas2, 0,0,this.canvas.width, this.canvas.height);
+			this.context.globalAlpha = 1;
+			//,this.canvas.width, this.canvas.height);
+		}else if(this.capVid){
+			//this.context.drawImage(nocam,0,0,this.canvas.width,this.canvas.height);
+			this.context.font = "14px verdana";
+			this.context.fillStyle = "#000";
+			this.context.fillText('No camera Feed :(', this.ww-140,this.hh - 10);
+		}
+		this.context.drawImage(this.canvas3, 0,0);
+		
+		//console.log(this.beat);
+		var nextNotes = [];
+		for( var nnn = 0; nnn < this.notes.length; nnn += 1){
+			if(this.notes[nnn].a > 0){
+				nextNotes.push(this.notes[nnn]);
+				this.context.fillStyle = '#fff';
+				this.context.globalAlpha = this.notes[nnn].a/2
+				this.context.fillRect(	this.notes[nnn].x* this.canvas.width/this.hzSpaces,
+										this.notes[nnn].y* this.canvas.height/this.vtSpaces,
+										this.canvas.width/this.hzSpaces,
+										this.canvas.height/this.vtSpaces);
+				this.notes[nnn].a -= (this.locked)?(0.003):(0.03);
+			}
+		}
+		this.notes = nextNotes;
+		
+		
+		
 	},
 	events: {
 		'mouseover'						: 'mouseover',
@@ -392,37 +268,13 @@ var DisplayToneMatrixView = Backbone.View.extend({
 		'click .lock'					: 'lockMatrix',
 		'click .flip'					: 'flipMatrix'
 	},
-	resize: function(){
-		this.canvas.width = this.canvas2.width = this.ww;
-		this.canvas.height = this.canvas2.height = this.hh;
-		this.context2.lineWidth = 1;
-		this.context2.fillStyle = this.model.get('color');
-		this.context2.fillRect(0,0,this.ww,this.hh);
-		this.context2.strokeStyle = this.model.get('gridcolor');
-		for(var i = 1; i < this.ww - 2; i += this.hzLength){
-			this.context2.beginPath();
-			this.context2.moveTo(i,0);
-			this.context2.lineTo(i,this.hh);
-			this.context2.closePath();
-			this.context2.stroke();
-		}
-		for(var n = 1; n < this.hh - 2; n += this.vtLength){
-			this.context2.beginPath();
-			this.context2.moveTo(0,n);
-			this.context2.lineTo(this.ww,n);
-			this.context2.closePath();
-			this.context2.stroke();
-		}
-		
-		this.altImage = this.context2.getImageData(0,0,this.canvas2.width, this.canvas2.height);
-	},
 	mouseover: function(){
 		this.$('.square-border').css({'border-color': this.model.get('gridcolor')});
 		//$('.square-container:not(.square-container-hover)').transition({opacity: 0.4});
 	},
 	mouseleave: function(){
 		this.$('.square-border').css({'border-color': 'rgba(0,0,0,0)'});
-		//$('.square-container').transition({opacity: 1});
+		
 	},
 	lockMatrix: function(){
 		if(!this.locked){
@@ -438,14 +290,18 @@ var DisplayToneMatrixView = Backbone.View.extend({
 		}
 	},
 	flipMatrix: function(ev){
-		//console.log($(ev.target));
-		// $(ev.target).parent().addClass('fliprotate', function(){
-		// setTimeout(function() {
-		// 	$(ev.target).parent().removeClass('fliprotate');
-		// }, 200);
-		// });
+		/*this.rot += 1;
+
+		for(var i = 0; i < this.notes.ar.length; i+=1){
+			notes[i].a = 0;
+		}*/
 	}
+
 });
+
+// Display Tone Matrix View
+//-----------------------------------------//
+
 
 // Knob View
 //-----------------------------------------//
@@ -460,22 +316,24 @@ var KnobView = Backbone.View.extend({
 		
 		this.$el.append('<div class="knob accelerate" knob-value="0"></div><div class="tick accelerate"></div><h5>' + this.model.get('title') + '</h5>');
 		
-		if(this.model.get('title') == 'Pitch') this.rotation = 0;
-		else this.rotation = -125;
-
+		this.min = this.model.attributes.min||0;
+		this.max = this.model.attributes.max||10;
+		this.setValue(this.model.attributes.value);
+		
 		this.render();
 		this.$el.addClass('accelerate');
 	},
+	setValue: function(v){
+		this.rot = Math.round(Math.min(Math.max(v, this.min), this.max));
+		this.rotation = -125 + (25*this.rot);
+		//this.render();
+	},
 	render: function(){
-		if(this.model.get('title') == 'Pitch') {
-			this.knobValue = this.$('.knob').attr('knob-value') - 5;
-			this.$('.knob').attr('knob-value', (this.rotation + 125) / 25 % 15 - 5);
-		} else {
-			this.knobValue = this.$('.knob').attr('knob-value');
-			this.$('.knob').attr('knob-value', (this.rotation + 125) / 25 % 15);
-		}
+		//this.knobValue = this.$('.knob').attr('knob-value');
+		this.$('.knob').attr('knob-value', this.rot);
+		
 
-		this.model.set('value', this.knobValue);
+		this.model.set('value', this.rot);
 
 		this.$('.tick').css({
 			'transform'    		: 'rotate(' + this.rotation + 'deg)',
@@ -517,9 +375,15 @@ var KnobView = Backbone.View.extend({
 				else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
 				else if(item.rotation > 130) 						item.rotation = -125;
 
-				item.rotation = Math.round(item.rotation / 25) * 25;
-
-				item.render();
+				item.setValue((item.rotation + 125) / 25 % 15)
+	
+				if(!item.pRot || item.rotation!=item.pRot){
+					item.render();
+					if(item.model.attributes.onChange){
+						item.model.attributes.onChange.call(null, item.rot);
+					}else console.log('noo way');
+				}
+				item.pRot = item.rotation;
 			}
 		});
 	},
