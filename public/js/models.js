@@ -35,6 +35,6 @@ var Slider = Backbone.Model.extend({
 var Instrument = Backbone.Model.extend({
 	defaults: {
 		title		: 'Instrument',
-		audio		: null
+		options		: null
 	}
 });

@@ -641,3 +641,7 @@ var DropdownView = Backbone.View.extend({
 		$(ev.target).css({'background-color': 'rgba(0,0,0,0)'});
 	}
 });
+
+var InstrumentView = Backbone.View.extend({
+
+});
