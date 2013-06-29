@@ -108,16 +108,37 @@ var ToneMatrixView = Backbone.View.extend({
 		//console.log(this.$('.tool-row').height());
 
 		var scope = this;
-		this.pitch = new KnobView({ model:new Knob({
-			title: 'Pitch', min: 1, max: 6,
-			onChange: function(aa){
-				scope.ins.defOct = aa;
-				scope.ins.rebuild();
-				console.log(scope.ins.defOct);
-			}
-		}) });
-		this.distortion = new KnobView({ model:new Knob({title: 'Distort'}) });
-		this.reverb = new KnobView({ model:new Knob({title: 'Reverb'}) });
+		this.pitch = new KnobView({ 
+			model:
+				new Knob({
+				title: 'Pitch', min: 1, max: 6,
+				onChange: function(aa){
+					scope.ins.defOct = aa;
+					scope.ins.rebuild();
+					console.log(scope.ins.defOct);
+				}
+			})
+		});
+
+		this.distortion = new KnobView({ model: 
+			new Knob({
+				title: 'Sustain',
+				onChange: function(aa){
+					scope.ins.distort = aa;
+					scope.ins.rebuild();
+					console.log(scope.ins.defOct);
+				}
+			})
+		});
+		this.reverb = new KnobView({ model: 
+			new Knob({
+				title: 'Length', min: 1,
+				onChange: function(aa){
+					scope.ins.noteLength = aa * 1000;
+					scope.ins.rebuild();
+				}
+			})
+		});
 
 		this.balance = new SliderView({ model:new Slider({title: 'Balance',type: 'balance', value: 3})});
 		this.volume = new SliderView({ model:new Slider({title: 'Volume',type: 'volume', value: 5, color: this.model.get('color'), handlecolor: this.model.get('gridcolor')})});
@@ -258,9 +279,6 @@ var ToneMatrixView = Backbone.View.extend({
 			}
 		}
 		this.notes = nextNotes;
-		
-		
-		
 	},
 	events: {
 		'mouseover'						: 'mouseover',

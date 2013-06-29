@@ -64,18 +64,18 @@ function SPI(g, o, options){
 	this.hitsPerChange = options.hits||1;
 	this.defOct = o;
 	this.grid.pitch.setValue(this.defOct);
+    this.distort = 0;
 	
 	this.rebuild();
 	
 	this.grid.setNotes(this.hitRate);
-	
 }
 
 
 SPI.prototype.rebuild = function(){
 	var scope = this;
 	this.main = T(this.type, { mul: this.mul, poly: this.poly }).play();
-	this.env = T("adsr", { d: this.noteLength, s: 0, r: 0 });
+	this.env = T("adsr", { d: this.noteLength, s: 0 + this.distort / 10, r: 0 });
 	this.clone = null
 
 	this.main.def = function(opts) {
@@ -300,13 +300,6 @@ T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	CYM = this.slice(2000).set({bang:false, mul:0.2});
 
     drum = T("lowshelf", { freq: 110, gain: 8, mul: 0.3}, BD, SD, HH1, HH2, CYM).play();
-    // drumFill = function() {
-    //     BD.bang();
-    //     SD.bang();
-    //     HH1.bang();
-    //     HH2.bang();
-    //     CYM.bang();
-    // }
 
 	T("interval", {interval:"BPM64 L16"}, hitNote).start();
 })
