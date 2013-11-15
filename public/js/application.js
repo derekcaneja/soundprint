@@ -89,20 +89,7 @@ function connectTo(ip){
 		
 	});
 }
-$(window).mouseup(function(){ 
-	toneMatrix1.reverb.rotate = false;
-	toneMatrix1.distortion.rotate = false;
-	toneMatrix1.pitch.rotate = false;
-	toneMatrix2.reverb.rotate = false;
-	toneMatrix2.distortion.rotate = false;
-	toneMatrix2.pitch.rotate = false;	
-	toneMatrix3.reverb.rotate = false;
-	toneMatrix3.distortion.rotate = false;
-	toneMatrix3.pitch.rotate = false;	
-	toneMatrix4.reverb.rotate = false;
-	toneMatrix4.distortion.rotate = false;
-	toneMatrix4.pitch.rotate = false;
-});
+
 //
 var playing = false;
 var bpm = 64;

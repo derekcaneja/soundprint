@@ -45,26 +45,32 @@ var quarter = measure/4;
 var eigth = measure/8
 var sxth = measure/16;
 
+var noteIt = 400;
 //SOUND PRINT INSTRUMENT
 function SPI(g, o, options){
 	this.grid = g
 	this.grid.ins = this;
 	this.matrix = options.mat||null;
-	this.hitRate = options.hr || 4;
+	this.hitRate = Math.pow(2, Math.ceil(Math.random()*5))
 	this.beatRate = options.br || 4;
 	this.type = options.type||'SynthDef';
 	this.fx = options.fx||'SynthDef';
 	this.mul = options.mul||0.45;
 	this.main = null;
 	this.poly = options.poly||3;
-	this.noteLength = options.noteLength||300;
+	this.noteLength = Math.ceil(Math.random() * 10) * noteIt;
 	this.sinType = options.sinType||'sin';
 	this.oct = options.oct||3;
 	this.dist = options.dist;
 	this.hitsPerChange = options.hits||1;
 	this.defOct = o;
+
+    this.waveform = document.getElementById(this.grid.model.get('title') + 'Waveform'); 
+    console.log(this.waveform) 
+
 	this.grid.pitch.setValue(this.defOct);
-    this.distort = 0;
+    this.grid.energy.setValue(Math.log(this.hitRate) / Math.log(2) - 1);
+    this.grid.sustain.setValue(this.noteLength / noteIt);
 	
 	this.rebuild();
 	
@@ -74,12 +80,14 @@ function SPI(g, o, options){
 
 SPI.prototype.rebuild = function(){
 	var scope = this;
-	this.main = T(this.type, { mul: this.mul, poly: this.poly }).play();
-	this.env = T("adsr", { d: this.noteLength, s: 0 + this.distort / 10, r: 0 });
+
+	this.main = T(this.type, { mul: this.mul, poly: this.poly }).play()//Math.min(this.poly, (this.noteLength/(2*noteIt))) }).play();
+	this.env = T("adsr", { d: (this.noteLength * (this.hitRate/16)), s: 0, r: 0 });
 	this.clone = null
 
 	this.main.def = function(opts) {
-		scope.clone = scope.env.clone()
+
+		scope.clone = scope.env.clone();
 		
 		if(scope.fx == 1){
 			var op1 = T("sin", { freq: opts.freq * 1, fb: 0.25, mul: 0.4})
@@ -97,11 +105,13 @@ SPI.prototype.rebuild = function(){
 
 			scope.clone.append(op1);
 		}
-		
-		return scope.clone.on("ended", opts.doneAction).bang();
+
+		return scope.clone.on("ended", opts.doneAction).bang()
 	}
 }
 SPI.prototype.playNote = function(beat){
+    var scope = this;
+    
 	if(!this.grid || !this.grid.densityArray)return false;
 	if(beat % this.hitRate == 0) {
 		var beatIndex = Math.floor(beat / this.hitRate);
@@ -110,12 +120,28 @@ SPI.prototype.playNote = function(beat){
 			if(this.grid.densityArray[beatIndex][ii] > 0.3 + ((this.hitRate) * 0.1)){
 				this.notes.push([scale[ii] + (this.defOct*12), 80, beatIndex, ])
 				this.grid.notes.push({x: ii, y: beatIndex, a: 1});
-				if(this.main)this.main.noteOn( scale[ii] + (this.defOct*12), 80);
+				if(this.main) {
+                    var canvas = document.getElementById(this.grid.model.get('title') + 'Waveform');     
+
+                    this.main.noteOn(scale[ii] + (this.defOct*12), 80).plot({ 
+                        target      : scope.waveform, 
+                        foreground  : scope.grid.model.get('color'), 
+                        background  : 'rgba(0,0,0,0)', 
+                        lineWidth   : 3
+                    });
+                }
 			}
 		}
 	}else if((beat*this.hitsPerChange) % (this.hitRate) == 0 && this.notes){
 		for(var ii = 0; ii < this.notes.length; ii += 1){
-			if(this.main)this.main.noteOn( this.notes[ii][0],this.notes[ii][1]);
+			if(this.main){
+                this.main.noteOn(this.notes[ii][0],this.notes[ii][1]).plot({ 
+                    target      : scope.waveform, 
+                    foreground  : scope.grid.model.get('color'), 
+                    background  : 'rgba(0,0,0,0)', 
+                    lineWidth   : 3
+                });
+            }
 		}
 	}
 }
@@ -127,7 +153,6 @@ var bass1 = {
     hr          : 4,
     type        : 'SynthDef',
     poly        : 1,
-    noteLength  : 1000,
     mul         : 1,
     fx          : 1,
 }
@@ -137,7 +162,6 @@ var bass2 = {
     hr          : 2,
     type        : 'SynthDef',
     poly        : 1,
-    noteLength  : 500,
     mul         : 1,
     fx          : 2,
 }
@@ -147,7 +171,6 @@ var bass3 = {
     hr          : 8,
     type        : 'SynthDef',
     poly        : 1,
-    noteLength  : 1000,
     mul         : 1,
     fx          : 2,
 }
@@ -157,7 +180,6 @@ var melody1 = {
     hr: 4,
     type:'SynthDef',
     poly:1,
-    noteLength:10,
     sinType:'saw',
     mul:0.5,
     fx:1,
@@ -166,10 +188,9 @@ var melody1 = {
 var melody2 = { 
 	name : 'melody 2',
     hr: 8,
-	hits: 4 ,
+	hits: 2 ,
     type:'SynthDef',
     poly:3,
-    noteLength:1000,
     mul:0.05    ,
     fx:1,
 }
@@ -179,7 +200,6 @@ var melody3 = {
     hr: 2,
     type:'OscGen',
     poly:6,
-    noteLength:1000,
     mul:0.03    ,
     fx:1,
 }
@@ -190,7 +210,6 @@ var rhythm1 = {
     hr: 2,
     type:'PluckGen',
     poly:3,
-    noteLength:200,
     sinType:'saw',
     mul:0.6,
     fx:2,
@@ -201,7 +220,6 @@ var rhythm2 = {
     hr: 2,
     type:'PluckGen',
     poly:3,
-    noteLength:1000,
     sinType:'sin',  
     mul:0.3,
     fx:2,
@@ -213,7 +231,6 @@ var rhythm3 = {
     hr: 4,
     type:'PluckGen',
     poly:2,
-    noteLength:1000,
     sinType:'sin',  
     mul:0.3,
     fx:2,
@@ -226,7 +243,6 @@ var harmony1 = {
     type:'PluckGen',
     poly:1,
 	hits:2,
-    noteLength:600,
     mul:0.15,
     fx:2,
     oct:5
@@ -238,7 +254,6 @@ var harmony2 = {
     type:'SynthDef',
     sinType:'saw',
     poly:1,
-    noteLength:800,
     mul:0.05,
     fx:1,
     oct:4
@@ -300,6 +315,7 @@ T("audio").load("/js/libs/timbre/misc/audio/drumkit.wav", function() {
 	CYM = this.slice(2000).set({bang:false, mul:0.2});
 
     drum = T("lowshelf", { freq: 110, gain: 8, mul: 0.3}, BD, SD, HH1, HH2, CYM).play();
+
 
 	T("interval", {interval:"BPM64 L16"}, hitNote).start();
 })

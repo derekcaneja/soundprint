@@ -2,6 +2,8 @@
 //-----------Application------------//
 //----------------------------------//
 
+var dev = false;
+
 var express = require('express')
   , hbs = require('hbs')
   , io = require('socket.io')
@@ -59,21 +61,21 @@ var compression = 4;
 for(var i = 0; i < 4; i+=1) cameraData[i] = null;
 	
 cameraSocket.on('connection', function(socket){	
-	socket.emit('handshake', onCam);
-	cameraClient.push(socket);
-	onCam += 1;
-	socket.on('setCam', function(number){
-		console.log('Connected Camera Number ' + number);
-	});
+	for(var nn = 0; nn < ((dev) ? (4) : (1)); nn += 1) {
+		socket.emit('handshake', onCam);
+		cameraClient.push(socket);
+		onCam += 1;
+		socket.on('setCam', function(number){
+			console.log('Connected Camera Number ' + number);
+		});
 
-	socket.on('frame', function(data){
-		//console.log('frame from ',data.cam);
-		timeOut[data.cam] = maxTimeOut;
-		if(data.pic)imd[data.cam] = data.pic;
-		if(data.density)dns[data.cam] = data.density;
-	});
-	
-	
+		socket.on('frame', function(data){
+			//console.log('frame from ',data.cam);
+			timeOut[data.cam] = maxTimeOut;
+			if(data.pic)imd[data.cam] = data.pic;
+			if(data.density)dns[data.cam] = data.density;
+		});
+	}
 });
 
 applicationSocket.on('connection', function(socket) {

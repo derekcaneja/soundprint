@@ -8,6 +8,7 @@ var rColors = [0.7,0.7,1.1,1.2];
 var gColors = [0.7,1.2,1.1,0.7];
 var bColors = [1.2,0.7,0.7,0.7];
 var rColor = bColor = gColor = 0;
+
 // Application View
 //-----------------------------------------//
 var ApplicationView = Backbone.View.extend({
@@ -105,8 +106,6 @@ var ToneMatrixView = Backbone.View.extend({
 		this.$('#'+this.model.get('title')+'Waveform').width('100%');
 		
 
-		//console.log(this.$('.tool-row').height());
-
 		var scope = this;
 
 		this.pitch = new KnobView({ 
@@ -117,29 +116,32 @@ var ToneMatrixView = Backbone.View.extend({
 				onChange: function(aa){
 					scope.ins.defOct = aa;
 					scope.ins.rebuild();
-					console.log(scope.ins.defOct);
 				}
 			})
 		});
 
-		this.distortion = new KnobView({ 
+		this.energy = new KnobView({ 
 			model: new Knob({
-				title: 'Notes',
+				title: 'Energy',
 				min: 0,
-				max: 6,
+				max: 4,
 				onChange: function(aa){
-					scope.ins.poly = aa;
+					var bb = [1, 2, 4, 8, 16][4 - aa]
+					scope.ins.grid.setNotes(bb);
+					scope.ins.hitRate = bb;
 					scope.ins.rebuild();
-					console.log(scope.ins.defOct);
+
+					this.text = ['2', '4', '8', '16', '32'][aa];
 				}
 			})
 		});
-		this.reverb = new KnobView({ 
+
+		this.sustain = new KnobView({ 
 			model: new Knob({
 				title: 'Length', 
 				min: 1,
 				onChange: function(aa){
-					scope.ins.noteLength = aa * 1000;
+					scope.ins.noteLength = aa * 100;
 					scope.ins.rebuild();
 				}
 			})
@@ -172,11 +174,10 @@ var ToneMatrixView = Backbone.View.extend({
 		});
 
 		this.$('.tools').append('<div class="tool-row"></div>');
-		this.$('.tool-row:nth-of-type(2)').append(this.pitch.el, this.distortion.el, this.reverb.el);
+		this.$('.tool-row:nth-of-type(2)').append(this.pitch.el, this.energy.el, this.sustain.el);
 		this.$('.tools').append('<div class="tool-row"></div>');
 		
 		this.$('.tool-row:nth-of-type(3)').addClass('sliderrow').append(this.balance.el, this.volume.el);
-
 
 		this.$el.addClass('accelerate');
 		
@@ -210,8 +211,6 @@ var ToneMatrixView = Backbone.View.extend({
 		
 		this.setNotes(1);
 		this.render();
-		
-
 	},
 	setNotes:function(nn){
 		this.hzSpaces = 8;
@@ -358,6 +357,8 @@ var KnobView = Backbone.View.extend({
 	initialize: function() {
 		this.knob_dragging = false;
 
+		this.text = this.model.attributes.text;
+
 		this.knobValue = 0;
 		this.knobValuePrev = 0;
 		
@@ -365,22 +366,16 @@ var KnobView = Backbone.View.extend({
 		
 		this.min = this.model.attributes.min||0;
 		this.max = this.model.attributes.max||10;
-		this.setValue(this.model.attributes.value);
 		
-		this.render();
 		this.$el.addClass('accelerate');
 	},
 	setValue: function(v){
 		this.rot = Math.round(Math.min(Math.max(v, this.min), this.max));
 		this.rotation = -125 + (25*this.rot);
-		this.render();
-	},
-	render: function(){
-		//this.knobValue = this.$('.knob').attr('knob-value');
-		this.$('.knob').attr('knob-value', this.rot);
-		
 
-		this.model.set('value', this.rot);
+		if(this.model.get('onChange')){
+			this.model.get('onChange').call(this, this.rot);
+		} else console.log('noo way');
 
 		this.$('.tick').css({
 			'transform'    		: 'rotate(' + this.rotation + 'deg)',
@@ -389,12 +384,15 @@ var KnobView = Backbone.View.extend({
 			'-moz-transform'    : 'rotate(' + this.rotation + 'deg)',
 			'-o-transform'    	: 'rotate(' + this.rotation + 'deg)'
 		});
+
+		this.$('.knob').attr('knob-value', (this.text || this.rot));
+		
+		this.model.set('value', this.rot);
 	},
 	events:{
 		'mouseover' : 'mouseover',
 		'mouseleave': 'mouseleave',
-		'mousedown'	: 'mousedown',
-		'mouseup'	: 'mouseup'
+		'mousedown'	: 'mousedown'
 	},
 	mouseover: function(){
 		//document.onselectstart = function(){ return false; };
@@ -406,36 +404,31 @@ var KnobView = Backbone.View.extend({
 		var item = this;
 		var offsetX = this.$('.knob').offset().left + this.$('.knob').width() / 2;
 		var offsetY = this.$('.knob').offset().top + this.$('.knob').height() / 2;
+
+
+		var onmousemove = function(e){	
+			item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
+
+			item.rotation += 90;
+
+			if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
+			else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
+			else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
+			else if(item.rotation > 130) 						item.rotation = -125;
+
+			item.setValue((item.rotation + 125) / 25 % 15)
+		}
+
 		this.$el.css({'cursor': 'pointer'});
 		this.$el.children().css({'cursor': 'pointer'});
 
-		this.rotate = true;
 		$('body').css({'cursor': 'pointer'});
-		$(window).mousemove(function(e){
-			if(item.rotate){
-				item.rotation = Math.atan2(e.pageY - offsetY, e.pageX - offsetX) * 180 / Math.PI;
 
-				item.rotation += 90;
-
-				if(item.rotation > 120 && item.rotation < 150) item.rotation = 125;
-				else if(item.rotation < -85 || item.rotation > 230) item.rotation = -100;
-				else if(item.rotation < 230 && item.rotation > 130) item.rotation = -125;
-				else if(item.rotation > 130) 						item.rotation = -125;
-
-				item.setValue((item.rotation + 125) / 25 % 15)
-	
-				if(!item.pRot || item.rotation!=item.pRot){
-					item.render();
-					if(item.model.attributes.onChange){
-						item.model.attributes.onChange.call(null, item.rot);
-					}else console.log('noo way');
-				}
-				item.pRot = item.rotation;
-			}
-		});
-	},
-	mouseup: function(){
-		$('body').css({'cursor': 'default'});
+		window.addEventListener('mousemove', onmousemove, false);
+		window.addEventListener('mouseup', function() { 
+			$('body').css({'cursor': 'default'});
+			window.removeEventListener('mousemove', onmousemove);
+		}, false);
 	}
 });
 
@@ -506,9 +499,9 @@ var DropdownView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'btn-group instrument',
 	initialize: function() {
-		this.$el.append('<a class="btn dropdown-toggle accelerate" data-toggle="dropdown" href="#">Default<span class="caret accelerate"></span></a><ul class="dropdown-menu accelerate"><div class="dropdownarrow"></div></ul>');
+		//this.$el.append('<a class="btn dropdown-toggle accelerate" data-toggle="dropdown" href="#">Default<span class="caret accelerate"></span></a><ul class="dropdown-menu accelerate"><div class="dropdownarrow"></div></ul>');
 	
-		for(var i = 0; i < 3; i++) this.$('.dropdown-menu').append('<li class="accelerate"><a class="instrument-item accelerate">' + this.model.get('title') + ' ' + (i + 1) + '</a></li>');
+		//for(var i = 0; i < 3; i++) this.$('.dropdown-menu').append('<li class="accelerate"><a class="instrument-item accelerate">' + this.model.get('title') + ' ' + (i + 1) + '</a></li>');
 			this.rgbaColor = jQuery.Color(this.model.get('color'));
  		this.rgbaColor = this.rgbaColor.toRgbaString();
  		this.borderAlpha = '.4';
