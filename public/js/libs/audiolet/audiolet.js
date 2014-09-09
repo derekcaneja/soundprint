@@ -4504,7 +4504,7 @@ WebKitBufferPlayer.prototype.onDecode = function(buffer) {
     this.setNumberOfOutputChannels(0, numberOfChannels);
 
     // Create the JavaScript node for reading the data into Audiolet
-    this.jsNode = this.context.createJavaScriptNode(4096, numberOfChannels, 0);
+    this.jsNode = this.context.createScriptProcessor(4096, numberOfChannels, 0);
     this.jsNode.onaudioprocess = this.onData.bind(this);
 
     // Connect it all up
@@ -6431,7 +6431,7 @@ sinks('webaudio', function (readFn, channelCount, bufferSize, sampleRate) {
 		soundData	= null,
 		zeroBuffer	= null;
 	self.start.apply(self, arguments);
-	node = context.createJavaScriptNode(self.bufferSize, self.channelCount, self.channelCount);
+	node = context.createScriptProcessor(self.bufferSize, self.channelCount, self.channelCount);
 
 	function bufferFill(e) {
 		var	outputBuffer	= e.outputBuffer,

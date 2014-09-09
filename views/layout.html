@@ -2,6 +2,76 @@
 	<head>
 	  	<title>{{title}}</title>
 	  	<link rel="stylesheet" href="css/style.css">
+	  	<style>
+	  		body {
+	  			background: #34495e;
+	  			color: #EBEBEB;
+	  			text-align: center;
+	  		}
+	  	</style>
 	</head>
-	<body>{{{body}}}</body>
+	<body>
+		<header class="header">
+			<div class="logo-container">
+				<div class="handprint-logo"></div>
+				<span>|</span>
+				<h1>Soundprint</h1>
+			</div>
+		</header>
+
+		{{{body}}}
+
+		<script src="js/libs/audiolet/audiolet.js"></script>
+		<script>
+			    var BassSynth = function(audiolet, frequency) {
+			        AudioletGroup.call(this, audiolet, 0, 1);
+			        // Basic wave
+			        // this.saw = new Saw(audiolet, frequency);
+
+			        // // Gain envelope
+			        // this.gain = new Gain(audiolet);
+			        // this.env = new PercussiveEnvelope(audiolet, 1, 0.1, 0.1,
+			        //     function() {
+			        //         this.audiolet.scheduler.addRelative(0, this.remove.bind(this));
+			        //     }.bind(this)
+			        // );
+			        // this.envMulAdd = new MulAdd(audiolet, 0.3, 0);
+
+			        // Main signal path
+			        // this.saw.connect(this.gain);
+			        // this.gain.connect(this.outputs[0]);
+
+			        this.sine = new Sine(this.audiolet, frequency);
+			        this.modulator = new Sine(this.audiolet, frequency * 2);
+			        this.modulatorMulAdd = new MulAdd(this.audiolet, frequency / 2,
+			                                          frequency);
+
+			        this.gain = new Gain(this.audiolet);
+
+			        this.modulator.connect(this.modulatorMulAdd);
+			        this.modulatorMulAdd.connect(this.sine);
+			        this.sine.connect(this.gain);
+			        this.gain.connect(this.outputs[0]);
+			    };
+			    extend(BassSynth, AudioletGroup);
+
+			    var SchedulerApp = function() {
+			        this.audiolet = new Audiolet();
+
+			        var synth = new BassSynth(this.audiolet, 40);
+			        synth.connect(this.audiolet.output);
+			    };
+
+			    SchedulerApp.prototype.playChord = function(chord) {
+			        for (var i = 0; i < chord.length; i++) {
+			            var degree = chord[i];
+			            var frequency = this.scale.getFrequency(degree, 16.352, 4);
+			            var synth = new BassSynth(this.audiolet, frequency);
+			            synth.connect(this.audiolet.output);
+			        }
+			    };
+
+			   // var app = new SchedulerApp();
+		</script>
+	</body>
 </html>

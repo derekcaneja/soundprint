@@ -16,9 +16,8 @@ var ApplicationView = Backbone.View.extend({
 	className: 'application',
 	initialize: function(options) {
 		_.bindAll(this, 'resize');
-		this.$el.append(options.header.el);
 		this.$el.append('<div class="content-wrapper"><div class="square-wrapper"></div></div>');
-		//this.$el.append(options.footer.el)
+
 		for(var i = 0; i < options.content.length; i++) this.$('.square-wrapper').append(options.content[i].el);
 
 		this.count = 0;
@@ -64,17 +63,6 @@ var DisplayView = Backbone.View.extend({
 	},
 	stop: function() {
 		clearInterval(this.interval);
-	}
-});
-
-// Header View
-//-----------------------------------------//
-var HeaderView = Backbone.View.extend({
-	tagName: 'header',
-	className: 'header',
-	initialize: function() {
-		this.$el.append('<div class="logo-container"></div>');
-		this.$('.logo-container').append('<div class="handprint-logo"></div><span>|</span><h1>Soundprint</h1>');
 	}
 });
 

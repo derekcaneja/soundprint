@@ -1,8 +1,12 @@
 {
-  "name"          : "Soundprint",
-  "version"       : "0.0.1",
-  "private"       : true,
-  "scripts"       : { "start": "node app" },
-  "dependencies"  : { "express": "*", "hbs": "*", "socket.io": "*", "fs": "*", "timbre": "*" },
-  "engines"       : { "node": "0.8.4", "npm": "1.1.40" }
+  	"name"          : "Soundprint",
+  	"version"       : "0.0.1",
+ 	"private"       : true,
+  	"scripts"       : { "start": "node web" },
+  	"engines"       : { "node": "0.8.4", "npm": "1.1.40" }
+  	"dependencies"  : { 
+  		"express"   : "*", 
+  		"hbs"       : "*", 
+  		"socket.io" : "*"
+  	}
 }

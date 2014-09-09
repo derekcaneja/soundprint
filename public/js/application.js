@@ -47,11 +47,11 @@ var colors = [
 	b2:60,
 }];
 
-var header = new HeaderView();
+//var header = new HeaderView();
 var content = [toneMatrix1, toneMatrix2, toneMatrix3, toneMatrix4];
 var footer = new FooterView();
 
-var application = new ApplicationView({ header: header, content: content, footer: footer });
+var application = new ApplicationView({ content: content, footer: footer });
 
 $('body').append(application.el);
 
