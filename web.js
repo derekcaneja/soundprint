@@ -58,13 +58,10 @@ var cameraClients 	   = [null, null, null, null];
 var applicationClients = [];
 var displayClients     = [];
 
-var cameraData = [];
-var onCamMaybe = 0;
-var maxTimeOut = 3;
-var timeOut = [0,0,0,0];
 var imd = [null, null, null, null];
 var dns = [null, null, null, null];
-var compression = 4;
+
+var lastLoop = new Date;
 	
 cameraSocket.on('connection', function(socket){
 	var open = getOpenCamera();
@@ -78,8 +75,12 @@ cameraSocket.on('connection', function(socket){
 	cameraClients[open] = socket;
 
 	socket.on('frame', function(data){
-		//console.log('frame from ',data.cam);
-		timeOut[data.cam] = maxTimeOut;
+		// Determine FPS over network
+		var thisLoop = new Date;
+	    var fps = 1000 / (thisLoop - lastLoop);
+	    lastLoop = thisLoop;
+
+	    socket.emit('tracker', { fps: fps });
 		
 		if(data.pic)	 imd[data.cam] = data.pic;
 		if(data.density) dns[data.cam] = data.density;
@@ -88,6 +89,8 @@ cameraSocket.on('connection', function(socket){
 	socket.on('disconnect', function() {
 		var i = cameraClients.indexOf(socket);
 		cameraClients[i] = null;
+
+		socket.emit('disconnect');
 
 		console.log('Camera ' + i + ' disconnected');
 	});
@@ -100,15 +103,16 @@ applicationSocket.on('connection', function(socket) {
 
 	console.log(applicationClients.length + ' application(s) connected');
 	
-	socket.on('request', function(dat){
-		if(applicationClients[dat.index]){
-			applicationClients[dat.index].volatile.emit('sendData', {
+	socket.on('request', function(data){
+		if(applicationClients[data.index]){
+			applicationClients[data.index].volatile.emit('sendData', {
 				density : dns,
-				pics    : ((dat.vids) ? (imd) : (null))
+				pics    : ((data.vids) ? (imd) : (null))
 			});
 		};
 	})
 });
+
 
 function getOpenCamera() {
 	for(var i = 0; i < cameraClients.length; i++) {

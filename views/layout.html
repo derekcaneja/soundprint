@@ -25,22 +25,7 @@
 		<script>
 			    var BassSynth = function(audiolet, frequency) {
 			        AudioletGroup.call(this, audiolet, 0, 1);
-			        // Basic wave
-			        // this.saw = new Saw(audiolet, frequency);
-
-			        // // Gain envelope
-			        // this.gain = new Gain(audiolet);
-			        // this.env = new PercussiveEnvelope(audiolet, 1, 0.1, 0.1,
-			        //     function() {
-			        //         this.audiolet.scheduler.addRelative(0, this.remove.bind(this));
-			        //     }.bind(this)
-			        // );
-			        // this.envMulAdd = new MulAdd(audiolet, 0.3, 0);
-
-			        // Main signal path
-			        // this.saw.connect(this.gain);
-			        // this.gain.connect(this.outputs[0]);
-
+			          
 			        this.sine = new Sine(this.audiolet, frequency);
 			        this.modulator = new Sine(this.audiolet, frequency * 2);
 			        this.modulatorMulAdd = new MulAdd(this.audiolet, frequency / 2,

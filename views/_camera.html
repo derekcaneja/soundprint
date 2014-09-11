@@ -1,15 +1,17 @@
 <style>
 	.camera-container {
-		position: absolute;
-		top: 50%; 
-		margin-top: -150px;
+		margin-top: 120px;
+		padding: 50px 0;
 	}
 </style>
 
-<div class="container">
-	<div class="span8 camera-container">
+<div class="container camera-container">
+	<div class="span4 camera-stats">
+		<div class="camera-status">Camera Status: <span>Not Connected</span></div>
+		<div class="camera-fps">Current Local FPS: <span></span></div>
+		<div class="camera-network-fps">Current Netork FPS: <span></span></div>
 	</div>
-	<div class="span4"></div>
+	<div class="camera-view"></div>
 </div>
 
 <script src="js/libs/jquery/jquery.js"></script>
@@ -56,9 +58,12 @@
 	var bColors = [1.2,0.7,0.7,0.7];
 	var rColor = bColor = gColor = 0;
 
+	var lastLoop   = new Date;
 
 	function connectCamera(){
 		clientSocket = io.connect('http://{{IPv4}}:5555/camera');
+
+		$('.camera-status span').html('Connecting...');
 
 		clientSocket.on('handshake', function(err, number){
 			if(err) return console.log(err);
@@ -66,10 +71,20 @@
 			rColor = rColors[number];
 			gColor = gColors[number];
 			bColor = bColors[number];
+
+			$('.camera-status span').html('Connected');
 						
 			console.log('Connected Camera as ' + number);
 			
 			setInterval(processAndRender, 1000 / 40);
+		});
+
+		clientSocket.on('tracker', function(data) {
+			$('.camera-network-fps span').html(data.fps);
+		});
+
+		clientSocket.on('disconnect', function() {
+			$('.camera-status span').html('Not Connected');
 		});
 	}
 	//DRAWING VARS
@@ -81,13 +96,10 @@
 	var vcontext = vcanvas.getContext('2d');
 
 
-	$('.camera-container').html(canvas);
-
-	var maxMeasure = 5;
-	var measure = 0;
+	$('.camera-view').html(canvas);
 
 	var oldData = null;
-	var newData = null
+	var newData = null;
 
 	var size = 320;
 	var rows = 32;
@@ -103,130 +115,135 @@
 
 	var density = [];
 
-
-	//Tailor vairs
-	var noChange = 15;
+	
+	var minChange = 15;
 	var maxChange = 300;
-	density = [];
-	for(var i= 0; i < rows; i+=1){
+
+	for(var i = 0; i < rows; i++){
 		var temp = [];
-		for(var n = 0; n < cols; n+=1){
+		
+		for(var n = 0; n < cols; n++){
 			temp.push(0);
 		}
+		
 		density.push(temp);
 	}
-	//PROCESSING
+
+	// Processing
 	function processAndRender(){
 		
 		context.Alpha = 1
-		context.drawImage(video,0,0,canvas.width,canvas.height);
-		newData = context.getImageData(0,0,canvas.width,canvas.height);
+
+		// Draw Video to Canvas
+		context.drawImage(video, 0, 0, canvas.width, canvas.height);
 		
-		for(var ii = 0; ii < newData.data.length; ii+=4){
-			var grey = Math.round((newData.data[ii+0]+newData.data[ii+1]+newData.data[ii+2])/3);
-			newData.data[ii+0] = Math.min(grey,255);
-			newData.data[ii+1] = Math.min(grey,255);
-			newData.data[ii+2] = Math.min(grey,255);
+		// Get Video Pixel Data
+		newData = context.getImageData(0, 0, canvas.width, canvas.height);
+		
+		// Convert to Grayscale
+		for(var i = 0; i < newData.data.length; i += 4){
+			var gray = Math.round((newData.data[i] + newData.data[i + 1] + newData.data[i + 2]) / 3);
+			
+			newData.data[i] 	= Math.min(gray, 255);
+			newData.data[i + 1] = Math.min(gray, 255);
+			newData.data[i + 2] = Math.min(gray, 255);
 		}
-		context.putImageData(newData,0,0);
+
+		// Draw New Image and Replace Old
+		context.putImageData(newData, 0, 0);
 		newData = newData.data;
 		
-		// If we have data to cross compare
-		if(!oldData)'hi'//density = null;
-		else{
-			if(oldData.length!=newData.length)console.log('error: ', oldData.length,',', newData.length, "don't match");
-			else{
-				//build density
+		// Compare Data
+		if(oldData) {
+			
+			// Check Data Per Pixel
+			var x  = 0;
+			var y  = 0;
 				
+			for(var i = 0; i < oldData.length; i += 4 * (size / cols)) {
+				x += (size / cols);
 				
-				//Check every pixel we want
-				x = 0;
-				y = 0;
-				var xx = 0;
-				var yy = 0;
-				for(var ii = 0; ii < oldData.length; ii+= 4*(size/cols)){
-					x += (size/cols)
-					if(x>=(size)){
-						x = 0;
-						y += 1;
-					}
-					yy = Math.max(Math.floor(((y-0.1)/size)* rows),0);
-					xx = Math.max(Math.floor(((x-0.1)/size)* cols),0);
-					//xx = Math.floor((x/size)* cols)
+				if(x >= (size)) {
+					x = 0;
+					y += 1;
+				}
+				
+				var xx = Math.max(Math.floor(((x - 0.1) / size) * cols), 0);	
+				var yy = Math.max(Math.floor(((y - 0.1) / size) * rows), 0);
 					
-					//Cross compare colors
-					temp = Math.abs(oldData[ii+0] - newData[ii+0]);
+				//Cross compare colors
+				var temp = Math.abs(oldData[i] - newData[i]);
 					
-					//if(temp<noChange)temp = 0;
-					temp = Math.min(temp, maxChange);
-					temp /= maxChange;
+				temp = Math.min(temp, maxChange);
+				temp /= maxChange;
 					
-					//Set Density
-					try{
-						//console.log( Math.floor((y/size)*cols))
-						density[yy][xx] = (density[yy][xx]*0.99)+(temp * 0.2);
-					}catch(e){
-						console.log('DIDNT HAVE', yy,xx)
-					}
-						
-					
+				//Set Density
+				try {
+					density[yy][xx] = (density[yy][xx] * 0.99) + (temp * 0.2);
+				} catch(e) {
+					console.log('DIDNT HAVE', yy, xx)
 				}
 			}
-			//Draw the density
-			/*for(var i = 0; i < rows; i += 1){
+
+			// Draw Density Map
+			for(var i = 0; i < rows; i += 1){
 				for(var n = 0; n < cols; n += 1){
-					//densityArray[i][n] /= (vtSize*hzSize);
-					//densityArray[i][n] = densityArray[i][n]*2.5;
-					//densityArray[i][n] = Math.round(densityArray[i][n]*100)/100;
-					//if(Math.random()>0.9999)console.log(density[i][n]);
 					if(density[i][n] > 0.2){
 						context.fillStyle = "rgba(255,100,0,1)";
-						context.fillRect((n)*(size/cols), (i)*(size/rows), (size/cols)/3, (size/rows)/3);
+						context.fillRect((n) * (size / cols), (i) * (size / rows), (size / cols) /3, (size / rows) /3);
 					}
 				}
-			}*/
-			
-			
-		
-		}
-		
-		//This frame we measure
-		
-		
-		if(clientSocket){
-			try{
-				sendData = []; 
-				x = 0;
-				y = 0;
-				for(var ii = 0; ii < newData.length; ii+=4){
-					x += 1;
-					if(x>=(size)){
-						x = 0;
-						y += 1;
-					}
-					if(x%4 == 0 && y%4 == 0)sendData.push(newData[ii]);
-				}
-				var newDense = [];
-				for(var yy = 0; yy < density.length; yy += 1){
-					var temp = [0,0,0,0,0,0,0,0];
-					for(var xx = 0; xx < density[yy].length; xx += 1){
-						temp[Math.floor(xx/4)] += density[yy][xx] * 0.25
-					}
-					newDense.push(temp); 
-				}
-				//console.log('x,y',x,y);
-				//console.log('sent pic:', sendData.length);
-				
-				clientSocket.emit('frame',{
-					cam     : 0, 
-					density : newDense, 
-					pic     : sendData,
-				});
-			}catch(e){
-				console.log('could not send??')
 			}
 		}
 		
-		oldData = newData
+		// Send Frame To Server
+		if(clientSocket){
+			try {
+				var sendData = []; 
+				
+				var x = 0;
+				var y = 0;
+				
+				for(var i = 0; i < newData.length; i += 4){
+					x += 1;
+					
+					if(x >= size){
+						x = 0;
+						y += 1;
+					}
+
+					if(x % 4 == 0 && y % 4 == 0) sendData.push(newData[i]);
+				}
+
+				var newDensity = [];
+				
+				for(var yy = 0; yy < density.length; yy++){
+					var temp = [0, 0, 0, 0, 0, 0, 0, 0];
+					
+					for(var xx = 0; xx < density[yy].length; xx++){
+						temp[Math.floor(xx / 4)] += density[yy][xx] * 0.25
+					}
+					
+					newDensity.push(temp); 
+				}
+
+
+				var thisLoop = new Date;
+			    var fps = 1000 / (thisLoop - lastLoop);
+			    lastLoop = thisLoop;
+
+				$('.camera-fps span').html(fps);
+				
+				clientSocket.emit('frame', {
+					cam     : 0, 
+					density : newDensity, 
+					pic     : sendData,
+				});
+			} catch(e) {
+				console.log('Error while sending data:', e)
+			}
+		}
+		
+		oldData = newData;
 	}
 </script>
